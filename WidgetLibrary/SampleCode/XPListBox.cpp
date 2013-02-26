@@ -278,8 +278,8 @@ void XPListBoxDeleteItem(XPListBoxData_t *pListBoxData, int CurrentItem)
 int		XPListBoxProc(
 					XPWidgetMessage			inMessage,
 					XPWidgetID				inWidget,
-					long					inParam1,
-					long					inParam2)
+					intptr_t				inParam1,
+					intptr_t				inParam2)
 {
 //	static int SliderPosition, ScrollBarSlop, Min, Max, ScrollBarPageAmount, MaxListBoxItems;
 	static int ScrollBarSlop;
