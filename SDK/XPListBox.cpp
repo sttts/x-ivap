@@ -267,8 +267,8 @@ void XPListBoxDeleteItem(XPListBoxData_t *pListBoxData, int CurrentItem)
 int		XPListBoxProc(
 					XPWidgetMessage			inMessage,
 					XPWidgetID				inWidget,
-					long					inParam1,
-					long					inParam2)
+					intptr_t					inParam1,
+					intptr_t					inParam2)
 {
 //	static int SliderPosition, ScrollBarSlop, Min, Max, ScrollBarPageAmount, MaxListBoxItems;
 	static int ScrollBarSlop;
@@ -419,7 +419,7 @@ int		XPListBoxProc(
 					
 					char	Buffer[512];
 					int		FontWidth, FontHeight;
-					long	charWidth;
+				//	long	charWidth;
 					int		ListBoxWidth = (Right - 20) - Left;
 					strcpy(Buffer, pListBoxData->Items[ListBoxIndex++].c_str());
 					XPLMGetFontDimensions(xplmFont_Basic, &FontWidth, &FontHeight, NULL);

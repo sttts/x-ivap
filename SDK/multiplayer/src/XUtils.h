@@ -21,7 +21,7 @@
  *
  */
 #ifndef XUTILS_H
-#define XUTILS_H
+#define XUTILS_HF
 
 struct	XObjCmd;
 struct	XObj;

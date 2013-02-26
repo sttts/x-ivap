@@ -652,7 +652,7 @@ bool CSL_LoadCSL(const char * inFolderPath, const char * inRelatedFile, const ch
 
 	char *	name_buf = (char *) malloc(16384);
 	char ** index_buf = (char **) malloc(65536);
-	long	total, ret;
+	int	total, ret; //changed from long to int due x64 problems 24/12/2012 bvk
 	
 	char folder[1024];
 #if APL

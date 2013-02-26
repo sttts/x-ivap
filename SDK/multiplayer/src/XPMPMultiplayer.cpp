@@ -113,11 +113,11 @@ const char * 	XPMPMultiplayerInit(
 	gDefaultPlane = inDefaultPlane;
 	gIntPrefsFunc = inIntPrefsFunc;
 	gFloatPrefsFunc = inFloatPrefsFunc;
-	char	myPath[1024];
-	char	airPath[1024];
-	char	line[256];
-	char	sysPath[1024];
-	FILE *	fi;
+	//char	myPath[1024];
+	//char	airPath[1024];
+	//char	line[256];
+	//char	sysPath[1024];
+	//FILE *	fi;
 	
 	bool	problem = false;
 

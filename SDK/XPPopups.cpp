@@ -430,8 +430,8 @@ static	void 	XPPopupWidgetProc(int inChoice, void * inRefcon)
 int		XPPopupButtonProc(
 					XPWidgetMessage			inMessage,
 					XPWidgetID				inWidget,
-					long					inParam1,
-					long					inParam2)
+					intptr_t					inParam1,
+					intptr_t					inParam2)
 {
 	// Select if we're in the background.
 	if (XPUSelectIfNeeded(inMessage, inWidget, inParam1, inParam2, 1/*eat*/))	return 1;
