@@ -17,14 +17,14 @@ TARS= client.cxx  server.cxx  stun.cxx  stun.h  tlsServer.cxx  udp.cxx  udp.h \
 VERSION=0.96
 
 CFLAGS+=-fno-stack-protector 
-CXXFLAGS+=-O2 -m32 -fPIC -fno-stack-protector -Wall -x c++ -ansi
-LDFLAGS+=-O2 -lssl -Wall -m32
+CXXFLAGS+=-O2 -m${ARCH} -fPIC -fno-stack-protector -Wall -x c++ -ansi
+LDFLAGS+=-O2 -lssl -Wall -m${ARCH}
 STUNLIB=libstun.a
 
 #
 # Alternatively, for debugging.
 #
-#CXXFLAGS+=-g -O -Wall -m32 -fPIC
+#CXXFLAGS+=-g -O -Wall -m${ARCH} -fPIC
 #LDFLAGS+=-g -O -Wall
 # for solaris
 #LDFLAGS+= -lnsl -lsocket

@@ -20,10 +20,10 @@ RANLIB          = ranlib
 
 DDEBUG          = -DDEBUG -g
 INCDIR          = ../include
-CXXOPTS         = $(OS_CXXOPTS) $(DDEBUG) -I$(INCDIR) -Wall -O2 -m32
+CXXOPTS         = $(OS_CXXOPTS) $(DDEBUG) -I$(INCDIR) -Wall -O2 -m${ARCH} -fPIC
 LDLIBS          = $(OS_LDLIBS)
 
-CXXOPTS_ST      = -DPTYPES_ST $(OS_CXXOPTS_ST) $(DDEBUG) -I$(INCDIR) -Wall -O2 -m32
+CXXOPTS_ST      = -DPTYPES_ST $(OS_CXXOPTS_ST) $(DDEBUG) -I$(INCDIR) -Wall -O2 -m${ARCH} -fPIC
 LDLIBS_ST       = $(OS_LDLIBS_ST)
 
 LIBNAME         = libptypes.a

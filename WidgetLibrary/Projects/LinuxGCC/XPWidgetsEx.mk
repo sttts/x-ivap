@@ -1,4 +1,4 @@
-all: XPWidgetsEx32_lib XPWidgetsEx64_lib
+all: XPWidgetsEx_lib XPWidgetsEx_lib
 
 clean: clean_XPWidgetsEx
 
@@ -6,16 +6,11 @@ clean: clean_XPWidgetsEx
 #######  TARGET: XPWidgetsEx
 ##############################
 
-XPWidgetsEx32_lib:
-	g++ -c -m32 -DLIN=1 -I../../SDK/CHeaders/XPLM/ -I../../SDK/CHeaders/Widgets/ ../../SampleCode/XPListBox.cpp -o ../../SampleCode/XPListBox32.o
-	g++ -c -m32 -DLIN=1 -I../../SDK/CHeaders/XPLM/ -I../../SDK/CHeaders/Widgets/ ../../SampleCode/XPPopups.cpp -o ../../SampleCode/XPPopups32.o
-	ar -r ../../Binaries/LinuxGCC/XPWidgetsEx32.lib ../../SampleCode/XPListBox32.o ../../SampleCode/XPPopups32.o
+XPWidgetsEx_lib:
+	g++ -c -m${ARCH} -fPIC -DLIN=1 -I../../SDK/CHeaders/XPLM/ -I../../SDK/CHeaders/Widgets/ ../../SampleCode/XPListBox.cpp -o ../../SampleCode/XPListBox.o
+	g++ -c -m${ARCH} -fPIC -DLIN=1 -I../../SDK/CHeaders/XPLM/ -I../../SDK/CHeaders/Widgets/ ../../SampleCode/XPPopups.cpp -o ../../SampleCode/XPPopups.o
+	ar -r ../../Binaries/LinuxGCC/XPWidgetsEx.lib ../../SampleCode/XPListBox.o ../../SampleCode/XPPopups.o
 
-XPWidgetsEx64_lib:
-	g++ -c -m64 -DLIN=1 -I../../SDK/CHeaders/XPLM/ -I../../SDK/CHeaders/Widgets/ ../../SampleCode/XPListBox.cpp -o ../../SampleCode/XPListBox64.o
-	g++ -c -m64 -DLIN=1 -I../../SDK/CHeaders/XPLM/ -I../../SDK/CHeaders/Widgets/ ../../SampleCode/XPPopups.cpp -o ../../SampleCode/XPPopups64.o
-	ar -r ../../Binaries/LinuxGCC/XPWidgetsEx64.lib ../../SampleCode/XPListBox64.o ../../SampleCode/XPPopups64.o	
-	
 clean_XPWidgetsEx:
 	rm -f ${OBJS_XPWidgetsEx}
 

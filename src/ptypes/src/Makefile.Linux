@@ -18,7 +18,7 @@ OS_CXXOPTS = -fno-stack-protector -pthread -D_GNU_SOURCE -fPIC
 
 OS_CXXOPTS_ST = -fno-stack-protector -D_GNU_SOURCE
 
-LIBTOOL = $(CXX) -shared -pthread -m32
+LIBTOOL = $(CXX) -shared -pthread -m${ARCH}
 SOSTRIP = strip
 
 SOEXT = so

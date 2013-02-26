@@ -1,5 +1,5 @@
-/home/bert/x-ivap/trunk/SDK/multiplayer/src/XUtils.cpp.o: \
- /home/bert/x-ivap/trunk/SDK/multiplayer/src/XUtils.cpp \
- /home/bert/x-ivap/trunk/SDK/multiplayer/src/XUtils.h \
- /home/bert/x-ivap/trunk/SDK/multiplayer/src/XObjDefs.h \
- /home/bert/x-ivap/trunk/SDK/multiplayer/src/PlatformUtils.h
+/home/kenny/docs/svn/xivap-sf/SDK/multiplayer/src/XUtils.cpp.o: \
+ /home/kenny/docs/svn/xivap-sf/SDK/multiplayer/src/XUtils.cpp \
+ /home/kenny/docs/svn/xivap-sf/SDK/multiplayer/src/XUtils.h \
+ /home/kenny/docs/svn/xivap-sf/SDK/multiplayer/src/XObjDefs.h \
+ /home/kenny/docs/svn/xivap-sf/SDK/multiplayer/src/PlatformUtils.h

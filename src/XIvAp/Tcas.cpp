@@ -262,7 +262,7 @@ while (i<maxplanes) {
 												Tcaslist[i].displaymode=T_CYAN;
 												Tcaslist[i].tCPA=9999;
 												Tcaslist[i].tCPAi=9999;
-												Tcaslist[i].ClofConfl=FALSE;
+												Tcaslist[i].ClofConfl=false;
 												//Tagging(lat,lon,alt);
 												return;
 												}
@@ -288,37 +288,37 @@ bool Tcas::Resolution (int nr)
 		XPLMDebugString(txt);
 #endif
 
-if (xivap.GetSpeed()<50) return FALSE; //disable function in case no speed;
+if (xivap.GetSpeed()<50) return false; //disable function in case no speed;
 
 	switch (tcasmode)
 	{
 	case TA: {	
-			if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return TRUE;} //wait in case a warning is already spoken
-			if  (SL_TABLE[i][4]<abs(Tcaslist[nr].altitude*100)) return FALSE; //check ouside dMOD alt range
+			if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return true;} //wait in case a warning is already spoken
+			if  (SL_TABLE[i][4]<abs(Tcaslist[nr].altitude*100)) return false; //check ouside dMOD alt range
 			if  (SL_TABLE[i][2]>Tcaslist[nr].distance) 	
 				{
 				Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
 				PlaySoundTcas(AURAL_traffic);
-				return TRUE;
+				return true;
 				 }
 			 if ((SL_TABLE[i][0]>Tcaslist[nr].tCPA) &  (SL_TABLE[i][0]>Tcaslist[nr].tCPAi) & (abs(Tcaslist[nr].tCPA-Tcaslist[nr].tCPAi)<5) ) 
 			 {
 				PlaySoundTcas(AURAL_traffic);																						
 				Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning																						
-				return TRUE;																																					
+				return true;																																					
 			 };
 			 break; //ta dMOD alarm
 			 }
 	case RA: {
 			
-			 if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return TRUE;} //wait in case a warning is already spoken
-			 if (SL_TABLE[i][5]<abs(Tcaslist[nr].altitude*100)) return FALSE; //check outside altitude range
+			 if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return true;} //wait in case a warning is already spoken
+			 if (SL_TABLE[i][5]<abs(Tcaslist[nr].altitude*100)) return false; //check outside altitude range
 			 XPLMDebugString("inside alitude\r\n");
 			 if  (SL_TABLE[i][3]>Tcaslist[nr].distance) //check dMOD range
 				 {
 				 Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
 				 PlaySoundTcas(AURAL_traffic);
-				 return TRUE;
+				 return true;
 				 };
 	
 			 char txt[100];
@@ -329,37 +329,37 @@ if (xivap.GetSpeed()<50) return FALSE; //disable function in case no speed;
 					if ( abs(Tcaslist[nr].tCPA-Tcaslist[nr].tCPAi)<15) {
 					 if (Tcaslist[nr].vspeed>0) {
 													PlaySoundTcas(AURAL_crossing_climb);	
-													Tcaslist[i].ClofConfl=TRUE;
+													Tcaslist[i].ClofConfl=true;
 													Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-													return TRUE;
+													return true;
 						 						}
 					  if (Tcaslist[nr].vspeed<0) {
 													PlaySoundTcas(AURAL_crossing_descend);
-													Tcaslist[i].ClofConfl=TRUE;
+													Tcaslist[i].ClofConfl=true;
 													Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-													return TRUE;
+													return true;
 						 						}
 					 if (Tcaslist[nr].tCPA<(SL_TABLE[i][1]/4)) {																				 
 																if (Tcaslist[nr].altitude<0) PlaySoundTcas(AURAL_reversal_climb); else PlaySoundTcas(AURAL_reversal_descend);
-																Tcaslist[i].ClofConfl=TRUE;
+																Tcaslist[i].ClofConfl=true;
 																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-																return TRUE;
+																return true;
 																}
 					 if (Tcaslist[nr].tCPA<(SL_TABLE[i][1]/2)) {																				 
 																if (Tcaslist[nr].altitude<0) PlaySoundTcas(AURAL_climb); else PlaySoundTcas(AURAL_descend);
-																Tcaslist[i].ClofConfl=TRUE;
+																Tcaslist[i].ClofConfl=true;
 																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning	
-																return TRUE;
+																return true;
 																}  else	
 																{					
 																PlaySoundTcas(AURAL_traffic);
 																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-																return TRUE;
+																return true;
 																 }
 					} else {					
 							PlaySoundTcas(AURAL_traffic);
 							Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-							return TRUE;
+							return true;
 							 }
 				}																					
 		  	 break; 
@@ -369,10 +369,10 @@ if (xivap.GetSpeed()<50) return FALSE; //disable function in case no speed;
 	if (Tcaslist[i].ClofConfl) {
 								PlaySoundTcas( AURAL_clear);
 								Tcaslist[nr].auraltimer=AURALTIME_WARNING;
-								Tcaslist[i].ClofConfl=FALSE;
+								Tcaslist[i].ClofConfl=false;
 								}
 	Tcaslist[nr].auraltimer=0;
-	return FALSE;
+	return false;
 }
 /*
 ABOVE - Expands the vertical scan to 9900 ft above and 2700 ft below the aircraft.
@@ -431,7 +431,7 @@ static bool firsttime;
 		}
 	}
 	//demo to be deleted later on
-//	if (!firsttime) {FindPoint(xivap.GetLat(),xivap.GetLon(),12,xivap.GetHeading()-180);firsttime=TRUE;}
+//	if (!firsttime) {FindPoint(xivap.GetLat(),xivap.GetLon(),12,xivap.GetHeading()-180);firsttime=true;}
 //else {FindPoint(fmclat,fmclon,0.1f,xivap.GetHeading());}
 //DumpPilotPos("testPilot",fmclat,fmclon,xivap.elevationft()-300,1,xivap.GetSpeed(), xivap.GetHeading());
 

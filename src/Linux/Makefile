@@ -101,7 +101,13 @@ LIBS+=-lz ${WD}/src/ptypes/lib/libptypes.a
 
 XIVAP_DEPENDS=ptypes stund png
 
-ARCH=32
+ifeq (${ARCH}, 32)
+	FMODEX=fmodex
+endif
+ifeq (${ARCH}, 64)
+	FMODEX=fmodex64
+	CFLAGS += -DX64
+endif
 
 # IVAO specifics
 CFLAGS+= -DIVAO
@@ -110,16 +116,16 @@ CFLAGS+= -DIVAO
 ifeq (${OS}, Linux)
 	cpp_SRC+=${WD}/SDK/multiplayer/src/PlatformUtils.lin.cpp
 
-	CFLAGS+=-m32 -DLINUX -DLIN=1 -Dlinux -O3 -Wall -fno-strict-aliasing -iquote../FMOD/FMODLinux/api/inc
-	#LDFLAGS+=-shared -m32 -rdynamic -nodefaultlibs -fvisibility=hidden -lGL -lGLU 
-	LDFLAGS+=-shared -m32 -rdynamic -fvisibility=hidden -lGL -lGLU
+	CFLAGS+=-m${ARCH} -DLINUX -DLIN=1 -Dlinux -O3 -Wall -fno-strict-aliasing -iquote../FMOD/FMODLinux/api/inc
+	#LDFLAGS+=-shared -m${ARCH} -rdynamic -nodefaultlibs -fvisibility=hidden -lGL -lGLU 
+	LDFLAGS+=-shared -m${ARCH} -rdynamic -fvisibility=hidden -lGL -lGLU
 	
 	LIBS+=-lpng
 	LIBS+=../../WidgetLibrary/Binaries/LinuxGCC/XPWidgetsEx.lib
-	LIBS+= -L../FMOD/FMODLinux/api/lib -lfmodex
+	LIBS+= -L../FMOD/FMODLinux/api/lib -l${FMODEX}
 	# link libstdc++ statically so we don't conflict with ATI OpenGL
 	# this may require a libstdc++.a or gcc 4.0, not sure which
-	LIBS+=-Wl,-Bstatic -lstdc++ -Wl,-Bdynamic
+	#LIBS+=-Wl,-Bstatic -lstdc++ -Wl,-Bdynamic
 	LIBS+=-Wl,--version-script=${WD}/src/Linux/linker.script
 	FINAL=-MMD
 
@@ -136,7 +142,7 @@ ifeq (${OS}, Darwin)
             LD=gcc-4.0
         endif
 	LIBS+=${WD}/src/png/libpng.a
-	LIBS+= -L../FMOD/FMODMac/api/lib -lfmodex 
+	LIBS+= -L../FMOD/FMODMac/api/lib -l${FMODEX} 
 	cpp_SRC+=${WD}/SDK/XPListBox.cpp
 	cpp_SRC+=${WD}/SDK/XPPopups.cpp
 	cpp_SRC+=${WD}/SDK/multiplayer/src/PlatformUtils.mac.cpp
@@ -172,7 +178,7 @@ X-IvAp: $(XIVAP_DEPENDS)
 	AR="ar -crs"  SIZE="size"
 
 X-IvAp.xpl: ${OBJS}
-	${LD} ${LDFLAGS} -o Release/Resources/plugins/X-IvAp.xpl ${OBJS} ${LIBS}
+	${LD} ${LDFLAGS} -o Release/Resources/plugins/X-IvAp-${ARCH}.xpl ${OBJS} ${LIBS}
 
 %.cpp.o: %.cpp
 	${CC} -c -fPIC ${CFLAGS} $< -o $@ ${FINAL}
