@@ -38,10 +38,11 @@
 #define MARGIN_LEFT 5
 //new mouse detection result 16/08/2012
 
-const	int	ExtMouseFields[]={524,104,554,119,621,86,651,114,630,53,647,67};
+const	int	ExtMouseFields[]={524,104,554,119,621,86,651,114,630,53,647,67,566,102,596,122};
 #define Connect_Capture	20
 #define TX_Capture	21
 #define	Ident_Capture	22
+#define	TCAS_Capture	23
 #define	Ex_Window_Range	155
 #define SK_COLOR colWhite
 
@@ -94,7 +95,7 @@ public:
 	int x, y;
 	UI_Alignment align;
 	bool big;
-	bool inGWFMS;
+	//bool inGWFMS;
 };
 
 class UiWindow {
@@ -122,8 +123,8 @@ public:
 	void scrollUp();
 	void scrollDown();
 
-	void scrollUpFMS();
-	void scrollDownFMS();
+	//void scrollUpFMS();
+	//void scrollDownFMS();
 
 
 	void setPage(int page);
@@ -141,7 +142,7 @@ public:
 	void dumpKeyboardFocus();
 	void grabKeyboardFocus();
 
-	void GWFMSPrint(bool clearScreen = true);
+	//void GWFMSPrint(bool clearScreen = true);
 	void buttonClicked(int button);
 	void setEditLine(const string& text) { editLine = text; };
 	string getEditLine() const { return editLine; };
@@ -197,14 +198,14 @@ private:
 
 	typedef std::pair<float*, string> line;
 	std::deque<line> uiText;	// the text in the UI
-	std::deque<line> uiTextFMS;	// same for the GW-FMS
+	//std::deque<line> uiTextFMS;	// same for the GW-FMS
 
 	// append some text to the UI
 	void _appendText(float* color, const string& line);
-	void _appendTextFMS(float* color, const string& line);
+	//void _appendTextFMS(float* color, const string& line);
 
 	size_t textLine;	// the start offset at which text display begins (for scrolling up/down)
-	size_t textLineFMS;
+	//size_t textLineFMS;
 
 	string editLine;	// the text line as it is being edited by the user
 	bool _cursor;		// blinking cursor
@@ -232,7 +233,7 @@ private:
 	// Number of characters available between the select buttons
 	//Jens: make wider
 	const static int ui_columns = 75; //was 100 before, reduced to get better xivap size 15/08/2012
-	const static int ui_columnsFMS = 25; // 25 characters in the FMS
+	//const static int ui_columnsFMS = 25; // 25 characters in the FMS
 
 	// don't change this
 	const static int ui_rows = 12;

@@ -31,8 +31,8 @@ string trim(string line);
 // convert string to UPPERCASE
 string strupcase(string line);
 
-string getXivapRessourcesDir();
-string getXplaneHomeDir();
+string getXivapRessourcesDir(void);
+string getXplaneHomeDir(void);
 string getPosixPath();
 
 #ifdef APPLE

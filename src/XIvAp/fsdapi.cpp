@@ -186,6 +186,7 @@ bool Flightplan::isValid()
 
 FsdAPI::FsdAPI()
 {
+
 	_connected = false;
 #ifndef IVAO                                                                                                                      
         _verified = true;                                                                                                          
@@ -210,6 +211,7 @@ void FsdAPI::_loadMTLAliases()
 
 	char l[512];
 	int linesize = 511;
+
     FILE *in = fopen(pconst(filename), "r");
 
 	_cslAliases.clear();
@@ -254,6 +256,7 @@ void FsdAPI::_loadMTLAliases()
 void FsdAPI::connectPilot(string host, string port, string callsign, string id, string password,
 		bool hideadm, FSD::SimulatorType sim, string realname)
 {
+
 	// refuse to connect a pilot without knowing plane information
 	if(_mtl == "" || !_sendPlaneInfo)
 		return;
@@ -385,6 +388,7 @@ FSD::Message FsdAPI::receive()
 void FsdAPI::sendInfoRequestReply(string dest, string request, string reply)
 {
 	FSD::Message m;
+
 	m.type = _FSD_INFOREPLY_;
 	m.source = _callsign;
 	m.dest = dest;
@@ -398,6 +402,7 @@ void FsdAPI::sendPong(const FSD::Message& m)
 	// source dest time
 	// $POEBBR_APP:N1697J:TIME
 	FSD::Message reply;
+
 	reply.type = _FSD_PONG_;
 	reply.source = _callsign;
 	reply.dest = m.source;
@@ -411,6 +416,7 @@ void FsdAPI::regInfo(const FSD::Message& m)
        // **************************                                                                           
        // removed on request by IVAO                                                                           
        // **************************
+
        _verified = true;
        _verificationCallback();
 }
@@ -418,6 +424,7 @@ void FsdAPI::regInfo(const FSD::Message& m)
 bool FsdAPI::send(FSD::Message &msg, bool colon_check)
 {
 	// don't send shit to a non-verified connection
+
 	if(!_verified && msg.type != _FSD_CLIENTVERIFY_ && msg.type != _FSD_ADDPILOT_ && msg.type != _FSD_ADDATC_)
 		return false;
 
@@ -444,6 +451,7 @@ bool FsdAPI::send(FSD::Message &msg, bool colon_check)
 
 void FsdAPI::clientVerify(const FSD::Message& m)
 {
+	
        // from server: source dest revision seed
        // !SSERVER:DAT120M:0:1234567890
   
@@ -456,6 +464,7 @@ void FsdAPI::clientVerify(const FSD::Message& m)
 
 void FsdAPI::sendInfoReply(const string& dest)
 {
+		
 	// send INF reply to the sender
 	string reply = string(FSD_SOFTWARE_NAME) + " " + SOFTWARE_VERSION 
 #ifdef IVAO
@@ -482,6 +491,7 @@ void FsdAPI::sendInfoReply(const string& dest)
 void FsdAPI::sendMessage(string destination, string message)
 {
 	FSD::Message m;
+
 	m.type = _FSD_TEXTMESSAGE_;
 	m.source = _callsign;
 	m.dest = stripcolons(destination);
@@ -492,6 +502,7 @@ void FsdAPI::sendMessage(string destination, string message)
 void FsdAPI::sendPilotPos(IdentMode ident, int transponder, float lat, float lon, int alt,
 						  int speed, float pitch, float bank, float hdg, bool onground, int pressurealt)
 {
+
 	if(!_connected)
 		return;
 
@@ -548,6 +559,7 @@ void FsdAPI::decodePBH(const unsigned int pbh, float& pitch, float& bank, float&
 
 void FsdAPI::disconnectPilot()
 {
+	
 	string packet = FSD_HEADS[_FSD_DELPILOT_] + _callsign;
 	_socket.writeln(packet);
 	_socket.close();

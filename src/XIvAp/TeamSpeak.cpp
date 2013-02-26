@@ -76,7 +76,7 @@ static int pointer=0;
 	ProgramRunning* program = (ProgramRunning*)lParam;
 
 	// check if we have a root window
-	HWND parent = (HWND)GetWindowLong(hWnd, GWL_HWNDPARENT);
+	HWND parent = (HWND)GetWindowLong(hWnd, GWLP_HWNDPARENT); //need to fix this for x32.....
 	if(parent) return TRUE;
 
 	// check on window title (usrhost/router)
@@ -84,7 +84,7 @@ static int pointer=0;
 	pointer++;
 
 	if (pointer<200) return (TRUE);
-	int h=GetWindowText(hWnd, rawtitle, sizeof(rawtitle)); //sizeof(rawtitle)
+	int h=GetWindowTextA(hWnd, rawtitle, sizeof(rawtitle)); //sizeof(rawtitle)
 
 	string title(rawtitle);
 		
@@ -136,12 +136,12 @@ void TeamSpeak::ForceStart()
 	unsigned long datatype;
 	unsigned long bufferlength = sizeof(buffer);
 
-	RegQueryValueEx(hKey, "", NULL, &datatype, buffer, &bufferlength);
+	RegQueryValueExA(hKey, "", NULL, &datatype, buffer, &bufferlength);
 	RegCloseKey(hKey);
 
 	// start it up
 	string app((const char*)buffer);
-	ShellExecute(NULL, "open", app, NULL, NULL, SW_SHOWMINNOACTIVE);
+	ShellExecuteA(NULL, "open", app, NULL, NULL, SW_SHOWMINNOACTIVE);
 
 	xivap.addText(colCyan, "Teamspeak: starting teamspeak installed in " + app, true, true);
 }
@@ -286,7 +286,7 @@ bool TeamSpeak::TryWithURL(const string& vid,
 	//string logurl(url);
 	//xivap.addText(colCyan, "Teamspeak: url = " + logurl);
 
-  ShellExecute(0/*m_hWnd*/, "open", url, "", "", SW_SHOWDEFAULT);
+  ShellExecuteA(0/*m_hWnd*/, "open", url, "", "", SW_SHOWDEFAULT);
 
   return true;
 }

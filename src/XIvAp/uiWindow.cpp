@@ -293,7 +293,7 @@ int UiWindow::checkButton(int x, int y)
 	x-=left;
 	y=top-y;
 	int i=0;
-	while (i<3)  {
+	while (i<4)  {
 		if (x>=ExtMouseFields[4*i] && x<=ExtMouseFields[4*i+2]) if (y>=ExtMouseFields[4*i+1] && y<=ExtMouseFields[4*i+3]) return (i+Connect_Capture);
 		i++;
 	}
@@ -404,6 +404,7 @@ void UiWindow::buttonClicked(int button)
 	switch (button)
 	{
 	case TX_Capture: xivap.xpdrModeToggle();break;
+	case TCAS_Capture: {xivap.Tcasbox.hide();break;}
 	case Ident_Capture: {xivap.setXpdrIdent();break;}
 	case Connect_Capture: if(xivap.fsd.connected()) xivap.disconnectForm().show();
 					else xivap.connectForm().show();

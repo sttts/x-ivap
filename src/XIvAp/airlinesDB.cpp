@@ -25,6 +25,7 @@ AirlinesDB::AirlinesDB()
 	FILE *in;
 
 	string filename = getXivapRessourcesDir() + "airlines.dat";
+
 	XPLMDebugString(string("My AirlinesDB is: ") + filename + "\n");
     in = fopen(pconst(filename), "r");
 

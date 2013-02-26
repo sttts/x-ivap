@@ -470,7 +470,8 @@ void WxStation::debugDump() const
 		+ " timestamp " + ftoa(timestamp) + " dist " + ftoa(distance) + " qnh " + ftoa(qnh),
 		false, true);
 
-	xivap.addText(colWhite,	string("# wind layers: ") + itostring(windLayers.size()), false, true);
+	/*disabled for x64 work, itostring gives problems 24/12/2012 bvk
+xivap.addText(colWhite,	string("# wind layers: ") + itostring(windLayers.size()), false, true);
 	for(size_t i = 0; i < windLayers.size(); ++i) {
 		xivap.addText(colWhite, string("#") + itostring(i)
 			+ " alt " + ftoa(windLayers[i].alt) + " speed " + ftoa(windLayers[i].speed)
@@ -479,6 +480,7 @@ void WxStation::debugDump() const
 			+ " turb " + itostring(windLayers[i].turbulence) + " shear " + itostring(windLayers[i].windshear),
 			false, true);
 	}
+
 
 	xivap.addText(colWhite,	string("# visibility layers: ") + itostring(visLayers.size()), false, true);
 	for(size_t i = 0; i < visLayers.size(); ++i) {
@@ -501,5 +503,6 @@ void WxStation::debugDump() const
 			+ " precip " + itostring(cloudLayers[i].precip),
 			false, true);
 	}
+*/
 #endif // apple
 }

@@ -356,7 +356,7 @@ void ConnectForm::setUserCredentials()
 	//	XPSetWidgetDescriptor(acTypeTextField, pconst(strupcase(trim(xivap.fpl.aircrafttype))));
 }
 
-int	ConnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	ConnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	char buffer[512];
 

@@ -15,7 +15,7 @@
 
 typedef int socklen_t;
 typedef SOCKET Socket;
-
+/* removed as it interferes with vc2010 27-12-2010
 #define EWOULDBLOCK             WSAEWOULDBLOCK
 #define EINPROGRESS             WSAEINPROGRESS
 #define EALREADY                WSAEALREADY
@@ -44,15 +44,15 @@ typedef SOCKET Socket;
 #define ETIMEDOUT               WSAETIMEDOUT
 #define ECONNREFUSED            WSAECONNREFUSED
 #define ELOOP                   WSAELOOP
-#define EHOSTDOWN               WSAEHOSTDOWN
+
 #define EHOSTUNREACH            WSAEHOSTUNREACH
 #define EPROCLIM                WSAEPROCLIM
 #define EUSERS                  WSAEUSERS
 #define EDQUOT                  WSAEDQUOT
 #define ESTALE                  WSAESTALE
 #define EREMOTE                 WSAEREMOTE
-
-
+*/
+#define EHOSTDOWN               WSAEHOSTDOWN
 typedef LONGLONG Int64; 
 inline int getErrno() { return WSAGetLastError(); }
 

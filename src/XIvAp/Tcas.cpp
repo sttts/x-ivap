@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "systemcallbacks.h"
 #include <math.h>
 #include "SoundGraphics.h"
+#include "XPLMCamera.h"
 //otherfiles affected: xivap.cpp,xivap.h,systemcallbacks.cpp,systemcallbacks.h,multiplayer.cpp
 //t==time, d==distance a==alitude
 const float SL_TABLE[7][6] = {
@@ -42,6 +43,7 @@ int Tcas::right;
 int Tcas::top;
 int Tcas::bottom;
 char Tcas::tcasmode;
+bool Tcas::ShowTcas;
 TCASLIST Tcas::Tcaslist[maxplanes];
 char Tcas::range;
 #define Debug	0
@@ -49,6 +51,9 @@ char Tcas::range;
 /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*::  This function converts decimal degrees to radians             :*/
 /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+///////////////////////////////////////////////////////////////
+
+///////////////////
 double Tcas::deg2rad(double deg) {
 
 	return (deg * PI / 180);
@@ -61,7 +66,30 @@ double Tcas::deg2rad(double deg) {
 double Tcas::rad2deg(double rad) {
 	return (rad * 180 / PI);
 }
+////////////////////////////////////////////////
+void Tcas::FindPoint(double lat1,double lon1,double d, double tc)
+{
+	double lat;
+	double lon;
 
+	d/=60;
+	d=deg2rad(d);
+	lat1=deg2rad(lat1);
+	lon1=deg2rad(lon1);
+	tc=deg2rad(tc);
+
+	lat=asin(sin(lat1)*cos(d)+cos(lat1)*sin(d)*cos(tc));
+	if (cos(lat)==0)
+		lon=lon1;      // endpoint a pole
+	else
+		lon=fmod(lon1-asin(sin(tc)*sin(d)/cos(lat))+PI,2*PI)-PI; 
+	
+	fmclat=rad2deg(lat);
+	fmclon=rad2deg(lon);
+
+
+}
+///////////////////////////////////////////////////////////////
 float Tcas::TrueCourse (double lat2, double lon2, double lat1, double lon1)
 {
 	double bearing;
@@ -97,38 +125,110 @@ void Tcas::Testtargets(void)
 }
 #endif
 //////////////////////////////////////
-void Tcas::DumpPilotPos(const char* pilot,float lat,float lon,float alt,int tcascode)
+float	TakeSmallestAngle(float Alp,float Bet)
+{
+	if (Alp>359) Alp-=360;
+	if (Bet>359) Bet-=360;
+	if (Alp>Bet) {
+		(Alp-=Bet);
+		if (Alp>179) return (360-Alp); else return Alp;
+	}
+	else {
+		Bet-=Alp;
+		if (Bet>179) return (360-Bet); else return Bet;
+	}
+}
+////////////////////////////////////////
+static	inline double	CalcAngle(double dy, double dx)
+{
+	double angle;
+	if (dx == 0.0)
+		angle = (dy > 0.0) ? 0.0 : 180.0;
+	else 
+		angle = 90.0 - (atan(dy/dx) * 180.0 / 3.14159265);
+	if (dx < 0.0)
+		angle += 180.0;
+	return angle;
+}
+///////////////////////////////////////////////////////////
+static	inline double	DiffAngle(double a1, double a2)
+{
+	double diff = (a2 - a1);
+	if (diff >= 180.0)
+		diff -= 360.0;
+	if (diff <= -180.0)
+		diff += 360.0;
+	return fabs(diff);
+}
+///////////////////////////////////////////////////////
+static	inline double sqr(double a) { return a * a; }
+////////////////////////////////
+void Tcas::DumpPilotPos( const char* pilot,float lat,float lon,float alt,int tcascode,float TargetSpeed, float targetheading)
 {
 #define TCASRANGE	40
 #define LATENCY		10
 #if Debug
 char txt[100];
 #endif
-float course;
+float intruderRadial,course,dCPA,dCPAi,speed;
 float dis=(float) deg2dist(lat,lon,xivap.GetLat(),xivap.GetLon());
 char i=0;
+
+Tagging(lat,lon,alt,pilot);
 if (tcascode==xpmpTransponderMode_Standby) return; //return in case transponder == off
 while (i<maxplanes) {if (strcmp(Tcaslist[i].pilot,pilot)==0) //do we know this guy?
 														{
 															if (dis>TCASRANGE) {Tcaslist[i].timeout=0;return;}////dump this guy, out of visiblity
+														
 
-															course=TrueCourse(lat,lon,xivap.GetLat(),xivap.GetLon())-xivap.GetHeading();
-															#if	Debug 
-															sprintf(txt,"old guy %s x:%d y:%d alt:%5.0f distance %2.1f-course%3.1f  pos %d\r\n",pilot,Tcaslist[i].x_plot,Tcaslist[i].y_plot,alt,dis,course,i);
-															
-															XPLMDebugString(txt);
-															#endif
+
+															intruderRadial=TrueCourse(lat,lon,xivap.GetLat(),xivap.GetLon()); //vectorpos to intruder
+															course=intruderRadial-xivap.GetHeading(); //alignment to headup
 															course=deg2rad(course);
 															Tcaslist[i].x_plot=sin(course)*dis*2.2f;
 															Tcaslist[i].y_plot=cos(course)*dis*2.2f;
-															Tcaslist[i].distance=dis;
+															Tcaslist[i].distance=dis; //radial distance to intruder
 															Tcaslist[i].timeout=LATENCY;
 															Tcaslist[i].altitude=(alt-xivap.elevationft())/100;
 															Tcaslist[i].elevation=alt;
+										
+															//do some trigoniometric stuff, calculate angle Gamma from know angles Beta and Alpha
+															//if we know Gamma, and the radial distance between ownplane and intruder, we know also
+															//the dCPA and dCPAintruder. this with the rules a/sin(a)=b/sin(b)=c/sin(c)... some basic stuff 
+															float Beta=TakeSmallestAngle(intruderRadial,xivap.GetHeading()); // first angle of triangle
+													
+															float Alpha=TakeSmallestAngle(180+intruderRadial,targetheading); //second angle of triangle
+
+															float Gamma=180-Alpha-Beta; //third angle of the CPA triangle
+
+															if ((Gamma!=0)| (Gamma!=180)) {
+
+																dCPA=(dis*sin(deg2rad(Alpha)))/sin(deg2rad(Gamma));
+																dCPAi=(dis*sin(deg2rad(Beta)))/sin(deg2rad(Gamma));
+
+															}
+															speed=xivap.GetSpeed();
+
+															if (speed>50) {
+																	    	if ((TargetSpeed>40) & (TargetSpeed<900)) Tcaslist[i].tCPAi=dCPAi*3600/TargetSpeed; else Tcaslist[i].tCPAi=9999;
+																			Tcaslist[i].tCPA=dCPA*3600/speed;
+																	    	} else {Tcaslist[i].tCPA=9999; Tcaslist[i].tCPAi=9999;}
+															if (Tcaslist[i].tCPA<0) Tcaslist[i].tCPA=9999;
+															if (Tcaslist[i].tCPAi<0) Tcaslist[i].tCPAi=9999;
+															//char txt[200];	
+															//sprintf(txt,"Pilot:%s dist:%3.1f  tCPA:%3.1f,tCPAi:%3.1f,Alpha:%3.1f,Beta:%3.1f alt:%5.0f-intruderc%3.1f:-Heading:%3.1f-Intruderhead:%3.1f IntrSpeed:%3.1f\r\n",pilot,dis,Tcaslist[i].tCPA,Tcaslist[i].tCPAi,Alpha,Beta,alt,intruderRadial,xivap.GetHeading(),targetheading,TargetSpeed);
+															//XPLMDebugString(txt);
+															
+															#if	Debug 
+															sprintf(txt,"old guy %s x:%d y:%d alt:%5.0f distance %2.1f-course%3.1f  heading:%3.1f pos %d\r\n",pilot,Tcaslist[i].x_plot,Tcaslist[i].y_plot,alt,dis,course,Tcaslist[i].course,i);
+															
+															XPLMDebugString(txt);
+															#endif
 															#if	Debug 
 															sprintf(txt,"Tcascode:%d\r\n",tcascode);
 															XPLMDebugString(txt);
 															#endif
+															//Tagging(lat,lon,alt);
 															return;
 
 														}
@@ -160,10 +260,15 @@ while (i<maxplanes) {
 												Tcaslist[i].vstimer=12;
 												Tcaslist[i].auraltimer=0;
 												Tcaslist[i].displaymode=T_CYAN;
+												Tcaslist[i].tCPA=9999;
+												Tcaslist[i].tCPAi=9999;
+												Tcaslist[i].ClofConfl=FALSE;
+												//Tagging(lat,lon,alt);
 												return;
 												}
 					i++;
-					}
+					} 
+XPLMDebugString("Tcaslist full\r\n");
 
 }
 ////////////////////////////////////////////////////
@@ -176,39 +281,96 @@ bool Tcas::Resolution (int nr)
 		if (xivap.Getgroundalt()<Alttabel[i]) break;
 		i++;
 	}
+//vspeed=Tcaslist[nr].lastOwnElevation-xivap.elevationft();
 #if TCASTEST
 	char txt[100];
 	sprintf(txt,"dist:%f,alt%f-i:%4.1f-elevation:%3.1f speed:%3.1f\r\n",SL_TABLE[i][2],SL_TABLE[i][4],xivap.elevationft(),xivap.Getgroundalt(),xivap.GetSpeed());
 		XPLMDebugString(txt);
+#endif
+
 if (xivap.GetSpeed()<50) return FALSE; //disable function in case no speed;
 
-#endif
 	switch (tcasmode)
 	{
-	case TA: if ((SL_TABLE[i][2]>Tcaslist[nr].distance) | (SL_TABLE[i][4]>abs(Tcaslist[nr].altitude*100))) 
-			 {
-				 if (Tcaslist[nr].auraltimer>0) Tcaslist[nr].auraltimer--; //wait in case a warning is already spoken
-				 else {
-					 Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
-					 PlaySoundTcas(AURAL_traffic);
+	case TA: {	
+			if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return TRUE;} //wait in case a warning is already spoken
+			if  (SL_TABLE[i][4]<abs(Tcaslist[nr].altitude*100)) return FALSE; //check ouside dMOD alt range
+			if  (SL_TABLE[i][2]>Tcaslist[nr].distance) 	
+				{
+				Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
+				PlaySoundTcas(AURAL_traffic);
+				return TRUE;
 				 }
-				 return TRUE;
-				 
-			 };
-		break; //ta dMOD alarm
-	case RA: if ((SL_TABLE[i][3]>Tcaslist[nr].distance) | (SL_TABLE[i][5]>abs(Tcaslist[nr].altitude))) 
+			 if ((SL_TABLE[i][0]>Tcaslist[nr].tCPA) &  (SL_TABLE[i][0]>Tcaslist[nr].tCPAi) & (abs(Tcaslist[nr].tCPA-Tcaslist[nr].tCPAi)<5) ) 
 			 {
-				 if (Tcaslist[nr].auraltimer>0) Tcaslist[nr].auraltimer--; //wait in case a warning is already spoken
-				 else {
-					 Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
-					 PlaySoundTcas(AURAL_traffic);
-				 }
-				 return TRUE;
-				 
+				PlaySoundTcas(AURAL_traffic);																						
+				Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning																						
+				return TRUE;																																					
 			 };
-		break; //ra dMOD alarm
+			 break; //ta dMOD alarm
+			 }
+	case RA: {
+			
+			 if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return TRUE;} //wait in case a warning is already spoken
+			 if (SL_TABLE[i][5]<abs(Tcaslist[nr].altitude*100)) return FALSE; //check outside altitude range
+			 XPLMDebugString("inside alitude\r\n");
+			 if  (SL_TABLE[i][3]>Tcaslist[nr].distance) //check dMOD range
+				 {
+				 Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
+				 PlaySoundTcas(AURAL_traffic);
+				 return TRUE;
+				 };
+	
+			 char txt[100];
+			 sprintf(txt,"table:%4.1f -%3.1f-%3.1f\r\n",SL_TABLE[i][1],Tcaslist[nr].tCPA,Tcaslist[nr].tCPAi);
+			 XPLMDebugString(txt);
+			 if ((SL_TABLE[i][1]>Tcaslist[nr].tCPA) &  (SL_TABLE[i][1]>Tcaslist[nr].tCPAi) ) 
+				{ 
+					if ( abs(Tcaslist[nr].tCPA-Tcaslist[nr].tCPAi)<15) {
+					 if (Tcaslist[nr].vspeed>0) {
+													PlaySoundTcas(AURAL_crossing_climb);	
+													Tcaslist[i].ClofConfl=TRUE;
+													Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
+													return TRUE;
+						 						}
+					  if (Tcaslist[nr].vspeed<0) {
+													PlaySoundTcas(AURAL_crossing_descend);
+													Tcaslist[i].ClofConfl=TRUE;
+													Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
+													return TRUE;
+						 						}
+					 if (Tcaslist[nr].tCPA<(SL_TABLE[i][1]/4)) {																				 
+																if (Tcaslist[nr].altitude<0) PlaySoundTcas(AURAL_reversal_climb); else PlaySoundTcas(AURAL_reversal_descend);
+																Tcaslist[i].ClofConfl=TRUE;
+																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
+																return TRUE;
+																}
+					 if (Tcaslist[nr].tCPA<(SL_TABLE[i][1]/2)) {																				 
+																if (Tcaslist[nr].altitude<0) PlaySoundTcas(AURAL_climb); else PlaySoundTcas(AURAL_descend);
+																Tcaslist[i].ClofConfl=TRUE;
+																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning	
+																return TRUE;
+																}  else	
+																{					
+																PlaySoundTcas(AURAL_traffic);
+																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
+																return TRUE;
+																 }
+					} else {					
+							PlaySoundTcas(AURAL_traffic);
+							Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
+							return TRUE;
+							 }
+				}																					
+		  	 break; 
+			 }
 	default: break;
 	}
+	if (Tcaslist[i].ClofConfl) {
+								PlaySoundTcas( AURAL_clear);
+								Tcaslist[nr].auraltimer=AURALTIME_WARNING;
+								Tcaslist[i].ClofConfl=FALSE;
+								}
 	Tcaslist[nr].auraltimer=0;
 	return FALSE;
 }
@@ -218,6 +380,7 @@ N - Normal position. TCAS vertical scan is +/- 2700 ft.
 BELOW - Expands the vertical scan to 2700 ft above and 9900 ft below the aircraft.*/
 void Tcas::TcasFlightLoopcallback()
 {
+static bool firsttime;
 #if TCASTEST
 	Testtargets();
 #endif
@@ -226,6 +389,7 @@ void Tcas::TcasFlightLoopcallback()
 		Tcaslist[i].show=false;
 		if (Tcaslist[i].timeout!=0) {
 			Tcaslist[i].timeout--; 
+			if (Tcaslist[i].timeout==0) {Tcaslist[i].show=false;XPLMDebugString("removing somebody from active list\r\n");}
 			Tcaslist[i].vstimer--;
 			if (Tcaslist[i].vstimer==0) {
 										Tcaslist[i].vstimer=12; //service 1x minute
@@ -251,7 +415,7 @@ void Tcas::TcasFlightLoopcallback()
 				case	All: default:	Tcaslist[i].show=true;break;
 				}
 			} 
-			if (Tcaslist[i].timeout==0) {Tcaslist[i].show=false;XPLMDebugString("removing somebody from active list\r\n");}
+			
 			switch (range)
 			{
 			case	NM3:	{Tcaslist[i].x_scale=Tcaslist[i].x_plot*13;Tcaslist[i].y_scale=Tcaslist[i].y_plot*13;break;}
@@ -263,16 +427,20 @@ void Tcas::TcasFlightLoopcallback()
 			if ((Tcaslist[i].distance>=6)| (abs(Tcaslist[i].altitude)>12)) Tcaslist[i].displaymode=T_CYAN; //all traffic <>+/0 1200 and/or 6nm
 			else if (Tcaslist[i].distance>3) Tcaslist[i].displaymode=T_WHITE; 
 			else if (Tcaslist[i].distance>1) Tcaslist[i].displaymode=T_YELLOW; 
-			else if (Resolution (i)) Tcaslist[i].displaymode=T_RED; else Tcaslist[i].displaymode=T_YELLOW;
+		    if (Resolution (i)) Tcaslist[i].displaymode=T_RED; 
 		}
 	}
+	//demo to be deleted later on
+//	if (!firsttime) {FindPoint(xivap.GetLat(),xivap.GetLon(),12,xivap.GetHeading()-180);firsttime=TRUE;}
+//else {FindPoint(fmclat,fmclon,0.1f,xivap.GetHeading());}
+//DumpPilotPos("testPilot",fmclat,fmclon,xivap.elevationft()-300,1,xivap.GetSpeed(), xivap.GetHeading());
 
 }
 ///////////////////////////////////////////////////////////////////////////////
 void	Tcas::TcasWinDrawCallback(XPLMWindowID inWindowID, void *inRefcon)
 {
 char txt[10];
-if (xivap.uiWindow.visible()) {
+if (xivap.uiWindow.visible() & ShowTcas) {
 									//XPLMDrawTranslucentDarkBox(left, top, right, bottom); //temp until opengl is finished
 					
 									sprintf(txt,"%dnm",RangeTab[range]);
@@ -313,6 +481,7 @@ if (xivap.uiWindow.visible()) {
 									
 									}
 }
+///////////////////////////////////////////////////////////////////////////////////////////
 int Tcas::TcasWinMouseCallback(XPLMWindowID inWindowID, int x, int y,
 										XPLMMouseStatus inMouse, void *inRefcon)
 {
@@ -348,6 +517,7 @@ void Tcas::Create()
 	tcasmode=0;
 	left = 50;
 	top = 720;
+	
 	right = left + Size();
 	bottom = top - Size();
 	window = XPLMCreateWindow(left, top, right, bottom, 1, //start disabled
@@ -355,7 +525,7 @@ void Tcas::Create()
 		TcasBoxKeyCallback, //provide a callback even not in use
 		TcasBoxWinMouseCallback,
 		NULL);
-
+	ShowTcas=false;
 	for (char(i)=0;i<maxplanes;i++) {Tcaslist[i].timeout=0;Tcaslist[i].show=false;}
 	XPLMRegisterFlightLoopCallback(TcasBoxFlightLoopCallback,		// Callback
 								   1.0,					// Interval 1.0 = second per frame
@@ -447,6 +617,8 @@ int Tcas::checkButton(int x, int y)
 
 void Tcas::PlaySoundTcas(char Ras)
 {
+	XPLMDebugString("aural warning given\r\n");
+		if (!Tcas::sound) return;
 	switch (Ras)
 	{
 	case	AURAL_none:  Playsound("cabin.wav");break; // =  1, ///< Traffic, Traffic           =  0, ///< don't say anything
@@ -463,4 +635,19 @@ void Tcas::PlaySoundTcas(char Ras)
 	case	AURAL_crossing_descend: Playsound("tcas_descend_x.wav");break;//= 15  ///< Descend, Crossing Descend (twice)
 	default: break;
 	}
+}
+void Tcas::Tagging(float lat,float lon,int elevation,const char* pilot)
+{
+	XPLMCameraPosition_t		cameraPos;
+	XPLMReadCameraPosition(&cameraPos);
+	double	x,y,z;
+	char text[100];
+	XPLMWorldToLocal(lat, lon, elevation * 0.3048, &x, &y, &z);
+	double	headingToTarget = CalcAngle(cameraPos.z - z, x - cameraPos.x);
+	double	pitchToTarget = CalcAngle(sqrt(sqr(x - cameraPos.x) + sqr(cameraPos.z - z)), y - cameraPos.y);
+
+	double	headOff = DiffAngle(headingToTarget, cameraPos.heading);
+	double	pitchOff = DiffAngle(pitchToTarget,cameraPos.pitch);
+	sprintf(text,"Camerapos van %s pitch %3.1f head % 3.1f\r\n",pilot,pitchOff,headOff);
+	XPLMDebugString(text);
 }

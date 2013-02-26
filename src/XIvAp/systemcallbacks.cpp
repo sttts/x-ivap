@@ -22,6 +22,7 @@ extern char Graphics;
 
 PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
 {
+
 #ifdef INTERNAL_BETA
 	if(!xivap.betaBlocker.CheckDate())
 		return 0;
@@ -32,8 +33,8 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
 	string desc = string(SOFTWARE_NAME) + " " 
 		+ SOFTWARE_VERSION + " (" + SOFTWARE_REVISION + ") - Fly online on IVAO " + SOFTWARE_COPYRIGHT1;
 	strcpy(outDesc, pconst(desc));
-	if (!InitSound()) XPLMDebugString("SoundInit error\r\n"); //added for sound init
-	if (!InitGraphics()) XPLMDebugString("Graphics init error\r\n");//added for graphics init
+	if (!InitSound()) XPLMDebugString(" Xivap SoundInit error\r\n"); //added for sound init
+	if (!InitGraphics()) XPLMDebugString("XIvap Graphics init error\r\n");//added for graphics init
 	Graphics=1;
 	int mySubMenuItem = XPLMAppendMenuItem(XPLMFindPluginsMenu(), // Put in plugins menu
 						"X-IvAp",	// Item Title
@@ -73,6 +74,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
 
 PLUGIN_API void	XPluginStop(void)
 {
+
 #ifdef BETA
 	if(!xivap.betaBlocker.CheckDate())
 		return;
@@ -90,6 +92,7 @@ PLUGIN_API void	XPluginStop(void)
 
 PLUGIN_API void XPluginDisable(void)
 {
+
 #ifdef BETA
 	if(!xivap.betaBlocker.CheckDate())
 		return;
@@ -246,37 +249,37 @@ void MenuHandlerCallback(void *inMenuRef, void *inItemRef)
 }                                   
 
 
-int	connectFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	connectFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMsg_Create) return 0; // prevent endless loop
 	return xivap.connectForm().handler(inMessage, inWidget, inParam1, inParam2);
 }						
 
-int	disconnectFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	disconnectFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMsg_Create) return 0; // prevent endless loop
 	return xivap.disconnectForm().handler(inMessage, inWidget, inParam1, inParam2);
 }						
 
-int	msgBoxHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	msgBoxHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMsg_Create) return 0; // prevent endless loop
 	return xivap.messageBox().handler(inMessage, inWidget, inParam1, inParam2);
 }						
 
-int	flightplanFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	flightplanFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMsg_Create) return 0; // prevent endless loop
 	return xivap.flightplanForm().handler(inMessage, inWidget, inParam1, inParam2);
 }						
 
-int	fmcFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	fmcFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMsg_Create) return 0; // prevent endless loop
 	return xivap.fmcForm().handler(inMessage, inWidget, inParam1, inParam2);
 }						
 
-int	inspectorFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	inspectorFormHandler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMsg_Create) return 0; // prevent endless loop
 	return xivap.refInspector().handler(inMessage, inWidget, inParam1, inParam2);
@@ -345,4 +348,32 @@ int chatTextWinMouseCallback(XPLMWindowID inWindowID, int x, int y, XPLMMouseSta
 {
 	ChatWindow *obj = static_cast<ChatWindow*>(inRefcon);
 	return obj->chatMouseCallback(inWindowID, x, y, inMouse, inRefcon);
+}
+///////////////////////////////////////////////////////////////
+//tcas window callback 16/10/2012 added
+void TcasBoxWinDrawCallback(XPLMWindowID inWindowID, void *inRefcon)
+{
+	xivap.Tcasbox.TcasWinDrawCallback(inWindowID, inRefcon);
+}
+
+int TcasBoxWinMouseCallback(XPLMWindowID inWindowID, int x, int y, XPLMMouseStatus inMouse, void *inRefcon)
+{
+	return xivap.Tcasbox.TcasWinMouseCallback(inWindowID, x, y, inMouse, inRefcon);
+	
+return 1;
+}
+
+void TcasBoxKeyCallback(XPLMWindowID inWindowID, char inKey, XPLMKeyFlags inFlags, char inVirtualKey,
+						 void *inRefcon, int losingFocus)
+{
+	
+}
+float	TcasBoxFlightLoopCallback(
+									   float                inElapsedSinceLastCall,    
+									   float                inElapsedTimeSinceLastFlightLoop,    
+									   int                  inCounter,    
+									   void *               XFMCinRefcon)
+{
+	xivap.Tcasbox.TcasFlightLoopcallback();
+	return 1;
 }

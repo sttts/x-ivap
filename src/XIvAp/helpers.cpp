@@ -109,12 +109,13 @@ string strupcase(string line)
 	return line;
 }
 
-string getXplaneHomeDir()
+string getXplaneHomeDir(void)
 {
-	string result = "";
-	const char* app = GetApplicationPath();
-	static bool firsttime = true;
 
+	const char* app = GetApplicationPath();
+	string result=("");
+	static bool firsttime = true;
+	
 	if(app != NULL) {
 		string path = string(app);
 		int p;
@@ -128,15 +129,17 @@ string getXplaneHomeDir()
 #endif
 
 		p = rpos(DIR_CHAR, path);
-		result = copy(path, 0, p) + DIR_CHAR;
-		return result;
+		result=copy(path,0,p) +DIR_CHAR;
+		return  result;
 	}
 	return string("");
 }
 
 string getXivapRessourcesDir()
 {
-	string path = getXplaneHomeDir();
+
+	string path=getXplaneHomeDir( );
+	
 	//const char* app = GetApplicationPath();
 	static bool firsttime = true;
 

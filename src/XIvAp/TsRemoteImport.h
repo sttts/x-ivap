@@ -625,7 +625,7 @@ LPtsrSendTextMessage tsrSendTextMessage = NULL;
 
 int InitTsRemoteLibrary(const char* file)
 {
-	tsrDLL = LoadLibrary(file);
+	tsrDLL = LoadLibraryA(file);
 	if (!tsrDLL)
 		return -2;
 

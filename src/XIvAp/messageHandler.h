@@ -22,10 +22,10 @@ void MessageHandler(XPLMPluginID inFrom, long inMsg, void *inParam);
 
 // data ref getters
 int Handler_getInteger(void *refcon);
-long Handler_getString(void *refcon, void *outbuf, int inOffset, long inMaxLength);
+int Handler_getString(void *refcon, void *outbuf, int inOffset, int inMaxLength);
 
 // data ref setters
 void Handler_setInteger(void *refcon, int value);
-void Handler_setString(void *refcon, void *value, int offset, long length);
+void Handler_setString(void *refcon, void *value, int offset, int length);
 
 #endif

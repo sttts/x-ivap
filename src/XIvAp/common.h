@@ -185,9 +185,9 @@ extern float colGray[];
 // comment this to compile a public release
 // #define BETA
 
-#define EXPIRE_YEAR		2005
-#define EXPIRE_MONTH	11
-#define EXPIRE_DAY		1
+#define EXPIRE_YEAR		2012
+#define EXPIRE_MONTH	12
+#define EXPIRE_DAY		31
 
 #ifdef INTERNAL_BETA
 // warn on release builds

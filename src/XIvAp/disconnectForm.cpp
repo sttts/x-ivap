@@ -68,7 +68,7 @@ void DisconnectForm::create()
 	XPAddWidgetCallback(window, disconnectFormHandler);
 }
 
-int	DisconnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	DisconnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMessage_CloseButtonPushed) {
 		hide();

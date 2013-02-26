@@ -25,7 +25,7 @@ public:
 	void show();
 	void hide();
 
-	int handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2);
+	int handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2);
 
 	void setUserCredentials();
 

@@ -29,8 +29,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "fmod.h"
 #include "fmod_errors.h"
 #include "SoundGraphics.h"
-
-
+#include "Tcas.h"
+#include <math.h>
 /// Sandy Barbour
 /// Handles all platform OpenGL headers.
 #if IBM
@@ -60,6 +60,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //1.01 09-10-2012 added transpondermode 4 to the switch, adaption for the Qpac A320 using 1,2,4
 //1.02 12-10-2012 reattempt to use the old carbon lib for convertpath
 //1.03 13-10-2012 fix for transpondercodes <1000
+//1.04 15-10-2012 first attemt to build a extern tcasbox
+//1.05 2-01-2013 integration in x64 system
 
 // OS X: we use this to convert our file path.
 #if APL
@@ -86,7 +88,7 @@ extern int width, height;
 float soundlevel = 0.6f;
 GLint IVbase;				// Base Display List For The Font
 char *pFileName;
-XPLMTextureID IvaoTexture[MAXTEXTURE];
+XPLMTextureID IvaoTexture[30]; //maxtexture
 
 int	Ui_width, Ui_height;
 int	xPanelWindowLeft, xPanelWindowBottom;
@@ -101,7 +103,7 @@ int            key;
 unsigned int   version;
 FMOD_DSP       *dsp = 0;
 FMOD_SYSTEM    *csystem;
-
+Tcas	Tcasbox;
 
 int ERRCHECK(FMOD_RESULT result)
 {
@@ -186,10 +188,13 @@ void CloseAudioSystem(void)
 /////////////////////
 void	IvBuildTextures(void)
 {
-
+	
 	IVbase=glGenLists(MAXTEXTURE);
 	//build lnav lit
+	
+
 	glNewList(IVbase + IVPANEL_TEXTURE, GL_COMPILE);
+	glPushMatrix();
 	Ui_width = 670;
 	Ui_height = 130;
 	XPLMBindTexture2d(IvaoTexture[IVPANEL_TEXTURE], 0);
@@ -199,9 +204,11 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, Ui_height);         // Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(Ui_width, Ui_height);  // Top Right Of The Texture and Quad
 	glEnd();
+	glPopMatrix();
 	glEndList();
 
 	glNewList(IVbase + IVTRANS_OFF_TEXTURE, GL_COMPILE);
+	glPushMatrix();
 	XPLMBindTexture2d(IvaoTexture[IVTRANS_OFF_TEXTURE], 0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(+1, 1.0f); glVertex2f(32, 0);	// Bottom Right Of The Texture and Quad
@@ -209,9 +216,11 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, 32);	// Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(32, 32);	// Top Right Of The Texture and Quad
 	glEnd();
+	glPopMatrix();
 	glEndList();
 
 	glNewList(IVbase + IVTRANS_ON_TEXTURE, GL_COMPILE);
+	glPushMatrix();
 	XPLMBindTexture2d(IvaoTexture[IVTRANS_ON_TEXTURE], 0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(+1, 1.0f); glVertex2f(32, 0);	// Bottom Right Of The Texture and Quad
@@ -219,9 +228,11 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, 32);	// Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(32, 32);	// Top Right Of The Texture and Quad
 	glEnd();
+	glPopMatrix();
 	glEndList();
 
 	glNewList(IVbase + IVCONN_ON_TEXTURE, GL_COMPILE);
+	glPushMatrix();
 	XPLMBindTexture2d(IvaoTexture[IVCONN_ON_TEXTURE], 0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(+1, 1.0f); glVertex2f(34, 0);	// Bottom Right Of The Texture and Quad
@@ -229,9 +240,11 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, 34);	// Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(34, 34);	// Top Right Of The Texture and Quad
 	glEnd();
+	glPopMatrix();
 	glEndList();
 
 	glNewList(IVbase + IVCONN_OFF_TEXTURE, GL_COMPILE);
+	glPushMatrix();
 	XPLMBindTexture2d(IvaoTexture[IVCONN_OFF_TEXTURE], 0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(+1, 1.0f); glVertex2f(34, 0);	// Bottom Right Of The Texture and Quad
@@ -239,9 +252,11 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, 34);	// Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(34, 34);	// Top Right Of The Texture and Quad
 	glEnd();
+	glPopMatrix();
 	glEndList();
 
 	glNewList(IVbase + IVNO_FPL_TEXTURE, GL_COMPILE);
+	glPushMatrix();
 	XPLMBindTexture2d(IvaoTexture[IVNO_FPL_TEXTURE], 0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(+1, 1.0f); glVertex2f(34, 0);	// Bottom Right Of The Texture and Quad
@@ -249,9 +264,11 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, 34);	// Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(34, 34);	// Top Right Of The Texture and Quad
 	glEnd();
+	glPopMatrix();
 	glEndList();
 
 	glNewList(IVbase + IVFLP_SEND_TEXTURE, GL_COMPILE);
+
 	XPLMBindTexture2d(IvaoTexture[IVFLP_SEND_TEXTURE], 0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(+1, 1.0f); glVertex2f(34, 0);	// Bottom Right Of The Texture and Quad
@@ -259,10 +276,11 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, 34);	// Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(34, 34);	// Top Right Of The Texture and Quad
 	glEnd();
+
 	glEndList();
-
-
+////////////////////////////
 	glNewList(IVbase + IVIDENT_ON_TEXTURE, GL_COMPILE);
+
 	XPLMBindTexture2d(IvaoTexture[IVIDENT_ON_TEXTURE], 0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(+1, 1.0f); glVertex2f(11, 0);	// Bottom Right Of The Texture and Quad
@@ -270,11 +288,124 @@ void	IvBuildTextures(void)
 	glTexCoord2f(+0, 0.0f); glVertex2f(0, 11);	// Top Left Of The Texture and Quad
 	glTexCoord2f(+1, 0.0f); glVertex2f(11, 11);	// Top Right Of The Texture and Quad
 	glEnd();
+
+	glEndList();
+/////////////////				
+	glNewList(IVbase + IVTCAS, GL_COMPILE);
+
+	XPLMBindTexture2d(IvaoTexture[IVTCAS], 0);
+	glBegin(GL_QUADS);
+	glTexCoord2f(+1, 1.0f); glVertex2f(Tcasbox.Size(),0);	// Bottom Right Of The Texture and Quad
+	glTexCoord2f(+0, 1.0f); glVertex2f(0, 0);	// Bottom Left Of The Texture and Quad
+	glTexCoord2f(+0, 0.0f); glVertex2f(0, Tcasbox.Size());	// Top Left Of The Texture and Quad
+	glTexCoord2f(+1, 0.0f); glVertex2f(Tcasbox.Size(), Tcasbox.Size());	// Top Right Of The Texture and Quad
+	glEnd(); 
+
+	glEndList();
+/////////////////////
+	glNewList(IVbase + IVTCAS_RED, GL_COMPILE);
+
+	glBegin(GL_QUADS);
+	glColor4f(1.0f,0.0f,0.0f,1.0f); //paint red
+	glVertex2i(-5, -5);
+	glVertex2i(-5, 5);
+	glVertex2i(5, 5);
+	glVertex2i(5, -5);
+	glEnd();
+
+	glEndList();
+////////
+	glNewList(IVbase + IVTCAS_WHITE, GL_COMPILE);
+
+	glBegin(GL_QUADS);
+	glColor4f(1.0f,1.0f,1.0f,1.0f); //paint white
+ 	glVertex2i(0, -5);
+ 	glVertex2i(-5, 0);
+ 	glVertex2i(0, 5);
+	glVertex2i(5, 0);
+	glEnd();
+
+	glEndList();
+////////
+	glNewList(IVbase + IVTCAS_RANGE, GL_COMPILE);
+	glBegin(GL_POINTS);
+	glPointSize(1.0f);
+	glColor4f(1.0f,0.0f,0.0f,1.0f); //paint red
+	glVertex2i(0, 50);	
+ 	glVertex2i(15, 47);	
+	glVertex2i(29, 40);	
+	glVertex2i(40, 29);
+	glVertex2i(47, 15);
+	glVertex2i(50, 0);
+	glVertex2i(47, -15);
+	glVertex2i(40, -29);
+	glVertex2i(29, -40);
+	glVertex2i(15, -47);
+	glVertex2i(0, -50);
+	glVertex2i(-15, -47);
+	glVertex2i(-29, -40);
+	glVertex2i(-40, -29);
+	glVertex2i(-47, -15);
+	glVertex2i(-50, 0);
+	glVertex2i(-47, +15);
+	glVertex2i(-40, 29);
+	glVertex2i(-29, 40);
+	glVertex2i(-15, 47);
+	glEnd();
+ 	glEndList();
+///////////////////////
+	glNewList(IVbase + IVTCAS_YELLOW, GL_COMPILE);
+	glBegin(GL_TRIANGLE_FAN);
+	glColor4f(0.0f,1.0f,0.0f,1.0f);//Change the object color to yellow
+ 	glVertex2f(1.54, 4.75);	
+	glVertex2f(2.93, 4.04);	
+	glVertex2f(4.04, 2.93);
+	glVertex2f(4.75, 1.54);
+	glVertex2f(5, 0);
+	glVertex2f(4.75, -1.54);
+	glVertex2f(4.04, -2.93);
+	glVertex2f(2.93, -4.04);
+	glVertex2i(1.54, -4.75);
+	glVertex2f(0, -5);
+	glVertex2f(-1.54, -4.75);
+	glVertex2f(-2.93, -4.04);
+	glVertex2f(-4.04, -2.93);
+	glVertex2f(-4.75, -1.54);
+	glVertex2f(-5, 0);
+	glVertex2f(-4.75, +1.54);
+	glVertex2f(-4.04, 2.93);
+	glVertex2f(-2.93, 4.04);
+	glVertex2f(-1.54, 4.75);
+	glEnd();
+ 	glEndList();
+///////////////////////
+	glNewList(IVbase + IVTCAS_CYAN, GL_COMPILE);
+
+	glBegin(GL_LINE_LOOP); 
+	glColor4f(0.0f,1.0f,1.0f,1.0f); //paint cyan
+ 	glVertex2i(0, -5);
+ 	glVertex2i(-5, 0);
+ 	glVertex2i(0, 5);
+	glVertex2i(5, 0);
+	glEnd(); 
+
+	glEndList();
+////////////////////
+	glNewList(IVbase + IVTCAS_OWNPLANE, GL_COMPILE);
+	glBegin(GL_LINES); 
+
+	glVertex2f(0, -7); //body
+ 	glVertex2f(0, 7);
+	glVertex2f(-5, 3); //wing
+ 	glVertex2f(6, 3);
+	glVertex2f(-3, -4); //tail
+ 	glVertex2f(4, -4);
+	glEnd(); 
+
 	glEndList();
 	///generate the textures for digits 0-7
 	//code source: NeHe productions
 	// Loop Until All 7 Are Built
-
 	float	cx;											// Holds Our X Character Coord
 	char loop;
 
@@ -305,6 +436,7 @@ static int	IvaoDrawCallback(
 
 int InitGraphics (void)
 {
+		
 	char xTextureFileName[255];
 	gXpdrCode = XPLMFindDataRef("sim/cockpit/radios/transponder_code");
 	gXpdrMode = XPLMFindDataRef("sim/cockpit/radios/transponder_mode");
@@ -323,6 +455,7 @@ int InitGraphics (void)
 	if (!IvaoLoadGLTexture(FLPSEND, IVFLP_SEND_TEXTURE)) 	{XPLMDebugString("No fpl off PngFile found\r\n");return 0;}// message should be given
 	if (!IvaoLoadGLTexture(NOFPLSEND, IVNO_FPL_TEXTURE)) 	{XPLMDebugString("No fpl send PngFile found\r\n");return 0;}// message should be given
 	if (!IvaoLoadGLTexture(IDENTON, IVIDENT_ON_TEXTURE)) 	{XPLMDebugString("No ident on PngFile found\r\n");return 0;}// message should be given
+	if (!IvaoLoadGLTexture(TCAS, IVTCAS)) {XPLMDebugString("No TCas PngFile found\r\n");return 0;}// message should be given
 	if (!IvaoLoadGLTexture(TRANSPONDER, IVDIGITS_TEXTURES)) 	{XPLMDebugString("No Digittable PngFile found\r\n");return 0;}// message should be given
 	//buidling the OpenGldisplay list
 	IvBuildTextures();
@@ -362,14 +495,14 @@ int IvaoLoadGLTexture(char *xpFileName, int IvaoTextureId)
 	strcat(xTextureFileName, TEXTURE_DIR);
 	strcat(xTextureFileName, XPLMGetDirectorySeparator());
 	strcat(xTextureFileName, xpFileName);
-	//	XPLMDebugString(xTextureFileName);
+//	XPLMDebugString(xTextureFileName);
 #if APL
 	ConvertPath(xTextureFileName, xTextureFileName, sizeof(xTextureFileName));
 #endif
 	//CreateBitmapFromPNG(xTextureFileName, ximg);
-	XPLMDebugString("loading");
-	XPLMDebugString(xTextureFileName);
-	XPLMDebugString("\r\n");
+//	XPLMDebugString("loading");
+//	XPLMDebugString(xTextureFileName);
+//	XPLMDebugString("\r\n");
 	ximg = SOIL_load_image(xTextureFileName, &sxWidth, &sxHeight, &xchannels, 3);
 	XPLMGenerateTextureNumbers(&IvaoTexture[IvaoTextureId], 1);
 	XPLMBindTexture2d(IvaoTexture[IvaoTextureId], 0);
@@ -414,17 +547,6 @@ void glPrint(int x, int y, char *str)	// Where The Printing Happens
 	glLoadIdentity();
 
 	glTranslated(x, y, 0);
-    /*	switch(color)
-     {
-     case 0: glColor4f(1,1,1,1);break;
-     case 1: glColor4f(0.8f, 0.8f,0.8f,1 );break; //LightGray
-     case 2:	glColor4f(0.7, 0.7, 1.0,1);break;  //LightBlue
-     case 3: glColor4f(1, 1, 0.0, 1.0);break; //Yellow
-     case 4: glColor4f(0.5, 0.5, 1.0,1);break;  //LightBlue
-     case 5: glColor4f(1.0, 0.5, 0.5,1);break;  //Lightred
-     default: glColor4f(1,1,1,1);break;
-     }
-     */
 	glListBase(IVbase + IVDIGITS_TEXTURES - 48); // Choose The Font Set (0 or 1)
 	glMultMatrixf(modelview_matrix);
 
@@ -447,18 +569,18 @@ static int IvaoDrawGLScene(void )
 
 	xPanelLeft = xPanelWindowLeft;
 	xPanelBottom = xPanelWindowBottom;
-
-
-	glColor3f(xRed, xGreen, xBlue);
 	
 	glPushMatrix();
+	glColor3f(xRed, xGreen, xBlue);
+	
 	glTranslated(xPanelLeft, xPanelBottom, 0);
 	/// Tell Xplane what we are doing
 	XPLMSetGraphicsState(0/*Fog*/, 1/*TexUnits*/, 0/*Lighting*/, 0/*AlphaTesting*/, 0/*AlphaBlending*/, 0/*DepthTesting*/, 0/*DepthWriting*/);
 	
 	// Draw Panel
 	glCallList(IVbase + IVPANEL_TEXTURE);
-	
+
+
 	//draw the subtextures using alpha blend
 	XPLMSetGraphicsState(0/*Fog*/, 1/*TexUnits*/, 0/*Lighting*/, 0/*AlphaTesting*/, 1/*AlphaBlending*/, 0/*DepthTesting*/, 1/*DepthWriting*/);
 	// Enable Smooth Shading
@@ -489,13 +611,43 @@ static int IvaoDrawGLScene(void )
 	glTranslated(536, 98, 0);
 	if (Graphics & 16) glCallList(IVbase + IVIDENT_ON_TEXTURE);
 	glPopMatrix();
-	
+	glPushMatrix();
 	char text[10];
 	sprintf(text, "%4.4d", XPLMGetDatai(gXpdrCode)); //fix for transpondercodes <1000
 	glPrint(558, 90, text);
+	glPopMatrix();
+	glLoadIdentity();
+	//glPushMatrix();
+	glTranslated(Tcasbox.left,Tcasbox.bottom, 0);
+	if (Tcasbox.ShowTcas) glCallList(IVbase + IVTCAS); //tcas picture
 
+	glTranslated(100,100, 0); //set to center
+	//disable texture drawing and switch
+	XPLMSetGraphicsState(0/*Fog*/, 0/*TexUnits*/, 0/*Lighting*/, 0/*AlphaTesting*/, 0/*AlphaBlending*/, 0/*DepthTesting*/, 0/*DepthWriting*/);
+
+	glPushMatrix();
+	if ((Tcasbox.range==Tcasbox.NM3) & Tcasbox.ShowTcas) glCallList(IVbase+IVTCAS_RANGE);
+	glPopMatrix();
+	if ((Tcasbox.tcasmode!=STBY) & Tcasbox.ShowTcas) for (char i=0;i<10;i++) if (Tcasbox.Tcaslist[i].show)  {
+																glPushMatrix();
+																glTranslated(Tcasbox.Tcaslist[i].x_scale,Tcasbox.Tcaslist[i].y_scale, 0);
+																switch (Tcasbox.Tcaslist[i].displaymode)
+																{
+																	case	T_CYAN:default:	glCallList(IVbase+IVTCAS_CYAN);break;
+																	case	T_YELLOW:glCallList(IVbase+IVTCAS_YELLOW);break;
+																	case	T_WHITE:glCallList(IVbase+IVTCAS_WHITE);break;
+																	case	T_RED:glCallList(IVbase+IVTCAS_RED);break;
+																}
+														
+																glPopMatrix();
+																}
+
+
+	glColor4f(0.0f,1.0f,0.0f,1.0f);//Change the object color to yellow
+	if (Tcasbox.ShowTcas) glCallList(IVbase+IVTCAS_OWNPLANE);
+	/////////////////////////////
 	//set everything back as we found it
-    glPopMatrix();
+	glPopMatrix();
 	XPLMSetGraphicsState(0/*Fog*/, 1/*TexUnits*/, 0/*Lighting*/, 0/*AlphaTesting*/, 0/*AlphaBlending*/, 1/*DepthTesting*/, 0/*DepthWriting*/);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glFlush();

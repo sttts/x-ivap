@@ -40,7 +40,8 @@ void CloseGauge(void);
 #define NOFPLSEND		"fpl_err.png"
 #define IDENTON			"squawk_id.png"
 #define TRANSPONDER		"transponder.png"
-#define MAXTEXTURE 17	//17
+#define TCAS			"tcas.png"
+#define MAXTEXTURE 24	//17
 #define IVPANEL_TEXTURE 0
 #define	IVTRANS_OFF_TEXTURE	1
 #define	IVTRANS_ON_TEXTURE	2
@@ -50,8 +51,14 @@ void CloseGauge(void);
 #define	IVFLP_SEND_TEXTURE	6
 #define	IVIDENT_OFF_TEXTURE	7
 #define	IVIDENT_ON_TEXTURE	8
-#define	IVDIGITS_TEXTURES	9
-#endif // header
+#define IVTCAS				9
+#define	IVTCAS_WHITE		10
+#define IVTCAS_YELLOW		11
+#define IVTCAS_OWNPLANE		12
+#define	IVTCAS_RED			13
+#define IVTCAS_CYAN			14
+#define IVTCAS_RANGE		15
+#define	IVDIGITS_TEXTURES	16
 
 
 int LoadGLTexture(char *pFileName, int TextureId);
@@ -66,3 +73,5 @@ static unsigned char*
 
 static int IvaoDrawGLScene(void );
 void KillFont(void);	
+
+#endif // header

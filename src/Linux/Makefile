@@ -3,6 +3,7 @@
 #                   10.x
 #  12-12-2011 SD2/FJa - End of PPC support
 #  28-09-2012 SD2/FJa - OSX 10.8.1 support (Xcode 4.5)
+#  24-12-2012 changed makefiles to x64 support; inserted new 2.1 libs
 
 all: X-IvAp
 
@@ -48,7 +49,9 @@ cpp_SRC+=${WD}/src/XIvAp/navQuery.cpp
 cpp_SRC+=${WD}/src/XIvAp/WristWatch.cpp
 cpp_SRC+=${WD}/src/XIvAp/planeposition.cpp
 cpp_SRC+=${WD}/src/XIvAp/SoundGraphics.cpp
+cpp_SRC+=${WD}/src/XIvAp/Tcas.cpp
 cpp_SRC+=${WD}/src/stund/StunClient.cpp
+
 
 
 # source files from the multiplayer SDK
@@ -98,6 +101,7 @@ LIBS+=-lz ${WD}/src/ptypes/lib/libptypes.a
 
 XIVAP_DEPENDS=ptypes stund png
 
+ARCH=32
 
 # IVAO specifics
 CFLAGS+= -DIVAO

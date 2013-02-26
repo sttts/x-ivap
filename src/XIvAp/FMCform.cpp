@@ -299,7 +299,7 @@ void FMCForm::create()
 	XPAddWidgetCallback(window, fmcFormHandler);
 }
 
-int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMessage_CloseButtonPushed) {
 		hide();
@@ -308,32 +308,32 @@ int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inPara
 	
 	if(inMessage == xpMsg_PushButtonPressed) {
 		// cancel
-		if(inParam1 == (long)closeButton) {
+		if(inParam1 == (intptr_t)closeButton) {
 			hide();
 			return 1;
 		}
 
 		// export
-		if(inParam1 == (long)exportButton) {
+		if(inParam1 == (intptr_t)exportButton) {
 			FMCExport();
 			return 1;
 		}
 
-		if(inParam1 == (long)sidClearAllBtn) {
+		if(inParam1 == (intptr_t)sidClearAllBtn) {
 			// clear the list box
 			XPSetWidgetProperty(sidWptListBox, xpProperty_ListBoxClear, 1);
 			sidPoints.clear();
 			return 1;
 		}
 
-		if(inParam1 == (long)starClearAllBtn) {
+		if(inParam1 == (intptr_t)starClearAllBtn) {
 			// clear the list box
 			XPSetWidgetProperty(starWptListBox, xpProperty_ListBoxClear, 1);
 			starPoints.clear();
 			return 1;
 		}
 
-		if(inParam1 == (long)sidClearBtn) {
+		if(inParam1 == (intptr_t)sidClearBtn) {
 			int	item = XPGetWidgetProperty(sidWptListBox, xpProperty_ListBoxCurrentItem, NULL);
 			if(item >= (int)sidPoints.size() || item < 0) return 1;
 			XPSetWidgetProperty(sidWptListBox, xpProperty_ListBoxDeleteItem, 1);
@@ -343,7 +343,7 @@ int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inPara
 			return 1;
 		}
 
-		if(inParam1 == (long)starClearBtn) {
+		if(inParam1 == (intptr_t)starClearBtn) {
 			int	item = XPGetWidgetProperty(starWptListBox, xpProperty_ListBoxCurrentItem, NULL);
 			if(item >= (int)starPoints.size() || item < 0) return 1;
 			XPSetWidgetProperty(starWptListBox, xpProperty_ListBoxDeleteItem, 1);
@@ -353,7 +353,7 @@ int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inPara
 			return 1;
 		}
 
-		if(inParam1 == (long)addSidButton) {
+		if(inParam1 == (intptr_t)addSidButton) {
 			if(navEntries.size() <= 0) return 1;
 			// add point to SID
 			int	item = XPGetWidgetProperty(inputListBox, xpProperty_ListBoxCurrentItem, NULL);
@@ -369,7 +369,7 @@ int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inPara
 			return 1;
 		}
 
-		if(inParam1 == (long)addStarButton) {
+		if(inParam1 == (intptr_t)addStarButton) {
 			if(navEntries.size() <= 0) return 1;
 			// add point to STAR
 			int	item = XPGetWidgetProperty(inputListBox, xpProperty_ListBoxCurrentItem, NULL);
@@ -385,22 +385,22 @@ int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inPara
 			return 1;
 		}
 
-		if(inParam1 == (long)sidSaveBtn) {
+		if(inParam1 == (intptr_t)sidSaveBtn) {
 			saveSid();
 			return 1;
 		}
 
-		if(inParam1 == (long)starSaveBtn) {
+		if(inParam1 == (intptr_t)starSaveBtn) {
 			saveStar();
 			return 1;
 		}
 
-		if(inParam1 == (long)sidLoadBtn) {
+		if(inParam1 == (intptr_t)sidLoadBtn) {
 			loadSid();
 			return 1;
 		}
 
-		if(inParam1 == (long)starLoadBtn) {
+		if(inParam1 == (intptr_t)starLoadBtn) {
 			loadStar();
 			return 1;
 		}
@@ -408,14 +408,14 @@ int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inPara
 	}
 
 	if(inMessage == xpMessage_PopupNewItemPicked) {
-		if(inParam1 == (long)sidPopup) {
+		if(inParam1 == (intptr_t)sidPopup) {
 			unsigned int curItem = XPGetWidgetProperty(sidPopup, xpProperty_PopupCurrentItem, NULL);
 			if(curItem > SIDnames.size() || SIDnames.size() == 0) return 1;
 			XPSetWidgetDescriptor(sidTextField, pconst(SIDnames[curItem]));
 			return 1;
 		}
 
-		if(inParam1 == (long)starPopup) {
+		if(inParam1 == (intptr_t)starPopup) {
 			unsigned int curItem = XPGetWidgetProperty(starPopup, xpProperty_PopupCurrentItem, NULL);
 			if(curItem > STARnames.size() || STARnames.size() == 0) return 1;
 			XPSetWidgetDescriptor(starTextField, pconst(STARnames[curItem]));
@@ -424,9 +424,9 @@ int	FMCForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inPara
 	}
 
 	if(inMessage == xpMsg_ButtonStateChanged) {
-		if(inParam1 == (long)VORselect || inParam1 == (long)NDBselect ||
-		   inParam1 == (long)DMEselect || inParam1 == (long)FIXselect ||
-		   inParam1 == (long)LLselect) { 
+		if(inParam1 == (intptr_t)VORselect || inParam1 == (intptr_t)NDBselect ||
+		   inParam1 == (intptr_t)DMEselect || inParam1 == (intptr_t)FIXselect ||
+		   inParam1 == (intptr_t)LLselect) { 
 
 			XPSetWidgetProperty(VORselect, xpProperty_ButtonState, 0);
 			XPSetWidgetProperty(NDBselect, xpProperty_ButtonState, 0);
