@@ -2,11 +2,11 @@
 #define _XPLMPlugin_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -33,6 +33,8 @@ extern "C" {
  *
  */
 
+
+
 /*
  * XPLMGetMyID
  * 
@@ -49,7 +51,7 @@ XPLM_API XPLMPluginID         XPLMGetMyID(void);
  * disabled and enabled.                                                       
  *
  */
-XPLM_API long                 XPLMCountPlugins(void);
+XPLM_API int                  XPLMCountPlugins(void);
 
 /*
  * XPLMGetNthPlugin
@@ -60,7 +62,7 @@ XPLM_API long                 XPLMCountPlugins(void);
  *
  */
 XPLM_API XPLMPluginID         XPLMGetNthPlugin(
-                                   long                 inIndex);    
+                                   int                  inIndex);    
 
 /*
  * XPLMFindPluginByPath
@@ -115,6 +117,8 @@ XPLM_API void                 XPLMGetPluginInfo(
  * plugins will not need to use these APIs.                                    
  *
  */
+
+
 
 /*
  * XPLMIsPluginEnabled
@@ -180,6 +184,8 @@ XPLM_API void                 XPLMReloadPlugins(void);
  *
  */
 
+
+
 /* This message is sent to your plugin whenever the user's plane crashes.      */
 #define XPLM_MSG_PLANE_CRASHED 101
 
@@ -202,6 +208,32 @@ XPLM_API void                 XPLMReloadPlugins(void);
  * because in XP6 the number of aircraft is not user-adjustable.               */
 #define XPLM_MSG_AIRPLANE_COUNT_CHANGED 105
 
+#if defined(XPLM200)
+/* This message is sent to your plugin whenever a plane is unloaded.  The      *
+ * parameter is the number of the plane being unloaded; 0 indicates the user's *
+ * plane.  The parameter is of type int, passed as the value of the pointer.   *
+ * (That is: the parameter is an int, not a pointer to an int.)                */
+#define XPLM_MSG_PLANE_UNLOADED 106
+#endif /* XPLM200 */
+
+#if defined(XPLM210)
+/* This message is sent to your plugin right before X-Plane writes its         *
+ * preferences file.  You can use this for two purposes: to write your own     *
+ * preferences, and to modify any datarefs to influence preferences output.    *
+ * For example, if your plugin temporarily modifies saved preferences, you can *
+ * put them back to their default values here to avoid  having the tweaks be   *
+ * persisted if your plugin is not loaded on the next invocation of X-Plane.   */
+#define XPLM_MSG_WILL_WRITE_PREFS 107
+#endif /* XPLM210 */
+
+#if defined(XPLM210)
+/* This message is sent to your plugin right after a livery is loaded for an   *
+ * airplane.  You can use this to check the new livery (via datarefs) and      *
+ * react accordingly.  The parameter is of type int, passed as the value of a  *
+ * pointer and represents the aicraft plane number - 0 is the user's plane.    */
+#define XPLM_MSG_LIVERY_LOADED 108
+#endif /* XPLM210 */
+
 /*
  * XPLMSendMessageToPlugin
  * 
@@ -212,9 +244,86 @@ XPLM_API void                 XPLMReloadPlugins(void);
  */
 XPLM_API void                 XPLMSendMessageToPlugin(
                                    XPLMPluginID         inPlugin,    
-                                   long                 inMessage,    
+                                   int                  inMessage,    
                                    void *               inParam);    
 
+#if defined(XPLM200)
+/***************************************************************************
+ * Plugin Features API
+ ***************************************************************************/
+/*
+ * The plugin features API allows your plugin to "sign up" for additional 
+ * capabilities and plugin system features that are normally disabled for 
+ * backward compatibility.  This allows advanced plugins to "opt-in" to new 
+ * behavior. 
+ * 
+ * Each feature is defined by a permanent string name.  The feature string 
+ * names will vary with the particular  installation of X-Plane, so plugins 
+ * should not expect a feature to be guaranteed present.                       
+ *
+ */
+
+
+
+
+/*
+ * XPLMFeatureEnumerator_f
+ * 
+ * You pass an XPLMFeatureEnumerator_f to get a list of all features supported 
+ * by a given version running version of X-Plane.  This routine is called once 
+ * for each feature.                                                           
+ *
+ */
+typedef void (* XPLMFeatureEnumerator_f)(
+                                   const char *         inFeature,    
+                                   void *               inRef);    
+
+/*
+ * XPLMHasFeature
+ * 
+ * This returns 1 if the given installation of X-Plane supports a feature, or 
+ * 0 if it does not.                                                           
+ *
+ */
+XPLM_API int                  XPLMHasFeature(
+                                   const char *         inFeature);    
+
+/*
+ * XPLMIsFeatureEnabled
+ * 
+ * This returns 1 if a feature is currently enabled for your plugin, or 0 if 
+ * it is not enabled.  It is an error to call this routine with an unsupported 
+ * feature.                                                                    
+ *
+ */
+XPLM_API int                  XPLMIsFeatureEnabled(
+                                   const char *         inFeature);    
+
+/*
+ * XPLMEnableFeature
+ * 
+ * This routine enables or disables a feature for your plugin.  This will 
+ * change the running behavior of X-Plane and your plugin in some way, 
+ * depending on the feature.                                                   
+ *
+ */
+XPLM_API void                 XPLMEnableFeature(
+                                   const char *         inFeature,    
+                                   int                  inEnable);    
+
+/*
+ * XPLMEnumerateFeatures
+ * 
+ * This routine calls your enumerator callback once for each feature that this 
+ * running version of X-Plane supports. Use this routine to determine all of 
+ * the features that X-Plane can support.                                      
+ *
+ */
+XPLM_API void                 XPLMEnumerateFeatures(
+                                   XPLMFeatureEnumerator_f inEnumerator,    
+                                   void *               inRef);    
+
+#endif /* XPLM200 */
 #ifdef __cplusplus
 }
 #endif

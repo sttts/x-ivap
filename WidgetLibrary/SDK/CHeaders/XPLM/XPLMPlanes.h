@@ -2,11 +2,11 @@
 #define _XPLMPlanes_h_
 
 /*
- * Copyright 2005 Sandy Barbour and Ben Supnik
+ * Copyright 2005-2012 Sandy Barbour and Ben Supnik
  * 
  * All rights reserved.  See license.txt for usage.
  * 
- * X-Plane SDK Version: 1.0.2                                                  
+ * X-Plane SDK Version: 2.1.1                                                  
  *
  */
 
@@ -29,6 +29,7 @@ extern "C" {
  *                                                                             
  *
  */
+
 
 /*
  * XPLMSetUsersAircraft
@@ -57,6 +58,7 @@ XPLM_API void                 XPLMPlaceUserAtAirport(
  *
  */
 
+
 /* The user's aircraft is always index 0.                                      */
 #define XPLM_USER_AIRCRAFT   0
 /*
@@ -70,7 +72,7 @@ XPLM_API void                 XPLMPlaceUserAtAirport(
  * 
  * Most of these fields are ratios from 0 to 1 for control input.  X-Plane 
  * calculates what the actual controls look like based on the .acf file for 
- * that airplane.  Note for the yolk inputs, this is what the pilot of the 
+ * that airplane.  Note for the yoke inputs, this is what the pilot of the 
  * plane has commanded (post artificial stability system if there were one) 
  * and affects aelerons, rudder, etc.  It is not  necessarily related to the 
  * actual position of the plane!                                               
@@ -78,7 +80,7 @@ XPLM_API void                 XPLMPlaceUserAtAirport(
  */
 typedef struct {
      /* The size of the draw state struct.                                          */
-     long                      structSize;
+     int                       structSize;
      /* A ratio from [0..1] describing how far the landing gear is extended.        */
      float                     gearPosition;
      /* Ratio of flap deployment, 0 = up, 1 = full deploy.                          */
@@ -94,11 +96,11 @@ typedef struct {
      /* Thrust power, 0 = none, 1 = full fwd, -1 = full reverse.                    */
      float                     thrust;
      /* Total pitch input for this plane.                                           */
-     float                     yolkPitch;
+     float                     yokePitch;
      /* Total Heading input for this plane.                                         */
-     float                     yolkHeading;
+     float                     yokeHeading;
      /* Total Roll input for this plane.                                            */
-     float                     yolkRoll;
+     float                     yokeRoll;
 } XPLMPlaneDrawState_t;
 /*
  * XPLMCountAircraft
@@ -135,6 +137,8 @@ XPLM_API void                 XPLMGetNthAircraftModel(
  * one plugin may have this access at a time.                                  
  *
  */
+
+
 
 /*
  * XPLMPlanesAvailable_f
