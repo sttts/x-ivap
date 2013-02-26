@@ -672,30 +672,32 @@ stunRand()
       UInt64 tick;
 		
 #if defined(WIN32) 
+#if !defined(UNDER_CE) && !defined(__GNUC__) && !defined(_WIN64) //inserted x64 platform 24/12/2012
       volatile unsigned int lowtick=0,hightick=0;
-# ifndef __GNUC__
       __asm
       {
            rdtsc 
            mov lowtick, eax
            mov hightick, edx
       }
-# else	/* __GNUC__ */
-      asm("rdtsc\n\t");
-      asm("mov %0, %%eax\n\t" : "=r" (lowtick));
-      asm("mov %0, %%edx\n\t" : "=r" (hightick));
       tick = hightick;
       tick <<= 32;
       tick |= lowtick;
-# endif
-#elif defined(__GNUC__) && ( defined(__i686__) || defined(__i386__) )
+#else
+      tick = GetTickCount();
+#endif
+#elif defined(__GNUC__) && ( defined(__i686__) || defined(__i386__) || defined(__x86_64__) )
       asm("rdtsc" : "=A" (tick));
 #elif defined (__SUNPRO_CC) || defined( __sparc__ )	
       tick = gethrtime();
-#elif defined(__MACH__) 
+#elif defined (__APPLE__)|| (__MACH__) 
       int fd=open("/dev/random",O_RDONLY);
       read(fd,&tick,sizeof(tick));
       closesocket(fd);
+#elif defined(__linux__)
+ 	int fd=open("/dev/urandom",O_RDONLY);
+	 read(fd,&tick,sizeof(tick));
+ 	 closeSocket(fd);
 #else
 #     error Need some way to seed the random number generator 
 #endif 

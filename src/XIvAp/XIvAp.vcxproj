@@ -354,6 +354,7 @@
     <ClCompile Include="SoundGraphics.cpp" />
     <ClCompile Include="stb_image_aug.cpp" />
     <ClCompile Include="systemcallbacks.cpp" />
+    <ClCompile Include="Tcas.cpp" />
     <ClCompile Include="tcpsocket.cpp" />
     <ClCompile Include="TeamSpeak.cpp" />
     <ClCompile Include="TLVpacket.cpp" />
@@ -415,6 +416,7 @@
     <ClInclude Include="stbi_DDS_aug.h" />
     <ClInclude Include="stbi_DDS_aug_c.h" />
     <ClInclude Include="systemcallbacks.h" />
+    <ClInclude Include="Tcas.h" />
     <ClInclude Include="tcpsocket.h" />
     <ClInclude Include="TeamSpeak.h" />
     <ClInclude Include="TLVpacket.h" />
@@ -448,11 +450,16 @@
     <ClInclude Include="..\stund\udp.h" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="..\..\SDK\Libraries\Win\XPLM_64.lib" />
+    <Library Include="..\..\SDK\Libraries\Win\XPWidgets_64.lib" />
+    <Library Include="..\FMOD\FMODWindows\api\lib\fmodex64_vc.lib" />
     <Library Include="..\FMOD\FMODWindows\api\lib\fmodex_vc.lib" />
-    <Library Include="..\..\SDK\Libraries\Win\pnglib.lib" />
     <Library Include="..\..\Sdk\Libraries\Win\XPLM.lib" />
     <Library Include="..\..\Sdk\Libraries\Win\XPWidgets.lib" />
-    <Library Include="..\..\SDK\Libraries\Win\zlib.lib" />
+    <Library Include="..\png\Windows\pnglib.lib" />
+    <Library Include="..\png\Windows\pnglib64.lib" />
+    <Library Include="..\zlib\win32\zlib.lib" />
+    <Library Include="..\zlib\win32\zlib64.lib" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ptypes\win32\PTypes_ST.vcxproj">

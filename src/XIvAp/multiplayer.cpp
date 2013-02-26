@@ -318,7 +318,7 @@ void MultiplayerEngine::decodeFSDPosition(const FSD::Message& packet,
 
 			if(position != NULL) {
 				//adding the gluelogic to new TCAS 24/10/2012
-				xivap.Tcasbox.DumpPilotPos(packet.dest,atof(packet.tokens[2]),atof(packet.tokens[3]),atof(packet.tokens[4]));
+				// FIXME compile error: xivap.Tcasbox.DumpPilotPos(packet.dest,atof(packet.tokens[2]),atof(packet.tokens[3]),atof(packet.tokens[4]));
 
 				position->lat = atof(packet.tokens[2]);
 				position->lon = atof(packet.tokens[3]);

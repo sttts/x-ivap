@@ -687,7 +687,7 @@ void UiWindow::prepScreen()
 				addText(AL_ctr, 0, colDarkGreen, "MAIN", true);
 				addText(AL_left, 0, colDarkGreen, "VHF1 " + xivap.com1freq(), false);
 				
-				addText(AL_ctr, 1, colYellow,"WxStat:"+ xivap._erwin.oldWxStation,false); //added for display Used wxname 4/01/2013
+				// FIXME compile error: addText(AL_ctr, 1, colYellow,"WxStat:"+ xivap._erwin.oldWxStation,false); //added for display Used wxname 4/01/2013
 				string line = "OFFLINE";
 				if(xivap.online()) {line = xivap.fsd.callsign() + " ON";Graphics|=4;} else Graphics&=~4;
 				addText(AL_right, 0, colLightBlue, line, false);

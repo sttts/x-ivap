@@ -15,7 +15,8 @@
 
 typedef int socklen_t;
 typedef SOCKET Socket;
-/* removed as it interferes with vc2010 27-12-2010
+#ifndef IBM
+//diabled cause it generates errors due conflict with errno.h
 #define EWOULDBLOCK             WSAEWOULDBLOCK
 #define EINPROGRESS             WSAEINPROGRESS
 #define EALREADY                WSAEALREADY
@@ -51,7 +52,7 @@ typedef SOCKET Socket;
 #define EDQUOT                  WSAEDQUOT
 #define ESTALE                  WSAESTALE
 #define EREMOTE                 WSAEREMOTE
-*/
+#endif
 #define EHOSTDOWN               WSAEHOSTDOWN
 typedef LONGLONG Int64; 
 inline int getErrno() { return WSAGetLastError(); }
