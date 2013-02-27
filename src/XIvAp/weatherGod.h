@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *   Copyright (C) 2006 by Martin Domig                                    *
  *   martin@domig.net                                                      *
@@ -104,7 +105,7 @@ public:
 	void transit() { if(initialized && haveWeather) current.transit(target, lastset); };
 
 	void dump() const;
-
+	string oldWxStation;
 private:
 	// synchronizes the current weather station with reality
 	void syncWx();
@@ -128,7 +129,7 @@ private:
 	XPWeatherSituation lastset;		// the wx settings we did write to XP
 
 	// used for console printout only
-	string oldWxStation;
+	
 };
 
 #endif

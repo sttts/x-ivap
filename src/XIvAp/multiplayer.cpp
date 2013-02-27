@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *   Copyright (C) 2006 by Martin Domig                                    *
  *   martin@domig.net                                                      *
@@ -73,7 +74,7 @@ float FloatPrefs(const char *section, const char *key, float def)
 }
 
 /******************************************************************************/
-/** OO code below here :) *****************************************************/
+/** OO code below here  *****************************************************/
 /******************************************************************************/
 
 MultiplayerEngine::MultiplayerEngine():
@@ -318,7 +319,7 @@ void MultiplayerEngine::decodeFSDPosition(const FSD::Message& packet,
 
 			if(position != NULL) {
 				//adding the gluelogic to new TCAS 24/10/2012
-				// FIXME compile error: xivap.Tcasbox.DumpPilotPos(packet.dest,atof(packet.tokens[2]),atof(packet.tokens[3]),atof(packet.tokens[4]));
+				xivap.Tcasbox.DumpPilotPos(packet.dest,atof(packet.tokens[2]),atof(packet.tokens[3]),atof(packet.tokens[4]),radarstatus->mode,atof(packet.tokens[5]),position->heading);
 
 				position->lat = atof(packet.tokens[2]);
 				position->lon = atof(packet.tokens[3]);
@@ -671,7 +672,7 @@ void MultiplayerEngine::p2phandshake(MultiplayerPilot *pilot)
 	static char buf[64];
 
 	response.reset();
-	// lets say hello ;)
+	// lets say hello 
 	response.setTLV(IVAO_PTPOS_Callsign, length(xivap.callsign)+1, pconst(xivap.callsign));
 	response.setTV(IVAO_EchoRequest, pilot->RegisterEchoRequest()); // ping him, since we're at it...
 	response.setTV(IVAO_PTPOS_CallsignReq, 0);
