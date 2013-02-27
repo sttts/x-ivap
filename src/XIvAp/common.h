@@ -64,6 +64,7 @@ USING_PTYPES
 #undef htons
 #endif
 
+#ifndef WIN32
 inline float htonf( const float f )
 {
     int i = htonl( *(int *)&f );
@@ -75,6 +76,7 @@ inline float ntohf( const float f )
     int i = ntohl( *(int *)&f );
     return *(float *)&i;
 }
+#endif
 
 
 // macro to convert a pt::string to std::string
