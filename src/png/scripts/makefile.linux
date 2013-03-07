@@ -31,8 +31,8 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-I$(ZLIBINC) -fno-stack-protector -Wall -O3 -funroll-loops \
-	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-fPIC -I$(ZLIBINC) -fno-stack-protector -Wall -O3 -funroll-loops \
+	$(ALIGN) -m$(ARCH) # $(WARNMORE) -g -DPNG_DEBUG=5 
 
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng12 -lz -lm
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
@@ -97,7 +97,7 @@ $(LIBNAME).so.$(PNGMAJ): $(LIBNAME).so.$(PNGVER)
 	ln -sf $(LIBNAME).so.$(PNGVER) $(LIBNAME).so.$(PNGMAJ)
 
 $(LIBNAME).so.$(PNGVER): $(OBJSDLL)
-	$(CC) -shared -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) \
+	$(CC) -m$(ARCH) -shared -Wl,-soname,$(LIBNAME).so.$(PNGMAJ) \
 	-o $(LIBNAME).so.$(PNGVER) \
 	$(OBJSDLL)
 
