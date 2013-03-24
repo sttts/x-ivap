@@ -131,6 +131,12 @@
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='IVAO|Win32'">.xpl</TargetExt>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='IVAO|x64'">.xpl</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IVAO|Win32'">
+    <TargetName>X-IvAp-32</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='IVAO|x64'">
+    <TargetName>X-IvAp-64</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
