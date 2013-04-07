@@ -379,11 +379,16 @@ bool TeamSpeak::Quit()
 
 
 /*
- * Run the Teamspeak command on Lniux
+ * Run the Teamspeak command on Linux
  */
 
 void TeamSpeak::RunTeamspeakControl(const string& url) {
-    string tscontrol_cmd = tscontrol_path + " CONNECT " + url + "";
-    xivap.addText(colCyan, "Teamspeak: running " + tscontrol_cmd, true, true);
-    system(tscontrol_cmd);
+    if (length(tscontrol_path) > 0) {
+
+        string tscontrol_cmd = tscontrol_path;
+        tscontrol_cmd += " CONNECT ";
+        tscontrol_cmd += url;
+
+        system(tscontrol_cmd);
+    }
 }
