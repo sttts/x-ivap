@@ -377,6 +377,7 @@ bool TeamSpeak::Quit()
 	return true;
 }
 
+#ifdef LINUX
 
 /*
  * Run the Teamspeak command on Linux
@@ -392,3 +393,5 @@ void TeamSpeak::RunTeamspeakControl(const string& url) {
         system(tscontrol_cmd);
     }
 }
+
+#endif
