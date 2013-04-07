@@ -35,6 +35,10 @@
 #define HAVE_TEAMSPEAK
 #endif
 
+#ifdef LINUX
+#define HAVE_TEAMSPEAK
+#endif
+
 class TeamSpeak 
 {
 public:
@@ -96,6 +100,11 @@ private:
                       const string& pilotcall,
                       const string& atccall);
 
+#ifdef LINUX
+    void RunTeamspeakControl(const string& url);
+
+    string tscontrol_path;
+#endif
 
 };
 
