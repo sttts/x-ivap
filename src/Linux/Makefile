@@ -109,9 +109,6 @@ ifeq (${ARCH}, 64)
 	CFLAGS+=-DX64
 endif
 
-# IVAO specifics
-CFLAGS+= -DIVAO
-
 # Handle Linux/OS X specific stuff here.
 ifeq (${OS}, Linux)
 	cpp_SRC+=${WD}/SDK/multiplayer/src/PlatformUtils.lin.cpp
