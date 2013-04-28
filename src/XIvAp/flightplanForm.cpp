@@ -40,6 +40,7 @@ FlightplanForm::FlightplanForm()
 	XPAddWidgetCallback(actypeTextField, flightplanFormHandler);
 	XPAddWidgetCallback(departureTextField, flightplanFormHandler);
 	XPAddWidgetCallback(equipTextField, flightplanFormHandler);
+	XPAddWidgetCallback(transponderTextField, flightplanFormHandler);
 	XPAddWidgetCallback(routeTextField, flightplanFormHandler);
 	XPAddWidgetCallback(destTextField, flightplanFormHandler);
 	XPAddWidgetCallback(alternateTextField, flightplanFormHandler);
@@ -139,12 +140,15 @@ void FlightplanForm::create()
 	XPCreateWidget(x+221, y, x+233, y-22, 1, "-", 0, window, xpWidgetClass_Caption);
 	equipTextField = XPCreateWidget(x+241, y, x+295, y-22, 1, "S", 0, window, xpWidgetClass_TextField);
 	XPSetWidgetProperty(equipTextField, xpProperty_TextFieldType, xpTextEntryField);
-	XPSetWidgetProperty(equipTextField, xpProperty_MaxCharacters, 7);
+	XPSetWidgetProperty(equipTextField, xpProperty_MaxCharacters, 30); //changed to input max 30 chars, field 10a
 
 	// transpondertype
 	XPCreateWidget(x+298, y, x+318, y-22, 1, "/", 0, window, xpWidgetClass_Caption);
-	xpdrPopup = XPCreatePopup(x+318, y, x+350, y-22, 1, "C  (Mode C);S  (Mode S, with alt and aircraft id);X  (Mode S, no alt and no aircraft id);P  (Mode S, alt but no aircraft id);I  (Mode S, no alt but aircraft id);A  (Mode A - no altitude reporting);N  (no transponder on board);", window);	
-	XPCreateWidget(x+355, y, x+370, y-22, 1, "<<=", 0, window, xpWidgetClass_Caption);
+	//xpdrPopup = XPCreatePopup(x+318, y, x+350, y-22, 1, "C  (Mode C);S  (Mode S, with alt and aircraft id);X  (Mode S, no alt and no aircraft id);P  (Mode S, alt but no aircraft id);I  (Mode S, no alt but aircraft id);A  (Mode A - no altitude reporting);N  (no transponder on board);", window);	
+	transponderTextField = XPCreateWidget(x+318, y, x+360, y-22, 1, "S12345678", 0, window, xpWidgetClass_TextField);
+	XPSetWidgetProperty(transponderTextField, xpProperty_TextFieldType, xpTextEntryField);
+	XPSetWidgetProperty(transponderTextField, xpProperty_MaxCharacters, 10);
+	XPCreateWidget(x+360, y, x+370, y-22, 1, "<<=", 0, window, xpWidgetClass_Caption);
 
 	y = y - 24;
 	// aircraft select popup
@@ -436,7 +440,7 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long
 		if(widget == callsignTextField || widget == departureTextField || widget == actypeTextField
 			|| widget == equipTextField || widget == routeTextField || widget == destTextField
 			|| widget == alternateTextField || widget == alternate2TextField || widget == airlineTextField
-			|| widget == commentsTextField)
+			|| widget == commentsTextField || widget == transponderTextField)
 		{
 			key->key = pt::upcase(key->key);
 
@@ -540,18 +544,7 @@ void FlightplanForm::fillForm()
 	XPSetWidgetDescriptor(actypeTextField, pconst(xivap.fpl.aircrafttype));
 	XPSetWidgetDescriptor(airlineTextField, pconst(xivap.fpl.airline));
 	XPSetWidgetDescriptor(equipTextField, pconst(xivap.fpl.equip));
-
-	switch(xivap.fpl.transpondertype[0]) {
-		case 'C': i = 0; break;
-		case 'S': i = 1; break;
-		case 'X': i = 2; break;
-		case 'P': i = 3; break;
-		case 'I': i = 4; break;
-		case 'A': i = 5; break;
-		default:
-		case 'N': i = 6; break;
-	}
-	XPSetWidgetProperty(xpdrPopup, xpProperty_PopupCurrentItem, i);
+	XPSetWidgetDescriptor(transponderTextField, pconst(xivap.fpl.equip));	
 
 	XPSetWidgetDescriptor(departureTextField, pconst(xivap.fpl.departure));
 	XPSetWidgetDescriptor(deptimeTextField, pconst(xivap.fpl.deptimeest));
@@ -676,17 +669,7 @@ void FlightplanForm::send(bool closeWindow)
 	}
 	
 	READFORM(equipTextField, xivap.fpl.equip);
-
-	i = XPGetWidgetProperty(xpdrPopup, xpProperty_PopupCurrentItem, NULL);
-	switch(i) {
-		case 0: xivap.fpl.transpondertype = "C"; break;
-		case 1: xivap.fpl.transpondertype = "S"; break;
-		case 2: xivap.fpl.transpondertype = "X"; break;
-		case 3: xivap.fpl.transpondertype = "P"; break;
-		case 4: xivap.fpl.transpondertype = "I"; break;
-		case 5: xivap.fpl.transpondertype = "A"; break;
-		case 6: xivap.fpl.transpondertype = "N"; break;
-	}
+	READFORM(transponderTextField, xivap.fpl.transpondertype);
 
 	READFORM(departureTextField, xivap.fpl.departure);
 	READFORM(deptimeTextField, xivap.fpl.deptimeest);

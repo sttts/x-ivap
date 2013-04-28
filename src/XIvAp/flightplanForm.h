@@ -40,7 +40,7 @@ public:
 private:
 	XPWidgetID window;
 	XPWidgetID callsignTextField, actypeTextField,
-		equipTextField, departureTextField, deptimeTextField,
+		equipTextField, departureTextField, deptimeTextField, transponderTextField,
 		speedTextField, altTextField, routeTextField, destTextField, eetTextField,
 		alternateTextField, alternate2TextField, commentsTextField, enduranceTextField,
 		pobTextField, picTextField, airlineTextField, airlineStaticText, fmcarStaticText;
