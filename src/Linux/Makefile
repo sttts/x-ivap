@@ -167,6 +167,12 @@ clean:
 
 # This cleans the supporting libraries too.
 distclean: clean
+ifeq (${OS}, Darwin)
+	cp ${WD}/src/png/scripts/makefile.darwin ${WD}/src/png/Makefile
+endif
+ifeq (${OS}, Linux)
+	cp ${WD}/src/png/scripts/makefile.linux ${WD}/src/png/Makefile
+endif
 	cd ${WD}/src/ptypes/ ; ${MAKE} clean
 	cd ${WD}/src/png/ ; ${MAKE} clean
 	cd ${WD}/src/stund/ ; ${MAKE} clean
