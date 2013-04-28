@@ -28,7 +28,8 @@
 #include <stdio.h>
 #include <algorithm>
 #include "PlatformUtils.h"
-
+#include "XPLMDisplay.h"
+#include "XPLMGraphics.h"
 #include <string.h>
 
 using std::max;
@@ -968,6 +969,7 @@ void			CSL_DrawObject(
 		glRotatef(pitch, 01.0, 0.0, 0.0);
 		glRotatef(roll, 0.0, 0.0, -1.0);
 	}	
+	float colWhite[]		= { 1.0f, 1.0f, 1.0f };
 
 	switch (type)
 	{

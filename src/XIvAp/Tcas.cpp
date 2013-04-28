@@ -174,7 +174,7 @@ float intruderRadial,course,dCPA,dCPAi,speed;
 float dis=(float) deg2dist(lat,lon,xivap.GetLat(),xivap.GetLon());
 char i=0;
 
-Tagging(lat,lon,alt,pilot);
+
 if (tcascode==xpmpTransponderMode_Standby) return; //return in case transponder == off
 while (i<maxplanes) {if (strcmp(Tcaslist[i].pilot,pilot)==0) //do we know this guy?
 														{
@@ -228,7 +228,7 @@ while (i<maxplanes) {if (strcmp(Tcaslist[i].pilot,pilot)==0) //do we know this g
 															sprintf(txt,"Tcascode:%d\r\n",tcascode);
 															XPLMDebugString(txt);
 															#endif
-															//Tagging(lat,lon,alt);
+															
 															return;
 
 														}
@@ -262,8 +262,8 @@ while (i<maxplanes) {
 												Tcaslist[i].displaymode=T_CYAN;
 												Tcaslist[i].tCPA=9999;
 												Tcaslist[i].tCPAi=9999;
-												Tcaslist[i].ClofConfl=false;
-												//Tagging(lat,lon,alt);
+												Tcaslist[i].ClofConfl=FALSE;
+												
 												return;
 												}
 					i++;
@@ -288,37 +288,37 @@ bool Tcas::Resolution (int nr)
 		XPLMDebugString(txt);
 #endif
 
-if (xivap.GetSpeed()<50) return false; //disable function in case no speed;
+if (xivap.GetSpeed()<50) return FALSE; //disable function in case no speed;
 
 	switch (tcasmode)
 	{
 	case TA: {	
-			if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return true;} //wait in case a warning is already spoken
-			if  (SL_TABLE[i][4]<abs(Tcaslist[nr].altitude*100)) return false; //check ouside dMOD alt range
+			if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return TRUE;} //wait in case a warning is already spoken
+			if  (SL_TABLE[i][4]<abs(Tcaslist[nr].altitude*100)) return FALSE; //check ouside dMOD alt range
 			if  (SL_TABLE[i][2]>Tcaslist[nr].distance) 	
 				{
 				Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
 				PlaySoundTcas(AURAL_traffic);
-				return true;
+				return TRUE;
 				 }
 			 if ((SL_TABLE[i][0]>Tcaslist[nr].tCPA) &  (SL_TABLE[i][0]>Tcaslist[nr].tCPAi) & (abs(Tcaslist[nr].tCPA-Tcaslist[nr].tCPAi)<5) ) 
 			 {
 				PlaySoundTcas(AURAL_traffic);																						
 				Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning																						
-				return true;																																					
+				return TRUE;																																					
 			 };
 			 break; //ta dMOD alarm
 			 }
 	case RA: {
 			
-			 if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return true;} //wait in case a warning is already spoken
-			 if (SL_TABLE[i][5]<abs(Tcaslist[nr].altitude*100)) return false; //check outside altitude range
+			 if (Tcaslist[nr].auraltimer>0) {Tcaslist[nr].auraltimer--; return TRUE;} //wait in case a warning is already spoken
+			 if (SL_TABLE[i][5]<abs(Tcaslist[nr].altitude*100)) return FALSE; //check outside altitude range
 			 XPLMDebugString("inside alitude\r\n");
 			 if  (SL_TABLE[i][3]>Tcaslist[nr].distance) //check dMOD range
 				 {
 				 Tcaslist[nr].auraltimer=AURALTIME_WARNING; //new timer aural warning
 				 PlaySoundTcas(AURAL_traffic);
-				 return true;
+				 return TRUE;
 				 };
 	
 			 char txt[100];
@@ -329,37 +329,37 @@ if (xivap.GetSpeed()<50) return false; //disable function in case no speed;
 					if ( abs(Tcaslist[nr].tCPA-Tcaslist[nr].tCPAi)<15) {
 					 if (Tcaslist[nr].vspeed>0) {
 													PlaySoundTcas(AURAL_crossing_climb);	
-													Tcaslist[i].ClofConfl=true;
+													Tcaslist[i].ClofConfl=TRUE;
 													Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-													return true;
+													return TRUE;
 						 						}
 					  if (Tcaslist[nr].vspeed<0) {
 													PlaySoundTcas(AURAL_crossing_descend);
-													Tcaslist[i].ClofConfl=true;
+													Tcaslist[i].ClofConfl=TRUE;
 													Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-													return true;
+													return TRUE;
 						 						}
 					 if (Tcaslist[nr].tCPA<(SL_TABLE[i][1]/4)) {																				 
 																if (Tcaslist[nr].altitude<0) PlaySoundTcas(AURAL_reversal_climb); else PlaySoundTcas(AURAL_reversal_descend);
-																Tcaslist[i].ClofConfl=true;
+																Tcaslist[i].ClofConfl=TRUE;
 																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-																return true;
+																return TRUE;
 																}
 					 if (Tcaslist[nr].tCPA<(SL_TABLE[i][1]/2)) {																				 
 																if (Tcaslist[nr].altitude<0) PlaySoundTcas(AURAL_climb); else PlaySoundTcas(AURAL_descend);
-																Tcaslist[i].ClofConfl=true;
+																Tcaslist[i].ClofConfl=TRUE;
 																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning	
-																return true;
+																return TRUE;
 																}  else	
 																{					
 																PlaySoundTcas(AURAL_traffic);
 																Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-																return true;
+																return TRUE;
 																 }
 					} else {					
 							PlaySoundTcas(AURAL_traffic);
 							Tcaslist[nr].auraltimer=AURALTIME_THREAT; //new timer aural warning
-							return true;
+							return TRUE;
 							 }
 				}																					
 		  	 break; 
@@ -369,10 +369,10 @@ if (xivap.GetSpeed()<50) return false; //disable function in case no speed;
 	if (Tcaslist[i].ClofConfl) {
 								PlaySoundTcas( AURAL_clear);
 								Tcaslist[nr].auraltimer=AURALTIME_WARNING;
-								Tcaslist[i].ClofConfl=false;
+								Tcaslist[i].ClofConfl=FALSE;
 								}
 	Tcaslist[nr].auraltimer=0;
-	return false;
+	return FALSE;
 }
 /*
 ABOVE - Expands the vertical scan to 9900 ft above and 2700 ft below the aircraft.
@@ -431,7 +431,7 @@ static bool firsttime;
 		}
 	}
 	//demo to be deleted later on
-//	if (!firsttime) {FindPoint(xivap.GetLat(),xivap.GetLon(),12,xivap.GetHeading()-180);firsttime=true;}
+//	if (!firsttime) {FindPoint(xivap.GetLat(),xivap.GetLon(),12,xivap.GetHeading()-180);firsttime=TRUE;}
 //else {FindPoint(fmclat,fmclon,0.1f,xivap.GetHeading());}
 //DumpPilotPos("testPilot",fmclat,fmclon,xivap.elevationft()-300,1,xivap.GetSpeed(), xivap.GetHeading());
 
@@ -635,19 +635,4 @@ void Tcas::PlaySoundTcas(char Ras)
 	case	AURAL_crossing_descend: Playsound("tcas_descend_x.wav");break;//= 15  ///< Descend, Crossing Descend (twice)
 	default: break;
 	}
-}
-void Tcas::Tagging(float lat,float lon,int elevation,const char* pilot)
-{
-	XPLMCameraPosition_t		cameraPos;
-	XPLMReadCameraPosition(&cameraPos);
-	double	x,y,z;
-	char text[100];
-	XPLMWorldToLocal(lat, lon, elevation * 0.3048, &x, &y, &z);
-	double	headingToTarget = CalcAngle(cameraPos.z - z, x - cameraPos.x);
-	double	pitchToTarget = CalcAngle(sqrt(sqr(x - cameraPos.x) + sqr(cameraPos.z - z)), y - cameraPos.y);
-
-	double	headOff = DiffAngle(headingToTarget, cameraPos.heading);
-	double	pitchOff = DiffAngle(pitchToTarget,cameraPos.pitch);
-	sprintf(text,"Camerapos van %s pitch %3.1f head % 3.1f\r\n",pilot,pitchOff,headOff);
-	XPLMDebugString(text);
 }

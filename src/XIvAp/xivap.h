@@ -148,8 +148,16 @@ public:
 
 	bool usingWeather() { return _useWeather; };
 	void setWeather(bool value);
+
 	bool usingVoice() { return _useVoice; };
 	void setVoice(bool value);
+
+	bool usingPMSG() {return _usePMSG;};
+	void setPMSG(bool value);
+
+	void setLabels(bool value);
+	bool usingLabels() {return _useLabels;};
+
 	bool usingMultiplayer() { return _useMultiplayer; };
 	void setMultiplayer(bool value);
 
@@ -311,6 +319,8 @@ private:
 	void checkWeather(double elapsed);
 
 	bool _useVoice;
+	bool _useLabels;
+	bool _usePMSG;
 #ifdef HAVE_TEAMSPEAK
 	TeamSpeak tsRemote;
 	bool _tsLoaded;

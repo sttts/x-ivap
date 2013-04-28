@@ -38,7 +38,7 @@
 #include "XPLMUtilities.h"
 
 #include "XOGLUtils.h"
-#include "PlatformUtils.h"
+//#include "PlatformUtils.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -113,11 +113,11 @@ const char * 	XPMPMultiplayerInit(
 	gDefaultPlane = inDefaultPlane;
 	gIntPrefsFunc = inIntPrefsFunc;
 	gFloatPrefsFunc = inFloatPrefsFunc;
-	//char	myPath[1024];
-	//char	airPath[1024];
-	//char	line[256];
-	//char	sysPath[1024];
-	//FILE *	fi;
+	char	myPath[1024];
+	char	airPath[1024];
+	char	line[256];
+	char	sysPath[1024];
+	FILE *	fi;
 	
 	bool	problem = false;
 
@@ -170,9 +170,9 @@ const  char * XPMPMultiplayerEnable(void)
 				gPackages[p].planes[pp].austin_idx = gPlanePaths.size();
 				char	buf[1024];
 				strcpy(buf,gPackages[p].planes[pp].file_path.c_str());
-				//#if APL <----------delete false call to Posix2HFS 2/11/2012
-				//	Posix2HFSPath(buf,buf,1024);
-				//#endif
+				#if APL
+					Posix2HFSPath(buf,buf,1024);
+				#endif
 				gPlanePaths.push_back(buf);
 			}
 		}
@@ -480,11 +480,7 @@ int	XPMPRenderMultiplayerPlanes(
 		gRenderer(gRendererRef);
 	else
 		XPMPDefaultPlaneRenderer();
-#if XTWR	// We don't want to see our own plane!
-	return 0;
-#else
 	return 1;
-#endif
 }
 
 bool			XPMPIsICAOValid(

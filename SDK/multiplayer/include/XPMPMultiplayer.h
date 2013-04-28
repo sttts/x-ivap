@@ -82,6 +82,7 @@ typedef	struct {
 	float	pitch;
 	float	roll;
 	float	heading;
+	char label[32];
 } XPMPPlanePosition_t;
 
 
@@ -137,9 +138,9 @@ typedef	struct {
      float                 slatRatio;
      float                 wingSweep;
      float                 thrust;
-     float                 yolkPitch;
-     float                 yolkHeading;
-     float                 yolkRoll;
+     float                 yokePitch;
+     float                 yokeHeading;
+     float                 yokeRoll;
      xpmp_LightStatus      lights;
 } XPMPPlaneSurfaces_t;
 
@@ -193,7 +194,7 @@ typedef	int			XPMPPlaneDataType;
  */
 enum {
 	xpmpData_Unavailable = 0,	/* The information has never been specified. */
-	xpmpData_Unchanged = 1,		/* The information from the last time the plug-in was aksed. */
+	xpmpData_Unchanged = 1,		/* The information from the last time the plug-in was asked. */
 	xpmpData_NewData = 2		/* The information has changed this sim cycle. */
 };
 typedef	int			XPMPPlaneCallbackResult;
@@ -462,6 +463,19 @@ typedef	void (* XPMPRenderPlanes_f)(
  *
  */
 void		XPMPDumpOneCycle(void);
+
+/*
+ * XPMPEnableAircraftLabels
+ * XPMPDisableAircraftLabels
+ * 
+ * These functions enable and disable the drawing of aircraft labels above the aircraft 
+ *
+ */	
+void				  XPMPEnableAircraftLabels(void);
+
+void				  XPMPDisableAircraftLabels(void);
+
+bool				  XPMPDrawingAircraftLabels(void);
 
 #ifdef __cplusplus
 }

@@ -323,7 +323,14 @@ void Xivap::XPluginStart()
 	// compare against 0 -> if it is not set, it defaults to ON
 	if(str == "0") _useMultiplayer = false;
 	else _useMultiplayer = true;
-
+	str = config.readConfig("PREFERENCES", "TAGGING");
+	// compare against 0 -> if it is not set, it defaults to ON
+	if(str == "0") _useLabels = false;
+	else _useLabels = true;
+	str = config.readConfig("PREFERENCES", "PRVTMSGSOUND");
+	// compare against 0 -> if it is not set, it defaults to ON
+	if(str == "0") _usePMSG = false;
+	else _usePMSG = true;
 	// p2p preferences
 	str = config.readConfig("P2P", "ENABLE");
 	// compare against 0 -> if it is not set, it defaults to ON
@@ -1115,7 +1122,7 @@ void Xivap::handleTextMessage(const FSD::Message& m)
 				if((*it)->hasCallsign(m.source)) {
 					inChatWindow = true;
 					(*it)->addMessage(colGreen, m.source + "> " + message);
-					Playsound("selcal.wav");
+					if (xivap.usingPMSG()) Playsound("selcal.wav");
 				}
 				++it;
 			}
@@ -1126,7 +1133,7 @@ void Xivap::handleTextMessage(const FSD::Message& m)
 				message = m.source + " [prv]> " + message;
 				color = colRed;
 				_lastPrivSender = m.source;
-				Playsound("selcal.wav");
+				if (xivap.usingPMSG()) 	Playsound ("selcal.wav"); //this one 
 			}
 		}
 	}
@@ -1961,6 +1968,27 @@ void Xivap::setVoice(bool value)
 	string filename = getXivapRessourcesDir() + CONFIG_FILE;
 	config.load(filename);
 	config.setConfig("SOUND", "VOICE", (_useVoice == 1 ? "1" : "0"));
+	config.save(filename);
+}
+void Xivap::setPMSG(bool value)
+{
+	if (_usePMSG==value) return;
+	_usePMSG=value;
+	ConfigFile config;
+	string filename = getXivapRessourcesDir() + CONFIG_FILE;
+	config.load(filename);
+	config.setConfig("PREFERENCES", "PRVTMSGSOUND", (_usePMSG == 1 ? "1" : "0"));
+	config.save(filename);
+}
+void Xivap::setLabels(bool value)
+{
+	if(_useLabels == value) return;
+
+	_useLabels=value;
+	ConfigFile config;
+	string filename = getXivapRessourcesDir() + CONFIG_FILE;
+	config.load(filename);
+	config.setConfig("PREFERENCES", "TAGGING", (_useLabels == 1 ? "1" : "0"));
 	config.save(filename);
 }
 

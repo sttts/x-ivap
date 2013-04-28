@@ -74,13 +74,14 @@ enum {
 // This plane struct represents one model in one CSL packpage.
 // It has a type, a single file path for whatever we have to load,
 // and then implementation-specifc stuff.
-struct	CSLPlane_t {	
+struct	CSLPlane_t {
 	int							plane_type;		// What kind are we?
 	string						file_path;		// Where do we load from
 	bool						moving_gear;	// Does gear retract?
 	// plane_Austin
 	int							austin_idx;
 	// plane_Obj
+
 	bool						objNeedLoad;// den_rain for dynamic loading;
 	bool						objLoaded;// den_rain for dynamic loading;
 	int							obj_idx;

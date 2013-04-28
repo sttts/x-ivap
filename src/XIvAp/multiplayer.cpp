@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *   Copyright (C) 2006 by Martin Domig                                    *
  *   martin@domig.net                                                      *
@@ -74,7 +73,7 @@ float FloatPrefs(const char *section, const char *key, float def)
 }
 
 /******************************************************************************/
-/** OO code below here  *****************************************************/
+/** OO code below here :) *****************************************************/
 /******************************************************************************/
 
 MultiplayerEngine::MultiplayerEngine():
@@ -200,7 +199,7 @@ bool MultiplayerEngine::enable()
 	XPMPLoadPlanesIfNecessary();
 	return true;
 }
-
+////plane update is a callback from multiplayer engine
 XPMPPlaneCallbackResult MultiplayerEngine::planeCallback(
 					XPMPPlaneID inPlane,
 					XPMPPlaneDataType inDataType,
@@ -220,7 +219,9 @@ XPMPPlaneCallbackResult MultiplayerEngine::planeCallback(
 	switch(inDataType) {
 		case xpmpDataType_Position: {
 				XPMPPlanePosition_t *pos = static_cast<XPMPPlanePosition_t*>(ioData);
+			//	XPLMDebugString(callsign);
 				
+			
 				if(pos->lat == plane->position.pos.lat
 					&& pos->lon == plane->position.pos.lon
 					&& pos->pitch == plane->position.pos.pitch
@@ -228,7 +229,14 @@ XPMPPlaneCallbackResult MultiplayerEngine::planeCallback(
 					&& pos->heading == plane->position.pos.heading
 					&& pos->elevation == plane->position.pos.elevation)
 					return xpmpData_Unchanged;
-
+				
+					
+				if (xivap.usingLabels()) {
+				if (strlen(callsign)>11) strcpy(plane->position.pos.label,"????");
+					else {if ((pos->elevation<45000) & (pos->elevation>-30))  sprintf(plane->position.pos.label,"%s(%1.0f)",callsign,pos->elevation);
+					else sprintf(plane->position.pos.label,"%s(%1.0f)",callsign,0); //to avoid overrun of buffer
+					}
+				} else strcpy(plane->position.pos.label,"");
 				memcpy(ioData, static_cast<void*>(&plane->position), sizeof(XPMPPlanePosition_t));
 				return xpmpData_NewData;
 			}
@@ -326,6 +334,8 @@ void MultiplayerEngine::decodeFSDPosition(const FSD::Message& packet,
 				position->elevation = atof(packet.tokens[4]);
 				position->pitch	*= -1;
 				position->roll	*= -1;
+
+				
 			}
 			break;
 
@@ -444,6 +454,7 @@ void MultiplayerEngine::eatThis(const FSD::Message &packet)
 	}
 
 	pilot->timestamp = xivap.watch.getTime();
+	
 
 	/***************************************************
 	 * Only if a valid MTL string is received from an other client,
@@ -520,6 +531,7 @@ void MultiplayerEngine::eatThis(const FSD::Message &packet)
 		pos->onground = pilot->onground;
 		pos->p_timestamp = 0;
 		pos->latency = 0;
+		
 		pilot->interpolator.takeNewPosition(pos, pilot->distance);
 
 		pilot->CalcDistance(xivap.GetLat(), xivap.GetLon());
@@ -672,7 +684,7 @@ void MultiplayerEngine::p2phandshake(MultiplayerPilot *pilot)
 	static char buf[64];
 
 	response.reset();
-	// lets say hello 
+	// lets say hello ;)
 	response.setTLV(IVAO_PTPOS_Callsign, length(xivap.callsign)+1, pconst(xivap.callsign));
 	response.setTV(IVAO_EchoRequest, pilot->RegisterEchoRequest()); // ping him, since we're at it...
 	response.setTV(IVAO_PTPOS_CallsignReq, 0);
@@ -747,8 +759,8 @@ void MultiplayerEngine::HandlePlaneParams(MultiplayerPilot *pilot, FSD::PlanePar
 	pilot->surfaces.wingSweep			= pilot->onground ? 0.8f : 0.0f;
 
 	// wtf is that anyway?
-	pilot->surfaces.yolkHeading = 0;
-	pilot->surfaces.yolkPitch = 0;
+	pilot->surfaces.yokeHeading = 0;
+	pilot->surfaces.yokePitch = 0;
 
 	/*
 	string str = "gear " + itostring(params.gear) +
@@ -829,6 +841,7 @@ void MultiplayerEngine::ProcessPPOS1Pos(MultiplayerPilot *pilot, const char *buf
 	pos->p_timestamp = timestamp; // time value of received packet (peers timestamp)
 	pos->timestamp = now_;
 	pos->latency = pilot->p2platency;
+	//pos->pos.label="test";
 	// process it
 	pilot->interpolator.takeNewPosition(pos, pilot->distance);
 

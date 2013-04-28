@@ -639,8 +639,14 @@ void UiWindow::buttonClicked(int button)
 				case LSK2:
 					xivap.setMultiplayer(!xivap.usingMultiplayer());
 					break;
-#ifdef HAVE_TEAMSPEAK
+				case LSK3:
+					xivap.setLabels(!xivap.usingLabels());
+					break;
 				case LSK4:
+					xivap.setPMSG(!xivap.usingPMSG());
+					break;
+#ifdef HAVE_TEAMSPEAK
+				case LSK5:
 					xivap.setVoice(!xivap.usingVoice());
 					break;
 #endif
@@ -687,7 +693,7 @@ void UiWindow::prepScreen()
 				addText(AL_ctr, 0, colDarkGreen, "MAIN", true);
 				addText(AL_left, 0, colDarkGreen, "VHF1 " + xivap.com1freq(), false);
 				
-				// FIXME compile error: addText(AL_ctr, 1, colYellow,"WxStat:"+ xivap._erwin.oldWxStation,false); //added for display Used wxname 4/01/2013
+				addText(AL_ctr, 1, colYellow,"WxStat:"+ xivap._erwin.oldWxStation,false); //added for display Used wxname 4/01/2013
 				string line = "OFFLINE";
 				if(xivap.online()) {line = xivap.fsd.callsign() + " ON";Graphics|=4;} else Graphics&=~4;
 				addText(AL_right, 0, colLightBlue, line, false);
@@ -774,13 +780,15 @@ void UiWindow::prepScreen()
 			addText(AL_left, 1, colWhite, string("<WX ") + (xivap.usingWeather() ? "ON" : "OFF"), true);
 			addText(AL_left, 2, colDarkGreen, "MULTIPLAYER", false);
 			addText(AL_left, 3, colWhite, string("<MP ") + (xivap.usingMultiplayer() ? "ON" : "OFF"), true);
-
-			addText(AL_left, 6, colDarkGreen, "VOICE COMM", false);
+			addText(AL_left, 5, colWhite,string("<Tagging ") + (xivap.usingLabels() ? "ON" : "OFF"), true);
+			addText(AL_left, 7, colWhite,string("<Private MSG alert ") + (xivap.usingPMSG() ? "ON" : "OFF"), true);
+			addText(AL_left, 8, colDarkGreen, "TeamSpeak", false);
 #ifdef HAVE_TEAMSPEAK
-			addText(AL_left, 7, colWhite, string("<VOICE ") + (xivap.usingVoice() ? "ON" : "OFF"), true);
+			addText(AL_left, 9, colWhite, string("<VOICE ") + (xivap.usingVoice() ? "ON" : "OFF"), true);
 #else
-			addText(AL_left, 7, colGreen, "INOP", true);
+			addText(AL_left, 9, colGreen, "INOP", true);
 #endif
+			
 			addText(AL_right, 9, colWhite, "SYSTEM>", true);
 			addText(AL_right, 11, colWhite, "MAIN>", true);
 			break;

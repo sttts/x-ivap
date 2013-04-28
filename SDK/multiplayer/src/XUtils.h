@@ -21,7 +21,7 @@
  *
  */
 #ifndef XUTILS_H
-#define XUTILS_HF
+#define XUTILS_H
 
 struct	XObjCmd;
 struct	XObj;
@@ -66,9 +66,9 @@ bool	GetNextNoComments(StTextFileScanner& f, string& s);
 // unit is also rather questionable.
 double	GetObjRadius(const XObj& inObj);
 
-void	StripPath(string& ioPath);
-void	StripPathCP(string& ioPath);
-void	ExtractPath(string& ioPath);
+//void	StripPath(string& ioPath);
+//void	StripPathCP(string& ioPath);
+//void	ExtractPath(string& ioPath);
 
 int		PickRandom(vector<double>& chances);
 bool	RollDice(double inProb);
@@ -78,7 +78,7 @@ double	RandRangeBias(double mmin, double mmax, double biasRatio, double randomAm
 #if APL && !defined(XUTILS_EXCLUDE_MAC_CRAP)
 
 #include <MacTypes.h>
-#include <Carbon/Carbon.h>
+#include <Files.h>
 
 void	AppPath(string& outString);
 OSErr	FindSuperFolder(const FSSpec& inItem, FSSpec& outFolder);

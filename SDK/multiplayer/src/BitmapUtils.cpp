@@ -633,7 +633,7 @@ int	ConvertAlphaToBitmap(
 	return 0;
 }			
 
-#pragma mark 
+#pragma mark -
 
 #if BITMAP_USE_JPEG
 
