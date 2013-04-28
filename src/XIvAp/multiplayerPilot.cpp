@@ -43,8 +43,8 @@ void MultiplayerPilot::initSurfaces(XPMPPlaneSurfaces_t& surfaces)
 	surfaces.spoilerRatio = 0;
 	surfaces.thrust = 0;
 	surfaces.wingSweep = 0;
-	surfaces.yolkHeading = 0;
-	surfaces.yolkPitch = 0;
+	surfaces.yokeHeading = 0;
+	surfaces.yokePitch = 0;
 	surfaces.lights.timeOffset = rand();
 }
 
