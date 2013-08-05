@@ -423,6 +423,11 @@ int	ConnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_
 				return 1;
 			}
 
+			if(length(callsign) > 7) {
+				xivap.messageBox().show("Your callsign is too long.");
+				return 1; 
+			}
+
 			//validate base airport
 			if(length(baseairport) < 4) {
 				xivap.messageBox().show("Please enter a valid base airport.");
