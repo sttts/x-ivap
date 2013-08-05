@@ -233,9 +233,14 @@ XPMPPlaneCallbackResult MultiplayerEngine::planeCallback(
 					
 				if (xivap.usingLabels()) {
 				
-				if ((strlen(callsign)>11) | (strlen(callsign)<2)) strcpy(plane->position.pos.label,"????");
-					else {if ((plane->position.pos.elevation<45000) & (plane->position.pos.elevation>-30))  sprintf(plane->position.pos.label,"%s(%1.0f)",callsign,plane->position.pos.elevation);
-					else sprintf(plane->position.pos.label,"%s(%1.1f)",callsign,0.1f); //to avoid overrun of buffer
+				        if ((strlen(callsign)>11) | (strlen(callsign)<2)) 
+                                              strcpy(plane->position.pos.label,"????");
+					else {
+					      /*if ((plane->position.pos.elevation<45000) & (plane->position.pos.elevation>-30))  
+      				          	    sprintf(plane->position.pos.label,"%s(%1.0f)",callsign,plane->position.pos.elevation);
+					      else 
+					            sprintf(plane->position.pos.label,"%s(%1.1f)",callsign,0.1f); */ //to avoid overrun of buffer
+       					      strcpy(plane->position.pos.label, callsign);
 					}
 				} else strcpy(plane->position.pos.label,"");
 				memcpy(ioData, static_cast<void*>(&plane->position), sizeof(XPMPPlanePosition_t));
