@@ -18,7 +18,7 @@ VERSION=0.96
 
 CFLAGS+=-fno-stack-protector 
 CXXFLAGS+=-O2 -m${ARCH} -fPIC -fno-stack-protector -Wall -x c++ -ansi
-LDFLAGS+=-O2 -lssl -Wall -m${ARCH}
+LDFLAGS+=-O2 -Wall -m${ARCH}
 STUNLIB=libstun.a
 
 #
