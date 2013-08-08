@@ -368,13 +368,13 @@ int	ConnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_
 		xivap.grabKeyboardFocus();
 
 		// cancel
-		if(inParam1 == (long)cancelButton) {
+		if(inParam1 == (intptr_t)cancelButton) {
 			hide();
 			return 1;
 		}
 
 		// connect
-		if(inParam1 == (long)connectButton) {
+		if(inParam1 == (intptr_t)connectButton) {
 
 			// read values from form
 			XPGetWidgetDescriptor(callsignTextField, buffer, sizeof(buffer));
