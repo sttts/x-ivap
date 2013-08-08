@@ -78,13 +78,13 @@ int	DisconnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intp
 		xivap.grabKeyboardFocus();
 
 		// no
-		if(inParam1 == (long)noButton) {
+		if(inParam1 == (intptr_t)noButton) {
 			hide();
 			return 1;
 		}
 
 		// yes
-		if(inParam1 == (long)yesButton) {
+		if(inParam1 == (intptr_t)yesButton) {
 			hide();
 			xivap.disconnect();
 			if(xivap.uiWindow.getPage() == SCREEN_SYSTEM)
