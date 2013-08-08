@@ -544,7 +544,7 @@ void FlightplanForm::fillForm()
 	XPSetWidgetDescriptor(actypeTextField, pconst(xivap.fpl.aircrafttype));
 	XPSetWidgetDescriptor(airlineTextField, pconst(xivap.fpl.airline));
 	XPSetWidgetDescriptor(equipTextField, pconst(xivap.fpl.equip));
-	XPSetWidgetDescriptor(transponderTextField, pconst(xivap.fpl.equip));	
+	XPSetWidgetDescriptor(transponderTextField, pconst(xivap.fpl.transpondertype));	//fixed bug 08/08/2013, tranponderfield 
 
 	XPSetWidgetDescriptor(departureTextField, pconst(xivap.fpl.departure));
 	XPSetWidgetDescriptor(deptimeTextField, pconst(xivap.fpl.deptimeest));
