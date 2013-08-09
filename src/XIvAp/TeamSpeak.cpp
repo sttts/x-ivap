@@ -13,9 +13,6 @@
 #include "TeamSpeak.h"
 #include "TsRemoteImport.h"
 #endif
-#ifdef LINUX
-#include "configFile.h"
-#endif
 
 #include "helpers.h"
 
@@ -26,9 +23,13 @@
  */
 TeamSpeak::TeamSpeak() 
 {
+		dll_loaded_ = false;
+		return;
+	if (X64) return;
+
 #ifdef WIN32
 	// DLL isn't loaded yet
-	dll_loaded_ = false;
+
 	
 	// path of teamspeak dll
 	string dll = getXivapRessourcesDir() + TS_DLL_NAME;
@@ -43,18 +44,6 @@ TeamSpeak::TeamSpeak()
 	// tell loaded
 	if(dll_loaded_) xivap.addText(colCyan, "Teamspeak: sdk found and linked", true, true);
 	else            xivap.addText(colCyan, "Teamspeak: sdk not found, trying with teamspeak:// urls", true, true);
-#endif
-#ifdef LINUX
-	ConfigFile config;
-
-	string str = getXivapRessourcesDir() + CONFIG_FILE;
-	config.load(str);
-
-	tscontrol_path = config.readConfig("SOUND", "TSCONTROL");
-
-    if(tscontrol_path == "") {
-        xivap.addText(colCyan, "Teamspeak: tscontrol not set in config", true, true);
-    }
 #endif
 }
 
@@ -122,8 +111,8 @@ static int pointer=0;
 void TeamSpeak::Start()
 {
 	
-#ifdef WIN32
-
+#ifdef WIN32 
+#if !X64
 	// prepare a check
 	ProgramRunning ts;
 	ts.running = false;
@@ -133,13 +122,15 @@ void TeamSpeak::Start()
 	EnumWindows(EnumForTeamspeak, (LPARAM)&ts);	
 	
 	// if teamspeak isn't running, start it!
-	if(!ts.running) ForceStart();
+	if(!ts.running)  ForceStart();
 
 
+#endif
 #endif
 }
 
 #ifdef WIN32
+#if !X64
 void TeamSpeak::ForceStart()
 {
 	// get the teamspeak data from registry
@@ -161,7 +152,7 @@ void TeamSpeak::ForceStart()
 	xivap.addText(colCyan, "Teamspeak: starting teamspeak installed in " + app, true, true);
 }
 #endif
-
+#endif
 /*
  * Switches teamspeak, but first checks if teamspeak isn't connected yet to that channel
  */
@@ -195,10 +186,6 @@ void TeamSpeak::SwitchChannel(string vid,
 		TryWithURL(vid, pass, server, pilotcall, atccall);
 		xivap.addText(colCyan, "Teamspeak: sdk switch failed, trying with url", true, true);
 	}
-#endif
-#ifdef LINUX
-    string url = GenerateURL(vid, pass, server, pilotcall, atccall);
-    RunTeamspeakControl(url);
 #endif
 }
 
@@ -355,10 +342,6 @@ bool TeamSpeak::Disconnect()
 	xivap.addText(colCyan, "Teamspeak: disconnect from the server", true, true);
 	return tsrDisconnect() == 0;
 #endif
-#ifdef LINUX
-    string url = "teamspeak://";
-    RunTeamspeakControl(url);
-#endif 
 }
 
 /**
@@ -376,22 +359,3 @@ bool TeamSpeak::Quit()
 #endif   // TDG moved this tsrQuit is not defined for Mac, is it for Lin?
 	return true;
 }
-
-#ifdef LINUX
-
-/*
- * Run the Teamspeak command on Linux
- */
-
-void TeamSpeak::RunTeamspeakControl(const string& url) {
-    if (length(tscontrol_path) > 0) {
-
-        string tscontrol_cmd = tscontrol_path;
-        tscontrol_cmd += " CONNECT ";
-        tscontrol_cmd += url;
-
-        system(tscontrol_cmd);
-    }
-}
-
-#endif
