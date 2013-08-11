@@ -314,7 +314,7 @@
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\WinIncludes;..\..\SDK;..\..\SDK\multiplayer\src;..\ptypes\include;..\..\SDK\CHeaders\Widgets;..\..\SDK\CHeaders\XPLM;..\stund;..\..\SDK\multiplayer\include;..\FMOD\FMODWindows\api\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IBM=1;IVAO;XPLM200;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IBM=1;IVAO;XPLM200;_CRT_SECURE_NO_WARNINGS;X64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -396,7 +396,6 @@
     <ClCompile Include="..\stund\udp.cxx" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\UnknownFiles\GW-FMS_SDK.h" />
     <ClInclude Include="aircraftDB.h" />
     <ClInclude Include="airlinesDB.h" />
     <ClInclude Include="atcPosition.h" />
