@@ -426,7 +426,7 @@ bool	LoadOnePackage(const string& inPath, int pass)
 					string::size_type pos2 = texLitPath.find_last_of(".");
 					if(pos2 != string::npos)
 					{
-						texLitPath.insert(pos2, "LIT");
+						texLitPath.insert(pos2, "_LIT"); //den_rain modification 13/08/2013
 						// remove load texture; add save path and flags texture; den_rain;
 						//pckg->planes.back().texLitID = OBJ_LoadTexture(texLitPath.c_str(), false);
 						pckg->planes.back().texLitLoaded = false;
@@ -1000,7 +1000,10 @@ void			CSL_DrawObject(
 				if (model->texLitNeedLoad && !model->texLitLoaded)
 				{
 					model->texLitLoaded = true;
+					
 					model->texLitID = OBJ_LoadTexture(model->texLitPath.c_str(), false);
+					XPLMDebugString(model->texLitPath.c_str());
+
 					if (model->texLitID == -1)
 					{
 						XPLMDump() << "Texture LIT " << model->texLitPath << " failed to dynamic load.\n";
