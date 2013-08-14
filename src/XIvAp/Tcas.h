@@ -97,7 +97,7 @@ private: XPLMWindowID window;
 public:
 	~Tcas();
 #define TcasSize	200
-#define	maxplanes	10
+#define	maxplanes	20
 
 	enum RangeScale{NM3,NM5,NM10,NM20,NM40};
 	static   int left, top, right, bottom;
