@@ -314,7 +314,7 @@ void FlightplanForm::create()
 	XPAddWidgetCallback(window, flightplanFormHandler);
 }
 
-int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if(inMessage == xpMessage_CloseButtonPushed) {
 		hide();
@@ -322,26 +322,26 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, long
 	}
 	if(inMessage == xpMsg_PushButtonPressed) {
 		// cancel
-		if(inParam1 == (long)cancelButton) {
+		if(inParam1 == (intptr_t)cancelButton) {
 			reset();
 			hide();
 			return 1;
 		}
 
 		// reset
-		if(inParam1 == (long)resetButton) {
+		if(inParam1 == (intptr_t)resetButton) {
 			reset();
 			return 1;
 		}
 
 		// send
-		if(inParam1 == (long)sendButton) {
+		if(inParam1 == (intptr_t)sendButton) {
 			send();
 			return 1;
 		}
 
 		// export
-		if(inParam1 == (long)exportButton) {
+		if(inParam1 == (intptr_t)exportButton) {
 			xivap.fmcForm().show();
 
 			send(false); // update xivap's flightplan
