@@ -90,8 +90,8 @@ inline float ntohf( const float f )
 #include "version.h"
 
 //splitted the copyrightlines to fit in the resized window 18/08/2012
-#define SOFTWARE_COPYRIGHT1	"(c)2005-2012 by Martin Domig, Kristof Provost, Andrew McGregor"
-#define	SOFTWARE_COPYRIGHT2	"Thijmen de Gooijer, Kenny Moens, Danis Maslov, XFMC Team"
+#define SOFTWARE_COPYRIGHT1	"(c)2005-2013 by Martin Domig, Kristof Provost, Andrew McGregor"
+#define	SOFTWARE_COPYRIGHT2	"Thijmen de Gooijer, Kenny Moens, Denis Maslov, XFMC Team"
 
 #ifdef IVAO
 #define UNICOM_NAME       "UNICOM"
