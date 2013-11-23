@@ -26,8 +26,13 @@
 // define some basic types
 typedef unsigned char  UInt8;
 typedef unsigned short UInt16;
+
 #ifdef APPLE
-typedef long unsigned int UInt32;
+    #if (X64)
+    typedef  unsigned int UInt32;
+    #else
+    typedef long unsigned int UInt32;
+    #endif
 #else
 typedef unsigned int   UInt32;
 #endif
@@ -64,19 +69,19 @@ USING_PTYPES
 #undef htons
 #endif
 
-#ifndef WIN32
-inline float htonf( const float f )
+//#ifndef WIN32
+inline float htonf1( const float f )
 {
     int i = htonl( *(int *)&f );
     return *(float *)&i;
 }
 
-inline float ntohf( const float f )
+inline float ntohf1( const float f )
 {
     int i = ntohl( *(int *)&f );
     return *(float *)&i;
 }
-#endif
+//#endif
 
 
 // macro to convert a pt::string to std::string
@@ -91,7 +96,7 @@ inline float ntohf( const float f )
 
 //splitted the copyrightlines to fit in the resized window 18/08/2012
 #define SOFTWARE_COPYRIGHT1	"(c)2005-2013 by Martin Domig, Kristof Provost, Andrew McGregor"
-#define	SOFTWARE_COPYRIGHT2	"Thijmen de Gooijer, Kenny Moens, Denis Maslov, XFMC Team"
+#define	SOFTWARE_COPYRIGHT2	"Thijmen de Gooijer, Kenny Moens, X-AiR Team, XFMC Team"
 
 #ifdef IVAO
 #define UNICOM_NAME       "UNICOM"

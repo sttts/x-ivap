@@ -76,13 +76,14 @@ double	RandRange(double mmin, double mmax);
 double	RandRangeBias(double mmin, double mmax, double biasRatio, double randomAmount);
 
 #if APL && !defined(XUTILS_EXCLUDE_MAC_CRAP)
-
+/*
 #include <MacTypes.h>
 #include <Files.h>
 
 void	AppPath(string& outString);
 OSErr	FindSuperFolder(const FSSpec& inItem, FSSpec& outFolder);
 void	FSSpec_2_String(const FSSpec& inSpec, string& outString);
+ */
 #endif
 
 void	ExtractFixedRecordString(	

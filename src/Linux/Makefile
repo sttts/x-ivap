@@ -4,6 +4,7 @@
 #  12-12-2011 SD2/FJa - End of PPC support
 #  28-09-2012 SD2/FJa - OSX 10.8.1 support (Xcode 4.5)
 #  24-12-2012 changed makefiles to x64 support; inserted new 2.1 libs
+#  10-11-2013 BvK adapted makesfile for 64 bit support
 
 all: X-IvAp
 
@@ -101,16 +102,17 @@ LIBS+=-lz ${WD}/src/ptypes/lib/libptypes.a
 
 XIVAP_DEPENDS=ptypes stund zlib png
 
-ifeq (${ARCH}, 32)
-	FMODEX=fmodex
-endif
-ifeq (${ARCH}, 64)
-	FMODEX=fmodex64
-	CFLAGS+=-DX64
-endif
+
 
 # Handle Linux/OS X specific stuff here.
 ifeq (${OS}, Linux)
+	ifeq (${ARCH}, 32)
+	FMODEX=fmodex
+	endif
+	ifeq (${ARCH}, 64)
+	FMODEX=fmodex64
+	CFLAGS+=-DX64
+	endif
 	cpp_SRC+=${WD}/SDK/multiplayer/src/PlatformUtils.lin.cpp
 
 	CFLAGS+=-m${ARCH} -DLINUX -DLIN=1 -Dlinux -O3 -Wall -fno-strict-aliasing -iquote../FMOD/FMODLinux/api/inc
@@ -119,6 +121,7 @@ ifeq (${OS}, Linux)
 	LIBS+=-lpng -L../png/
     LIBS+=-lz -L../zlib/
 	LIBS+=../../WidgetLibrary/Binaries/LinuxGCC/XPWidgetsEx.lib
+	LIBS+=-Wl,-rpath,'$$ORIGIN' -shared
 	LIBS+= -L../FMOD/FMODLinux/api/lib -l${FMODEX}
     # link libstdc++ statically so we don't conflict with ATI OpenGL
     # this may require a libstdc++.a or gcc 4.0, not sure which
@@ -133,6 +136,13 @@ ifeq (${OS}, Linux)
 endif
 
 ifeq (${OS}, Darwin)
+	ifeq (${ARCH}, 32)
+	FMODEX=fmodex
+	endif
+	ifeq (${ARCH}, 64)
+	FMODEX=fmodex
+	CFLAGS+=-DX64
+	endif
         OS_VER=$(shell uname -r | sed 's/\([0-9]*\).*/\1/')
         ifeq (${OS_VER}, 10)
             CC=g++-4.0
@@ -144,17 +154,17 @@ ifeq (${OS}, Darwin)
 	cpp_SRC+=${WD}/SDK/XPPopups.cpp
 	cpp_SRC+=${WD}/SDK/multiplayer/src/PlatformUtils.mac.cpp
 	# teamspeex can be driven by URL
-	cpp_SRC+=${WD}/src/XIvAp/TeamSpeak.cpp
-	CFLAGS+= -DAPPLE -DAPL=1 -DLIN=0 -DIBM=0 -O3 -fpascal-strings \
+	#cpp_SRC+=${WD}/src/XIvAp/TeamSpeak.cpp
+	CFLAGS+= -m${ARCH} -DAPPLE -DAPL=1 -DLIN=0 -DIBM=0 -O3 -fpascal-strings \
 	 -I../MacIncludes \
 	  -funsigned-char \
 	  -arch i386 -mmacosx-version-min=10.4 \
 	  -iquote../FMOD/FMODMac/api/inc \
-	  -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk 
-	LDFLAGS+=-flat_namespace -undefined suppress
+	  -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.5.sdk 
+	LDFLAGS+=-m${ARCH} -flat_namespace -undefined suppress
 	LDFLAGS+= -bundle -framework Carbon -framework OpenGL -framework ApplicationServices
 	LDFLAGS+= -arch i386 -mmacosx-version-min=10.4
-	LDFLAGS+= -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
+	LDFLAGS+= -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.5.sdk
 	FINAL=
 endif
 

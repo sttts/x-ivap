@@ -16,8 +16,13 @@
 // define some basic types
 typedef unsigned char  UInt8;
 typedef unsigned short UInt16;
+
 #ifdef APPLE
-typedef long unsigned int UInt32;
+    #if (X64)
+    typedef  unsigned int UInt32;
+    #else
+    typedef  long unsigned int UInt32;
+    #endif
 #else
 typedef unsigned int   UInt32;
 #endif

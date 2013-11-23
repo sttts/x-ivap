@@ -1,6 +1,6 @@
 # Change history:
 #  30-12-2009 TDG - Added Darwin version check to call correct compiler on 10.6
-
+# 08-11-2013  BVK  added 64 bits support
 #
 #  C++ Portable Types Library (PTypes)
 #  Version 2.0.2  Released 17-May-2004
@@ -25,8 +25,8 @@ else
 endif
 
 OS_CXXOPTS=-fno-common -fPIC -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
-OS_CXXOPTS_ST=-fno-common -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
-LIBTOOL = g++ -dynamic -dynamiclib -arch i386 -lc -Wl,-syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
+OS_CXXOPTS_ST=-fno-common  -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
+LIBTOOL = g++ -dynamic -dynamiclib -m${ARCH} -arch i386 -lc -Wl,-syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
 
 
 SOSTRIP = test

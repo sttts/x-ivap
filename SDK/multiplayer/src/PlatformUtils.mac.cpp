@@ -31,6 +31,13 @@
 
 #include <Carbon/Carbon.h>
 
+template <typename T>
+struct CFSmartPtr {
+    CFSmartPtr(T p) : p_(p) {						  }
+    ~CFSmartPtr()			 { if (p_) CFRelease(p_); }
+    operator T ()			 { return p_; }
+    T p_;
+};
 
 
 static	OSErr		FSSpecToPathName(const FSSpec * inFileSpec, char * outPathname);
@@ -49,18 +56,6 @@ void	EndianFlipLong(long * ioLong)
 
 /* Get FilePathFromUser puts up a nav services dialog box and converts the results
    to a C string path. */
-
-pascal void event_proc(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, void *callBackUD)
-{
-}
-
-template <typename T>
-struct CFSmartPtr {
-	 CFSmartPtr(T p) : p_(p) {						  }
-	~CFSmartPtr()			 { if (p_) CFRelease(p_); }
-	operator T ()			 { return p_; }
-	T p_;
-};
 
 int HFS2PosixPath(const char *path, char *result, int resultLen)
 {
@@ -85,6 +80,7 @@ int HFS2PosixPath(const char *path, char *result, int resultLen)
 
 int Posix2HFSPath(const char *path, char *result, int resultLen)
 {
+    
 	CFSmartPtr<CFStringRef>		inStr(CFStringCreateWithCString(kCFAllocatorDefault, path ,kCFStringEncodingMacRoman));
 	if (inStr == NULL) return -1;
 	
@@ -109,25 +105,86 @@ void MakePartialPathNative(char * ioBegin, char * ioEnd)
 	}
 }
 
-
-
+#include "XPLMDisplay.h"
+#include "XPLMGraphics.h"
+#include "XPLMDataAccess.h"
+#include "XPLMUtilities.h"
+#include "XPLMNavigation.h"
+#include "XPLMProcessing.h"
 const char * GetApplicationPath(void)
 {
 	static	char		pathBuf[1024];
-	ProcessInfoRec		pir;
-	FSSpec				spec;
-	Str255				pStr;
-	ProcessSerialNumber	psn = { 0, kCurrentProcess };
-	pir.processInfoLength 	= sizeof(pir);
-	pir.processAppSpec 		= &spec;
-	pir.processName			= pStr;
-	GetProcessInformation(&psn, &pir);
-	OSErr err = FSSpecToPathName(&spec, pathBuf);
-	if (err != noErr)
-		return NULL;
+//	ProcessInfoRec		pir;
+//	FSSpec				spec;
+//	Str255				pStr;
+//	ProcessSerialNumber	psn = { 0, kCurrentProcess };
+//	pir.processInfoLength 	= sizeof(pir);
+	//pir.processAppSpec 		= &spec;
+//	pir.processName			= pStr;
+//	GetProcessInformation(&psn, &pir);
+	//OSErr err = FSSpecToPathName(&spec, pathBuf);
+	//if (err != noErr)
+	//	return NULL;
+    XPLMGetSystemPath(pathBuf);
+   // XPLMDebugString(pathBuf);
 	return pathBuf;
 }
 
+/*
+ * FSSpecToPathName
+ *
+ * This routine builds a full path from a file spec by recursing up the directory
+ * tree to the route, prepending each directory name.
+ *
+ */
+/*
+ OSErr	FSSpecToPathName(const FSSpec * inFileSpec, char * outPathname)
+ {
+ short			vRefNum = inFileSpec->vRefNum;
+ long			startDirID = inFileSpec->parID;
+ 
+ CInfoPBRec		paramRec;
+ Str255			dirName;
+ OSErr 			err = noErr;
+ 
+ paramRec.dirInfo.ioCompletion = nil;
+ paramRec.dirInfo.ioNamePtr = (StringPtr)(&dirName);
+ paramRec.dirInfo.ioDrParID = startDirID;
+ 
+ outPathname[0] = ':';
+ memcpy(outPathname+1, inFileSpec->name+1, inFileSpec->name[0]);
+ outPathname[inFileSpec->name[0]+1] = 0;
+ 
+ do {
+ paramRec.dirInfo.ioVRefNum = vRefNum;
+ paramRec.dirInfo.ioFDirIndex = -1;
+ paramRec.dirInfo.ioDrDirID = paramRec.dirInfo.ioDrParID;
+ 
+ if (!(err = PBGetCatInfoSync(&paramRec)))
+ {
+ 
+ short	newPart = dirName[0] + ((paramRec.dirInfo.ioDrDirID != fsRtDirID) ? 1 : 0);
+ memmove(outPathname+newPart, outPathname, strlen(outPathname)+1);
+ if (paramRec.dirInfo.ioDrDirID != fsRtDirID)
+ {
+ outPathname[0] = ':';
+ memcpy(outPathname+1, dirName+1, dirName[0]);
+ } else
+ memcpy(outPathname, dirName+1, dirName[0]);
+ }
+ } while ((err == noErr) && (paramRec.dirInfo.ioDrDirID != fsRtDirID));
+ return err;
+ }
+ */
+/*
+ MacCrap not needed
+ pascal void event_proc(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, void *callBackUD)
+ {
+ }
+ 
+
+ */
+/*maccrap not needed
 int		GetFilePathFromUser(
 					int					inType,
 					const char * 		inPrompt, 
@@ -136,7 +193,7 @@ int		GetFilePathFromUser(
 					char * 				outFileName)
 {
 		OSErr				err;
-		NavReplyRecord		reply;
+		//NavReplyRecord		reply;
 		NavDialogOptions	options;
 		FSSpec				fileSpec;
 		
@@ -180,12 +237,11 @@ int		GetFilePathFromUser(
 	if (!reply.validRecord)
 		goto bail;
 
-	/* Convert the result from an AEDesc to a Mac file spec. */
+	
 	err = AEGetNthPtr(&reply.selection, 1, typeFSS, NULL, NULL, &fileSpec, sizeof(fileSpec), NULL);
 	if (err != noErr)
 		goto bail;
 
-	/* Then convert the FSSpec to a full path. */
 	err = FSSpecToPathName(&fileSpec, outFileName);
 	if (err != noErr)
 		goto bail;
@@ -199,7 +255,6 @@ bail:
 
 
 }
-
 void	DoUserAlert(const char * inMsg)
 {
 	Str255	p1,p2;
@@ -286,52 +341,5 @@ int		ConfirmMessage(const char * inMsg, const char * proceedBtn, const char * ca
 
 	return (itemHit == 1);		
 }
-
-/*
- * FSSpecToPathName
- *
- * This routine builds a full path from a file spec by recursing up the directory
- * tree to the route, prepending each directory name.
- *
- */
-
-OSErr	FSSpecToPathName(const FSSpec * inFileSpec, char * outPathname)
-{
-	short			vRefNum = inFileSpec->vRefNum;
-	long			startDirID = inFileSpec->parID;
-
-	CInfoPBRec		paramRec;
-	Str255			dirName;	/* This will contain the name of the directory we get info about. */
-	OSErr 			err = noErr;
-	
-	paramRec.dirInfo.ioCompletion = nil;
-	paramRec.dirInfo.ioNamePtr = (StringPtr)(&dirName);
-	paramRec.dirInfo.ioDrParID = startDirID;
-
-	/* Start by putting a directory separator and the file name on the path. */
-	outPathname[0] = ':';
-	memcpy(outPathname+1, inFileSpec->name+1, inFileSpec->name[0]);
-	outPathname[inFileSpec->name[0]+1] = 0;
-
-	do {
-		paramRec.dirInfo.ioVRefNum = vRefNum;
-		paramRec.dirInfo.ioFDirIndex = -1;
-		paramRec.dirInfo.ioDrDirID = paramRec.dirInfo.ioDrParID;
-		
-		if (!(err = PBGetCatInfoSync(&paramRec))) 
-		{
-			/* For each directory we get info about, prepend a : and the directory name.
-			   But for the root directory, do NOT prepend the colon. */
-			short	newPart = dirName[0] + ((paramRec.dirInfo.ioDrDirID != fsRtDirID) ? 1 : 0);
-			memmove(outPathname+newPart, outPathname, strlen(outPathname)+1);
-			if (paramRec.dirInfo.ioDrDirID != fsRtDirID)
-			{
-				outPathname[0] = ':';
-				memcpy(outPathname+1, dirName+1, dirName[0]);
-			} else 
-				memcpy(outPathname, dirName+1, dirName[0]);
-		}
-	} while ((err == noErr) && (paramRec.dirInfo.ioDrDirID != fsRtDirID));
-	return err;
-}
+*/
 

@@ -16,7 +16,7 @@
 #define VERSION_H_
 
 #define SOFTWARE_VERSION	"0.3.0"
-#define SOFTWARE_REVISION	"59"
+#define SOFTWARE_REVISION	"133"
 #define SOFTWARE_VERSION_INT    30
 
 #endif

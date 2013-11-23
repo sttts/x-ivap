@@ -179,7 +179,7 @@ bool Flightplan::isValid()
 	FPCHECK(length(alternate) > 4, "invalid alternate airport");
 	FPCHECK(length(alternate2) > 4, "invalid 2nd alternate airport");
 	FPCHECK(length(remarks) > 100, "remarks field is too long");
-	FPCHECK(length(route) > 255, "route field is too long");
+	FPCHECK(length(route) > 384, "route field is too long");
 	_errorMessage = "";
 	return true;
 }
