@@ -27,13 +27,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //t==time, d==distance a==alitude
 const float SL_TABLE[7][6] = {
     // tTA  tRA    dTA   dRA   aTA   aRA
-    {   20,   0,  0.30,    0,  850,    0  }, // SL2: < 1000 AGL
-    {   25,  15,  0.33, 0.20,  850,  300  }, // SL3: < 2350 AGL
-    {   30,  20,  0.48, 0.35,  850,  300  }, // SL4: < FL050
-    {   40,  25,  0.75, 0.55,  850,  350  }, // SL5: < FL100
-    {   45,  30,  1.00, 0.80,  850,  400  }, // SL6: < FL200
-    {   48,  35,  1.30, 1.10,  850,  600  }, // SL7: < FL420
-    {   48,  35,  1.30, 1.10, 1200,  700  }  // SL7: > FL420 = SL8
+    {   20,   0,  0.30f,    0,  850,    0  }, // SL2: < 1000 AGL
+    {   25,  15,  0.33f, 0.20f,  850,  300  }, // SL3: < 2350 AGL
+    {   30,  20,  0.48f, 0.35f,  850,  300  }, // SL4: < FL050
+    {   40,  25,  0.75f, 0.55f,  850,  350  }, // SL5: < FL100
+    {   45,  30,  1.00f, 0.80f,  850,  400  }, // SL6: < FL200
+    {   48,  35,  1.30f, 1.10f,  850,  600  }, // SL7: < FL420
+    {   48,  35,  1.30f, 1.10f, 1200,  700  }  // SL7: > FL420 = SL8
 };
 
 const char		RangeTab[]={3,5,10,20,40};
@@ -184,13 +184,13 @@ while (i<maxplanes) {if (strcmp(Tcaslist[i].pilot,pilot)==0) //do we know this g
 
 															intruderRadial=TrueCourse(lat,lon,xivap.GetLat(),xivap.GetLon()); //vectorpos to intruder
 															course=intruderRadial-xivap.GetHeading(); //alignment to headup
-															course=deg2rad(course);
-															Tcaslist[i].x_plot=sin(course)*dis*2.2f;
-															Tcaslist[i].y_plot=cos(course)*dis*2.2f;
+															course=(float) deg2rad(course);
+															Tcaslist[i].x_plot= sin(course)*dis*2.2f;
+															Tcaslist[i].y_plot= cos(course)*dis*2.2f;
 															Tcaslist[i].distance=dis; //radial distance to intruder
 															Tcaslist[i].timeout=LATENCY;
-															Tcaslist[i].altitude=(alt-xivap.elevationft())/100;
-															Tcaslist[i].elevation=alt;
+															Tcaslist[i].altitude=(int) (alt-xivap.elevationft())/100;
+															Tcaslist[i].elevation=(int) alt;
 										
 															//do some trigoniometric stuff, calculate angle Gamma from know angles Beta and Alpha
 															//if we know Gamma, and the radial distance between ownplane and intruder, we know also
@@ -203,8 +203,8 @@ while (i<maxplanes) {if (strcmp(Tcaslist[i].pilot,pilot)==0) //do we know this g
 
 															if ((Gamma!=0)| (Gamma!=180)) {
 
-																dCPA=(dis*sin(deg2rad(Alpha)))/sin(deg2rad(Gamma));
-																dCPAi=(dis*sin(deg2rad(Beta)))/sin(deg2rad(Gamma));
+																dCPA=(dis*(float) sin(deg2rad(Alpha)))/(float) sin(deg2rad(Gamma));
+																dCPAi=(dis*(float) sin(deg2rad(Beta)))/(float) sin(deg2rad(Gamma));
 
 															}
 															speed=xivap.GetSpeed();
@@ -247,12 +247,12 @@ while (i<maxplanes) {
 												sprintf(txt,"New Pilot %s lat:%f lon:%f alt:%5.01f distance %2.1f--course%3.1f-pos%d\r\n",pilot,lat,lon,alt,dis,course,i);
 												XPLMDebugString(txt);
 												#endif
-												course=deg2rad(course);
+												course=(float) deg2rad(course);
 												Tcaslist[i].x_plot=sin(course)*dis*2.2f;
 												Tcaslist[i].y_plot=cos(course)*dis*2.2f;
 												Tcaslist[i].distance=dis;
-												Tcaslist[i].altitude=(alt-xivap.elevationft())/100;
-												Tcaslist[i].elevation=alt;
+												Tcaslist[i].altitude=(int) ((alt-xivap.elevationft())/100);
+												Tcaslist[i].elevation=(int) alt;
 												Tcaslist[i].lastaltitude=Tcaslist[i].elevation;
 												Tcaslist[i].timeout=LATENCY;
 												Tcaslist[i].show=false;
@@ -418,7 +418,7 @@ static bool firsttime;
 			
 			switch (range)
 			{
-			case	NM3:	{Tcaslist[i].x_scale=Tcaslist[i].x_plot*13;Tcaslist[i].y_scale=Tcaslist[i].y_plot*13;break;}
+			case	NM3:	{Tcaslist[i].x_scale= Tcaslist[i].x_plot*13;Tcaslist[i].y_scale= Tcaslist[i].y_plot*13;break;}
 			case	NM5:	{Tcaslist[i].x_scale=Tcaslist[i].x_plot*8;Tcaslist[i].y_scale=Tcaslist[i].y_plot*8;break;}break;
 			case	NM10:	{Tcaslist[i].x_scale=Tcaslist[i].x_plot*4;Tcaslist[i].y_scale=Tcaslist[i].y_plot*4;break;}
 			case	NM20:	{Tcaslist[i].x_scale=Tcaslist[i].x_plot*2;Tcaslist[i].y_scale=Tcaslist[i].y_plot*2;break;}

@@ -199,10 +199,10 @@ void	IvBuildTextures(void)
 	Ui_height = 130;
 	XPLMBindTexture2d(IvaoTexture[IVPANEL_TEXTURE], 0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(+1, 1.0f); glVertex2f(Ui_width, 0);          // Bottom Right Of The Texture and Quad
+	glTexCoord2f(+1, 1.0f); glVertex2f((float)Ui_width, 0);          // Bottom Right Of The Texture and Quad
 	glTexCoord2f(+0, 1.0f); glVertex2f(0, 0);                 // Bottom Left Of The Texture and Quad
-	glTexCoord2f(+0, 0.0f); glVertex2f(0, Ui_height);         // Top Left Of The Texture and Quad
-	glTexCoord2f(+1, 0.0f); glVertex2f(Ui_width, Ui_height);  // Top Right Of The Texture and Quad
+	glTexCoord2f(+0, 0.0f); glVertex2f(0, (float)Ui_height);         // Top Left Of The Texture and Quad
+	glTexCoord2f(+1, 0.0f); glVertex2f((float)Ui_width,(float) Ui_height);  // Top Right Of The Texture and Quad
 	glEnd();
 	glPopMatrix();
 	glEndList();
@@ -295,10 +295,10 @@ void	IvBuildTextures(void)
 
 	XPLMBindTexture2d(IvaoTexture[IVTCAS], 0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(+1, 1.0f); glVertex2f(Tcasbox.Size(),0);	// Bottom Right Of The Texture and Quad
+	glTexCoord2f(+1, 1.0f); glVertex2f((float)Tcasbox.Size(),0);	// Bottom Right Of The Texture and Quad
 	glTexCoord2f(+0, 1.0f); glVertex2f(0, 0);	// Bottom Left Of The Texture and Quad
-	glTexCoord2f(+0, 0.0f); glVertex2f(0, Tcasbox.Size());	// Top Left Of The Texture and Quad
-	glTexCoord2f(+1, 0.0f); glVertex2f(Tcasbox.Size(), Tcasbox.Size());	// Top Right Of The Texture and Quad
+	glTexCoord2f(+0, 0.0f); glVertex2f(0, (float)Tcasbox.Size());	// Top Left Of The Texture and Quad
+	glTexCoord2f(+1, 0.0f); glVertex2f((float)Tcasbox.Size(),(float) Tcasbox.Size());	// Top Right Of The Texture and Quad
 	glEnd(); 
 
 	glEndList();
@@ -357,25 +357,25 @@ void	IvBuildTextures(void)
 	glNewList(IVbase + IVTCAS_YELLOW, GL_COMPILE);
 	glBegin(GL_TRIANGLE_FAN);
 	glColor4f(0.0f,1.0f,0.0f,1.0f);//Change the object color to yellow
- 	glVertex2f(1.54, 4.75);	
-	glVertex2f(2.93, 4.04);	
-	glVertex2f(4.04, 2.93);
-	glVertex2f(4.75, 1.54);
+ 	glVertex2f(1.54f, 4.75f);	
+	glVertex2f(2.93f, 4.04f);	
+	glVertex2f(4.04f, 2.93f);
+	glVertex2f(4.75f, 1.54f);
 	glVertex2f(5, 0);
-	glVertex2f(4.75, -1.54);
-	glVertex2f(4.04, -2.93);
-	glVertex2f(2.93, -4.04);
-	glVertex2i(1.54, -4.75);
+	glVertex2f(4.75f, -1.54f);
+	glVertex2f(4.04f, -2.93f);
+	glVertex2f(2.93f, -4.04f);
+	glVertex2f(1.54f, -4.75f);
 	glVertex2f(0, -5);
-	glVertex2f(-1.54, -4.75);
-	glVertex2f(-2.93, -4.04);
-	glVertex2f(-4.04, -2.93);
-	glVertex2f(-4.75, -1.54);
+	glVertex2f(-1.54f, -4.75f);
+	glVertex2f(-2.93f, -4.04f);
+	glVertex2f(-4.04f, -2.93f);
+	glVertex2f(-4.75f, -1.54f);
 	glVertex2f(-5, 0);
-	glVertex2f(-4.75, +1.54);
-	glVertex2f(-4.04, 2.93);
-	glVertex2f(-2.93, 4.04);
-	glVertex2f(-1.54, 4.75);
+	glVertex2f(-4.75f, +1.54f);
+	glVertex2f(-4.04f, 2.93f);
+	glVertex2f(-2.93f, 4.04f);
+	glVertex2f(-1.54f, 4.75f);
 	glEnd();
  	glEndList();
 ///////////////////////
@@ -417,10 +417,10 @@ void	IvBuildTextures(void)
 		
 		glNewList(IVbase + IVDIGITS_TEXTURES + loop, GL_COMPILE); // Start Building A List
 			glBegin(GL_QUADS);							// Use A Quad For Each Character
-				glTexCoord2f(cx + 0.125,1); glVertex2f(25, 0); // Vertex Coord (Bottom Left)
+				glTexCoord2f(cx + 0.125f,1); glVertex2f(25, 0); // Vertex Coord (Bottom Left)
 				glTexCoord2f(cx, 1); glVertex2f(0, 0); 	// Vertex Coord (Bottom Right)
 				glTexCoord2f(cx, 0); glVertex2f(0, 25);	// Vertex Coord (Top Right)
-				glTexCoord2f(cx + 0.125, 0); glVertex2f(25, 25); // Vertex Coord (Top Left)
+				glTexCoord2f(cx + 0.125f, 0); glVertex2f(25, 25); // Vertex Coord (Top Left)
 			glEnd();									// Done Building Our Quad (Character)
 			glTranslated(25, 0, 0);						// Move To The Right Of The Character
 		glEndList();									// Done Building The Display List
@@ -567,8 +567,8 @@ static int IvaoDrawGLScene(void )
 	int xm = XPLMGetDatai(gXpdrMode);
 	//coordinates are taking from UI window
 
-	xPanelLeft = xPanelWindowLeft;
-	xPanelBottom = xPanelWindowBottom;
+	xPanelLeft = (float) xPanelWindowLeft;
+	xPanelBottom = (float) xPanelWindowBottom;
 	
 	glPushMatrix();
 	glColor3f(xRed, xGreen, xBlue);

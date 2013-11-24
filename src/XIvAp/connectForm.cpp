@@ -395,11 +395,11 @@ int	ConnectForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_
 
 			XPGetWidgetDescriptor(portTextField, buffer, sizeof(buffer));
 			string port = buffer;
-			long hideadm = XPGetWidgetProperty(hideSupCheckbox, xpProperty_ButtonState, NULL);
-			long rememberme = XPGetWidgetProperty(rememberMeCheckbox, xpProperty_ButtonState, NULL);
-			long followme = XPGetWidgetProperty(followMeCheckbox, xpProperty_ButtonState, NULL);
+			intptr_t hideadm = XPGetWidgetProperty(hideSupCheckbox, xpProperty_ButtonState, NULL);
+			intptr_t rememberme = XPGetWidgetProperty(rememberMeCheckbox, xpProperty_ButtonState, NULL);
+			intptr_t followme = XPGetWidgetProperty(followMeCheckbox, xpProperty_ButtonState, NULL);
 #ifdef HAVE_TEAMSPEAK
-			long voice = XPGetWidgetProperty(voiceCheckbox, xpProperty_ButtonState, NULL);
+			intptr_t voice = XPGetWidgetProperty(voiceCheckbox, xpProperty_ButtonState, NULL);
 #else
 			long voice = 0;
 #endif

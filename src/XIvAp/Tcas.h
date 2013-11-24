@@ -31,8 +31,8 @@ typedef	struct
 {
 	char	pilot[14];	
 	float	distance;
-	int		x_plot;
-	int		y_plot;
+	float		x_plot;
+	float		y_plot;
 	int		x_scale;
 	int		y_scale;
 	char	timeout;

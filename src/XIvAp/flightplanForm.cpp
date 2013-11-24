@@ -355,7 +355,7 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intp
 			READFORM(routeTextField, route);
 
 			// get the altitude from the flight plan
-			int i = XPGetWidgetProperty(alttypePopup, xpProperty_PopupCurrentItem, NULL);
+			intptr_t i = XPGetWidgetProperty(alttypePopup, xpProperty_PopupCurrentItem, NULL);
 			int multi = 1;
 			switch(i) {
 				case 0: multi = 100; break;	// FL are * 100 feet
@@ -640,7 +640,7 @@ void FlightplanForm::send(bool closeWindow)
 		xivap.callsign = trim(strupcase(xivap.fpl.callsign));
 	}
 
-	int i = XPGetWidgetProperty(flightRulesPopup, xpProperty_PopupCurrentItem, NULL);
+	intptr_t i = XPGetWidgetProperty(flightRulesPopup, xpProperty_PopupCurrentItem, NULL);
 	switch(i) {
 		case 0: xivap.fpl.flightrules = "V"; break;
 		case 1: xivap.fpl.flightrules = "I"; break;
