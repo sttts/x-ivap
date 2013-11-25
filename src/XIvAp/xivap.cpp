@@ -327,6 +327,12 @@ void Xivap::XPluginStart()
 	// compare against 0 -> if it is not set, it defaults to ON
 	if(str == "0") _useLabels = false;
 	else _useLabels = true;
+	/*extra parameter for the windturbulance x10*/
+	str = config.readConfig("PREFERENCES", "TURBULANCE");
+	_turbulance=atof(str);
+	if (_turbulance<2) _turbulance=4.0f;
+	else if (_turbulance>20) _turbulance=20.0f;
+
 	str = config.readConfig("PREFERENCES", "PRVTMSGSOUND");
 	// compare against 0 -> if it is not set, it defaults to ON
 	if(str == "0") _usePMSG = false;

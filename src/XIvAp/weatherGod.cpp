@@ -259,7 +259,7 @@ void WeatherGod::setClouds(const WxStation& s)
 
 		// check for turbulences inside a cloud layer the aircraft is flying in
 		if(s.cloudLayers[i].base <= aircraftAlt && s.cloudLayers[i].tops >= aircraftAlt)
-			turbulencePercent = static_cast<float>(s.cloudLayers[i].turbulence) / 4.0f;
+			turbulencePercent = static_cast<float>(s.cloudLayers[i].turbulence) / xivap.UsingTurbulance();
 	}
 
 	size_t layersSet = 0;
@@ -329,7 +329,7 @@ void WeatherGod::setWinds(const WxStation& station)
 	target.wind_direction_degt[0] = station.windLayers[0].direction;
 	target.wind_speed_kt[0] = station.windLayers[0].speed;
 	target.shear_direction_degt[0] = station.windLayers[0].variance;
-	target.turbulence[0] = station.windLayers[0].turbulence / 4.0f;
+	target.turbulence[0] = station.windLayers[0].turbulence / xivap.UsingTurbulance();
 	if(station.windLayers[0].gusts > 0)
 		target.shear_speed_kt[0] = station.windLayers[0].gusts - station.windLayers[0].speed;
 	else
@@ -346,7 +346,7 @@ void WeatherGod::setWinds(const WxStation& station)
 	target.wind_direction_degt[2] = station.windLayers[station.windLayers.size() - 1].direction;
 	target.wind_speed_kt[2] = station.windLayers[station.windLayers.size() - 1].speed;
 	target.shear_direction_degt[2] = station.windLayers[station.windLayers.size() - 1].variance;
-	target.turbulence[2] = station.windLayers[station.windLayers.size() - 1].turbulence / 4.0f;
+	target.turbulence[2] = station.windLayers[station.windLayers.size() - 1].turbulence / xivap.UsingTurbulance();
 	if(station.windLayers[2].gusts > 0)
 		target.shear_speed_kt[2] = station.windLayers[2].gusts - station.windLayers[2].speed;
 	else
@@ -359,13 +359,16 @@ void WeatherGod::setWinds(const WxStation& station)
 	//
 	// the layer in between
 	//
+	char text[100];
+	sprintf(text,"windturbulance:%4.1f\r\n",xivap.UsingTurbulance());
+	XPLMDebugString(text);
 	if(aircraftAlt <= station.windLayers[1].alt) {
 		// aircraft is below the second wind layer
 		target.wind_altitude_msl_m[1] = station.windLayers[1].alt;
 		target.wind_direction_degt[1] = station.windLayers[1].direction;
 		target.wind_speed_kt[1] = station.windLayers[1].speed;
 		target.shear_direction_degt[1] = station.windLayers[1].variance;
-		target.turbulence[1] = station.windLayers[1].turbulence / 4.0f;
+		target.turbulence[1] = station.windLayers[1].turbulence / xivap.UsingTurbulance();
 		if(station.windLayers[1].gusts > 0)
 			target.shear_speed_kt[1] = station.windLayers[1].gusts - station.windLayers[1].speed;
 		else
