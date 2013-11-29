@@ -64,7 +64,7 @@ void FlightplanForm::show()
 {
 	if(!XPIsWidgetVisible(window)) {
 		XPShowWidget(window);
-		//xivap.airportChange(); // why is that in here?
+		//xivap.airportChange();// why is that in here?
 	}
 	XPBringRootWidgetToFront(window);
 }
@@ -442,6 +442,12 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intp
 			|| widget == alternateTextField || widget == alternate2TextField || widget == airlineTextField
 			|| widget == commentsTextField || widget == transponderTextField)
 		{
+			// added CutCopyPaste only for non restricted text fields (route and comments)
+			if (widget == routeTextField || widget == commentsTextField){
+				if (WidgetFunc_CutCopyPaste(inMessage, widget, inParam1, inParam2))
+					return 1;
+			}
+			
 			key->key = pt::upcase(key->key);
 
 			if(widget == callsignTextField || widget == departureTextField || widget == destTextField
@@ -820,4 +826,125 @@ void FlightplanForm::FMcar(bool enable)
 	XPHideWidget(fmcarStaticText);
 	updateALList();   
 	}
+}
+
+// Get text from Clipboard for CutCopyPaste
+// Now it work only to PC
+bool FlightplanForm::GetTextFromClipboard(std::string& outText)
+{
+#if IBM
+		HGLOBAL   	hglb;
+		LPTSTR    	lptstr;
+		bool		retVal = false;
+		static XPLMDataRef hwndDataRef = XPLMFindDataRef("sim/operation/windows/system_window");
+		HWND hwndMain = (HWND) XPLMGetDatai(hwndDataRef);
+
+	if (!IsClipboardFormatAvailable(CF_TEXT))
+		return false;
+
+	if (!OpenClipboard(hwndMain))
+		return false;
+
+	hglb = GetClipboardData(CF_TEXT);
+	if (hglb != NULL)
+	{
+		lptstr = (LPSTR)GlobalLock(hglb);
+		if (lptstr != NULL)
+		{
+			outText = lptstr;
+			GlobalUnlock(hglb);
+  			retVal = true;
+		}
+	}
+
+	CloseClipboard();
+
+	return retVal;
+#endif
+}
+
+// Set text to Clipboard for CutCopyPaste
+// Now it work only to PC
+bool FlightplanForm::SetTextToClipboard(const std::string& inText)
+{
+#if IBM
+		LPTSTR  lptstrCopy;
+		HGLOBAL hglbCopy;
+		static XPLMDataRef hwndDataRef = XPLMFindDataRef("sim/operation/windows/system_window");
+		HWND hwndMain = (HWND) XPLMGetDatai(hwndDataRef);
+
+	if (!OpenClipboard(hwndMain))
+		return false;
+	EmptyClipboard();
+
+	hglbCopy = GlobalAlloc(GMEM_MOVEABLE, sizeof(TCHAR) * (inText.length() + 1));
+	if (hglbCopy == NULL)
+	{
+		CloseClipboard();
+		return false;
+	}
+
+	lptstrCopy = (LPSTR)GlobalLock(hglbCopy);
+	strcpy(lptstrCopy, inText.c_str());
+	GlobalUnlock(hglbCopy);
+
+	SetClipboardData(CF_TEXT, hglbCopy);
+	CloseClipboard();
+	return true;
+#endif
+}
+
+// CutCopyPaste in Widget
+int	FlightplanForm::WidgetFunc_CutCopyPaste(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+{
+	if (inMessage == xpMsg_KeyPress)
+	{
+		char			theChar = KEY_VKEY(inParam1);
+		XPLMKeyFlags	flags = KEY_FLAGS(inParam1);
+
+		if ((flags & (xplm_DownFlag + xplm_ControlFlag)) == (xplm_DownFlag + xplm_ControlFlag))
+		{
+			long	selStart = XPGetWidgetProperty(inWidget, xpProperty_EditFieldSelStart, NULL);
+			long	selEnd = XPGetWidgetProperty(inWidget, xpProperty_EditFieldSelEnd, NULL);
+			long	strLen = XPGetWidgetDescriptor(inWidget, NULL, 0);
+			std::string	txt;
+			txt.resize(strLen);
+			XPGetWidgetDescriptor(inWidget, &*txt.begin(), txt.size()+1);
+			if (theChar == XPLM_VK_V)
+			{
+				std::string	scrap;
+				if (GetTextFromClipboard(scrap) && !scrap.empty())
+				{
+					if ((selEnd > selStart) && (selStart >= 0) && (selEnd <= strLen))
+					{
+						txt.replace(selStart, selEnd - selStart, scrap);
+						XPSetWidgetDescriptor(inWidget, txt.c_str());
+						XPSetWidgetProperty(inWidget, xpProperty_EditFieldSelStart, selStart + scrap.size());
+						XPSetWidgetProperty(inWidget, xpProperty_EditFieldSelEnd, selStart + scrap.size());
+					} else if ((selStart >= 0) && (selStart <= strLen)) {
+						txt.insert(selStart, scrap);
+						XPSetWidgetDescriptor(inWidget, txt.c_str());
+						XPSetWidgetProperty(inWidget, xpProperty_EditFieldSelStart, selStart + scrap.size());
+						XPSetWidgetProperty(inWidget, xpProperty_EditFieldSelEnd, selStart + scrap.size());
+					}
+				}
+				return 1;
+			}
+			if ((theChar == XPLM_VK_C) || (theChar == XPLM_VK_X))
+			{
+				if ((selStart >= 0) && (selStart < selEnd) && (selEnd <= strLen))
+				{
+					std::string	scrap = txt.substr(selStart, selEnd - selStart);
+					if (SetTextToClipboard(scrap) && (theChar == XPLM_VK_X))
+					{
+						txt.erase(selStart, selEnd - selStart);
+						XPSetWidgetDescriptor(inWidget, txt.c_str());
+						XPSetWidgetProperty(inWidget, xpProperty_EditFieldSelEnd, selStart);
+					}
+				}
+				return 1;
+			}
+		}
+	}
+	return 0;
 }

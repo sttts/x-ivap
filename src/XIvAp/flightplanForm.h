@@ -19,6 +19,7 @@
 #include "aircraftDB.h"
 #include "airlinesDB.h"
 #include "awyFinder.h"
+#include "XPWidgetUtils.h" // added for CutCopyPaste
 
 class FlightplanForm {
 public:
@@ -36,6 +37,12 @@ public:
 	void setFPTextFields();
 	void setAcfIcao();
 	void FMcar(bool enable);
+
+	// CutCopyPaste functional
+	bool GetTextFromClipboard(std::string& outText);
+	bool SetTextToClipboard(const std::string& inText);
+	int WidgetFunc_CutCopyPaste(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2);
+
 
 private:
 	XPWidgetID window;
