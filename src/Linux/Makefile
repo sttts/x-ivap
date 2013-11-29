@@ -77,7 +77,7 @@ OBJS+=$(c_SRC:.c=.c.o)
 
 OBJS+=$(cpp_SRC:.cpp=.cpp.o)
 
-CFLAGS+= -DXPLM200 -iquote. -iquote.. -iquote../.. -iquote../../.. \
+CFLAGS+= -DXPLM200 -DIVAO -iquote. -iquote.. -iquote../.. -iquote../../.. \
  -iquote../../SDK/CHeaders/XPLM \
  -iquote../../SDK/CHeaders/Widgets \
  -iquote../XIvAp \
