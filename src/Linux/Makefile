@@ -158,12 +158,12 @@ ifeq (${OS}, Darwin)
 	CFLAGS+= -m${ARCH} -DAPPLE -DAPL=1 -DLIN=0 -DIBM=0 -O3 -fpascal-strings \
 	 -I../MacIncludes \
 	  -funsigned-char \
-	  -arch i386 -mmacosx-version-min=10.4 \
+	  -arch amd64 -mmacosx-version-min=10.6 \
 	  -iquote../FMOD/FMODMac/api/inc \
 	  -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.5.sdk 
 	LDFLAGS+=-m${ARCH} -flat_namespace -undefined suppress
 	LDFLAGS+= -bundle -framework Carbon -framework OpenGL -framework ApplicationServices
-	LDFLAGS+= -arch i386 -mmacosx-version-min=10.4
+	LDFLAGS+= -arch amd64 -mmacosx-version-min=10.6
 	LDFLAGS+= -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.5.sdk
 	FINAL=
 endif
