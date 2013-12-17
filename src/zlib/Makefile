@@ -42,7 +42,7 @@ ifeq (${OS}, Darwin)
     endif
 
     CFLAGS+=-isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
-    LDFLAGS+=Wl,-syslibroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+    LDFLAGS+=-Wl,-syslibroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
 endif
 
 LIBS=libz.a
