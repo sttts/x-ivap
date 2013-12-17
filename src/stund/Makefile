@@ -31,9 +31,9 @@ STUNLIB=libstun.a
 
 OS:=$(shell uname)
 ifeq (${OS}, Darwin)
-    CXXFLAGS+= -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -mmacosx-version-min=10.6
-    CFLAGS+= -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -mmacosx-version-min=10.6
-    LDFLAGS+= -Wl,-syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -mmacosx-version-min=10.6
+    CXXFLAGS+= -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
+    CFLAGS+= -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
+    LDFLAGS+= -Wl,-syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
     
     OS_VER=$(shell uname -r | sed 's/\([0-9]*\).*/\1/')
     ifeq (${OS_VER}, 10)

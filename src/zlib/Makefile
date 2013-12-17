@@ -41,8 +41,8 @@ ifeq (${OS}, Darwin)
         CC=gcc-4.0
     endif
 
-    CFLAGS+=-arch i386 -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
-    LDFLAGS+=-arch i386 -Wl,-syslibroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+    CFLAGS+=-isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+    LDFLAGS+=Wl,-syslibroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
 endif
 
 LIBS=libz.a

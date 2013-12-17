@@ -22,7 +22,7 @@ else
     CXX = c++
 endif
 
-OS_CXXOPTS=-fno-common -fPIC -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
+OS_CXXOPTS=-fno-common -fPIC -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
 
 include Makefile.common
 
