@@ -103,10 +103,10 @@ PLUGIN_API void XPluginDisable(void)
 
 // macro to register RW callbacks
 #define CALLBACK_REGISTER_INT(ref) \
-	XPLMRegisterDataAccessor(ref, xplmType_Int, 1, &Handler_getInteger, &Handler_setInteger, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ref, ref)
+	XPLMRegisterDataAccessor(ref, xplmType_Int, 1, &Handler_getInteger, &Handler_setInteger, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (void*) ref, (void*) ref)
 
 #define CALLBACK_REGISTER_STR(ref) \
-	XPLMRegisterDataAccessor(ref, xplmType_Data, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &Handler_getString, &Handler_setString, ref, ref)
+	XPLMRegisterDataAccessor(ref, xplmType_Data, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &Handler_getString, &Handler_setString, (void*) ref, (void*) ref)
 
 PLUGIN_API int XPluginEnable(void)
 {
@@ -122,11 +122,11 @@ PLUGIN_API int XPluginEnable(void)
 	// ----------------------------------
 
 	// int, readonly
-	XPLMRegisterDataAccessor(XSB_VERS_NUMBER, xplmType_Int, 0, &Handler_getInteger, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, XSB_VERS_NUMBER, XSB_VERS_NUMBER);
-	XPLMRegisterDataAccessor(XSB_CON_STATUS, xplmType_Int, 0, &Handler_getInteger, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, XSB_CON_STATUS, XSB_CON_STATUS);
+	XPLMRegisterDataAccessor(XSB_VERS_NUMBER, xplmType_Int, 0, &Handler_getInteger, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,(void *) XSB_VERS_NUMBER,(void *) XSB_VERS_NUMBER);
+	XPLMRegisterDataAccessor(XSB_CON_STATUS, xplmType_Int, 0, &Handler_getInteger, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (void *)XSB_CON_STATUS, (void *)XSB_CON_STATUS);
 
 	// string, readonly
-	XPLMRegisterDataAccessor(XSB_VERS_STRING, xplmType_Data, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &Handler_getString, NULL, XSB_VERS_STRING, XSB_VERS_STRING);
+	XPLMRegisterDataAccessor(XSB_VERS_STRING, xplmType_Data, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &Handler_getString, NULL,(void *) XSB_VERS_STRING,(void *) XSB_VERS_STRING);
 
 	CALLBACK_REGISTER_INT(XSB_CON_PORT);
 	CALLBACK_REGISTER_INT(XSB_FP_FLIGHT_TYPE);
@@ -219,7 +219,7 @@ int focusdumpMouseCallback(XPLMWindowID inWindowID,
 
 void MenuHandlerCallback(void *inMenuRef, void *inItemRef)
 {
-	int menuEntry = (int)inItemRef;
+	int menuEntry = (intptr_t)inItemRef;
 	switch(menuEntry) {
 		case MENU_CONNECT:
 			xivap.connectForm().show();
