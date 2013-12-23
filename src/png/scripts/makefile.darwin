@@ -29,8 +29,13 @@ ifeq (${OS_VER}, 10)
 endif
 
 MACOSX_DEPLOYMENT_TARGET=10.6
-CFLAGS=-I$(ZLIBINC) -m$(ARCH) -Wall -O3 -funroll-loops -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -mmacosx-version-min=10.6
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -Wl,-syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -mmacosx-version-min=10.6
+CFLAGS=-I$(ZLIBINC) -m$(ARCH) -Wall -O3 -funroll-loops -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz -Wl,-syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6
+
+ifeq (${ARCH}, 32)
+	CFLAGS += -arch i386
+	LDFLAGS += -arch i386
+endif
 
 #RANLIB=echo
 RANLIB=ranlib
