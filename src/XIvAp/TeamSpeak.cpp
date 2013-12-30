@@ -356,13 +356,16 @@ bool TeamSpeak::Disconnect()
 #endif
 #ifdef WIN32
 	// dll not loaded, so return false
-	if(!dll_loaded_) return false;
+	if(!dll_loaded_) {string url = "teamspeak://";
+						ShellExecuteA(0/*m_hWnd*/, "open", url, "", "", SW_SHOWDEFAULT);
+						return false; //insert  0,0,0,0 url
+					}
 
 	// disconnect now
 	xivap.addText(colCyan, "Teamspeak: disconnect from the server", true, true);
 	return tsrDisconnect() == 0;
 #endif
-#ifdef LINUX
+#ifdef LINUX 
     string url = "teamspeak://";
     RunTeamspeakControl(url);
 #endif 
