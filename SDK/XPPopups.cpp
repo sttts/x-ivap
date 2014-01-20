@@ -421,7 +421,7 @@ static	void 	XPPopupWidgetProc(int inChoice, void * inRefcon)
 	if (inChoice != -1)
 	{
 		XPSetWidgetProperty(inRefcon, xpProperty_PopupCurrentItem, inChoice);
-		XPSendMessageToWidget(inRefcon, xpMessage_PopupNewItemPicked, xpMode_UpChain, (long) inRefcon, inChoice);
+		XPSendMessageToWidget(inRefcon, xpMessage_PopupNewItemPicked, xpMode_UpChain, (intptr_t) inRefcon, inChoice);
 	}
 }
 
@@ -496,38 +496,28 @@ int		XPPopupButtonProc(
 			// Since there is no UI element code for this, we must draw it by hand!
 			if (sim >= 700)
 			{
-/*				XPLMSetGraphicsState(0, 1, 0,  0, 1,  0, 0);
-				XPLMBindTexture2d(XPLMGetTexture(xplm_Tex_GeneralInterface), 0);
-				glColor4f(1.0, 1.0, 1.0, 1.0);*/
+
 				
 				int center = (t + b) / 2;
 
-/// This is in the new widgets lib				
-/*				XPDrawElement(	l - 4, center - 13, r + 4, center + 13, 
-								xpElement_PushButtonWithSelector, 0);
-*/
 				XPDrawElement(	l - 4, center - 13, r + 4, center + 13, 
 								xpElement_PushButton, 0);
-				
-/*
-				// These are offsets for the popup button in the texture
-				DrawStretchedQuad(l - 4, center - 13, r + 4, center + 13, 
-									357, 357+12,357+12+30, 357+12+30+26, 
-									486, 486+8, 486+8+6, 486+8+6+12);*/
+		
+
 		
 			} else 
 				// If we are version 6, use a window drag bar as a fake popup button.
 				XPDrawElement(l+2, b, r-2, t, xpElement_WindowDragBarSmooth, 0);
 
 			// Now draw the button label.
-			long	titleLen = XPGetWidgetDescriptor(inWidget, buf, sizeof(buf));
+			int	titleLen = XPGetWidgetDescriptor(inWidget, buf, sizeof(buf));
 
 			SetupAmbientColor(xpColor_MenuText, white);
 			SetupAmbientColor(xpColor_MenuTextDisabled, gray);
 			
 			if (charWidth)
 			{
-				long	maxCharCapacity = (r - l - 24) / charWidth;
+				int	maxCharCapacity = (r - l - 24) / charWidth;
 				if (itemLen > maxCharCapacity)
 					itemLen = maxCharCapacity;
 			}

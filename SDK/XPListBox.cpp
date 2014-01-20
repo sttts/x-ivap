@@ -42,7 +42,7 @@
 #if IBM
 double round(double InValue)
 {
-    long WholeValue;
+    int WholeValue;
     double Fraction;
 
     WholeValue = InValue;
@@ -273,7 +273,6 @@ int		XPListBoxProc(
 //	static int SliderPosition, ScrollBarSlop, Min, Max, ScrollBarPageAmount, MaxListBoxItems;
 	static int ScrollBarSlop;
 //	static bool Highlighted;
-
 	// Select if we're in the background.
 	if (XPUSelectIfNeeded(inMessage, inWidget, inParam1, inParam2, 1/*eat*/))	return 1;
 	
@@ -293,6 +292,8 @@ int		XPListBoxProc(
 	int	MaxListBoxItems = XPGetWidgetProperty(inWidget, xpProperty_ListBoxMaxListBoxItems, NULL);
 	int	Highlighted = XPGetWidgetProperty(inWidget, xpProperty_ListBoxHighlighted, NULL);
 	XPListBoxData_t	*pListBoxData = (XPListBoxData_t*) XPGetWidgetProperty(inWidget, xpProperty_ListBoxData, NULL);
+	
+	
 
 	switch(inMessage) 
 	{
@@ -301,7 +302,7 @@ int		XPListBoxProc(
 			pListBoxData = new XPListBoxData_t;
 			XPGetWidgetDescriptor(inWidget, Buffer, sizeof(Buffer));
 			XPListBoxFillWithData(pListBoxData, Buffer, (Right - Left - 20));
-			XPSetWidgetProperty(inWidget, xpProperty_ListBoxData, (long)pListBoxData);
+			XPSetWidgetProperty(inWidget, xpProperty_ListBoxData, (intptr_t)pListBoxData);
 			XPSetWidgetProperty(inWidget, xpProperty_ListBoxCurrentItem, 0);
 			Min = 0;
 			Max = pListBoxData->Items.size();
@@ -309,12 +310,16 @@ int		XPListBoxProc(
 			Highlighted = false;
 			SliderPosition = Max;
 			MaxListBoxItems = (Top - Bottom) / LISTBOX_ITEM_HEIGHT;
+			
 			ScrollBarPageAmount = MaxListBoxItems;
+			
 			XPSetWidgetProperty(inWidget, xpProperty_ListBoxScrollBarSliderPosition, SliderPosition);
+			
 			XPSetWidgetProperty(inWidget, xpProperty_ListBoxScrollBarMin, Min);
 			XPSetWidgetProperty(inWidget, xpProperty_ListBoxScrollBarMax, Max);
 			XPSetWidgetProperty(inWidget, xpProperty_ListBoxScrollBarPageAmount, ScrollBarPageAmount);
-			XPSetWidgetProperty(inWidget, xpProperty_ListBoxMaxListBoxItems, MaxListBoxItems);
+			XPSetWidgetProperty(inWidget, xpProperty_ListBoxMaxListBoxItems, MaxListBoxItems); 
+	
 			XPSetWidgetProperty(inWidget, xpProperty_ListBoxHighlighted, Highlighted);
 			return 1;
 
@@ -451,7 +456,7 @@ int		XPListBoxProc(
 						XPSetWidgetDescriptor(inWidget, pListBoxData->Items[CurrentItem].c_str());
 					else
 						XPSetWidgetDescriptor(inWidget, "");
-					XPSendMessageToWidget(inWidget, xpMessage_ListBoxItemSelected, xpMode_UpChain, (long) inWidget, CurrentItem);
+					XPSendMessageToWidget(inWidget, xpMessage_ListBoxItemSelected, xpMode_UpChain, (intptr_t) inWidget, CurrentItem);
 				}
 			}
 			return 1;
@@ -539,7 +544,7 @@ int		XPListBoxProc(
 				}
 			}		
 		return 1;
-
+	
 	case xpMsg_MouseDrag:
 		if (IN_RECT(MOUSE_X(inParam1), MOUSE_Y(inParam1), Right-20, Top, Right, Bottom))
 		{
@@ -585,7 +590,7 @@ int		XPListBoxProc(
 }				
 
 // To create a listbox, make a new widget with our listbox proc as the widget proc.
-XPWidgetID           XPCreateListBox(
+XPWidgetID  XPCreateListBox(
                                    int                  inLeft,    
                                    int                  inTop,    
                                    int                  inRight,    
@@ -593,6 +598,7 @@ XPWidgetID           XPCreateListBox(
                                    int                  inVisible,    
                                    const char *         inDescriptor,    
                                    XPWidgetID           inContainer)
+
 {
 	return XPCreateCustomWidget(
                                    inLeft,    
