@@ -185,7 +185,7 @@ string TempLayer::dump() const
 		+ " dewpoint: " + itostring((int)dewpoint);
 	return result;
 }
-
+////decoding fsd protocol
 void WxDB::add(const FSD::Message &m, float elapsed)
 {
 	string stationName = m.tokens[0];
