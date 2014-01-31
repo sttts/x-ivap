@@ -18,7 +18,7 @@
 
 #include "weatherPosition.h"
 
-#define WX_DEBUG //switch this on for weatherdebug
+//#define WX_DEBUG
 
 #define CLOUD_LAYERS 3
 #define WIND_LAYERS 3

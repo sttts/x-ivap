@@ -22,9 +22,7 @@ XPWeatherSituation::XPWeatherSituation():
 initialized(false)
 {
 }
-#ifdef WX_DEBUG
-char text[200];
-#endif
+
 void XPWeatherSituation::init()
 {
 	// those are all 660+ refs
@@ -117,8 +115,7 @@ void XPWeatherSituation::getWeather()
 	thermal_rate_ms = XPLMGetDataf(ref_thermal_rate_ms);
 	thermal_altitude_msl_m = XPLMGetDataf(ref_thermal_altitude_msl_m);
 }
-////////////this function dumps the selected data to xplane
-//wx data is enabled and modified to dump to xplane log
+
 void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherSituation& lastset)
 {
 
@@ -126,7 +123,6 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 #define WXf(ref, x) { if(lastset.x != x && ref != NULL) { XPLMSetDataf(ref, x); lastset.x = x; } }
 
 // debug version
-
 #define DEB_WXf(text, ref, x) {												\
 	if(lastset.x != x) {													\
 		XPLMSetDataf(ref, x); lastset.x = x;								\
@@ -135,23 +131,18 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 }
 
 	if(!initialized) return;
-#ifdef WX_DEBUG
-	XPLMDebugString("Xivap dumping following data to Xplane\r\n");
-#endif
+
 	for(int i = 0; i < CLOUD_LAYERS; ++i) {
 		WXi(ref_cloud_type[i], cloud_type[i]);
 		WXf(ref_cloud_base_msl_m[i], cloud_base_msl_m[i]);
 		WXf(ref_cloud_tops_msl_m[i], cloud_tops_msl_m[i]);
-
+/*
 #ifdef WX_DEBUG
-		
-		sprintf(text,"set cloud layer %d : type %d base  %3.1f  tops \r\n",i,cloud_type[i],cloud_base_msl_m[i],cloud_tops_msl_m[i]);
-		XPLMDebugString(text);
-	//	xivap.addText(colWhite, "set cloud layer " + itostring(i) + ": type " + itostring(cloud_type[i])
-	//		+ " base " + ftoa(cloud_base_msl_m[i]) + " tops " + ftoa(cloud_tops_msl_m[i]),
-	//		false, true); // log to file only
+		xivap.addText(colWhite, "set cloud layer " + itostring(i) + ": type " + itostring(cloud_type[i])
+			+ " base " + ftoa(cloud_base_msl_m[i]) + " tops " + ftoa(cloud_tops_msl_m[i]),
+			false, true); // log to file only
 #endif
-
+*/
 	}
 
 /*
@@ -170,19 +161,17 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 		DEB_WXf(string("shear spd ") + itostring(i), ref_shear_speed_kt[i], shear_speed_kt[i]);
 		DEB_WXf(string("turb ") + itostring(i), ref_turbulence[i], turbulence[i]);
 
-
+/*
 #ifdef WX_DEBUG
-		
-		sprintf(text,"set wind layer %d: alt %5.0f dir %3.1f speed %3.0f sheardir %3.1f gusts %3.1f turb %1.3f \r\n",i,wind_altitude_msl_m[i],wind_direction_degt[i],wind_speed_kt[i],shear_direction_degt[i],shear_speed_kt[i],turbulence[i]);
-		XPLMDebugString(text);
-	//	xivap.addText(colWhite, "set wind layer " + itostring(i) + ": alt " + ftoa(wind_altitude_msl_m[i])
-		//	+ " dir " + ftoa(wind_direction_degt[i]) + " speed " + ftoa(wind_speed_kt[i])
-		//	+ " shear " + ftoa(shear_direction_degt[i]) + " gusts " + ftoa(shear_speed_kt[i])
-		//	+ " turb " + ftoa(turbulence[i]),
-		//	false, true); // log to file only
-		
+		if(i == 1) {
+		xivap.addText(colWhite, "set wind layer " + itostring(i) + ": alt " + ftoa(wind_altitude_msl_m[i])
+			+ " dir " + ftoa(wind_direction_degt[i]) + " speed " + ftoa(wind_speed_kt[i])
+			+ " shear " + ftoa(shear_direction_degt[i]) + " gusts " + ftoa(shear_speed_kt[i])
+			+ " turb " + ftoa(turbulence[i]),
+			false, true); // log to file only
+		}
 #endif
-		
+*/
 	}
 
 	WXf(ref_temperature_sealevel_c, temperature_sealevel_c);
@@ -201,18 +190,17 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 	XPLMSetDatai(ref_use_real_weather_bool, 0);
 	XPLMSetDataf(ref_rate_change_percent, rate_change_percent);
 
-
+/*
 #ifdef WX_DEBUG
-	sprintf(text,"temp %3.1f dewp %2.1f press %4.1f rain %3.0f thdst %3.0f vis %5.0f\r\n\n",temperature_sealevel_c,dewpoi_sealevel_c,barometer_sealevel_inhg,rain_percent,thunderstorm_percent,visibility_reported_m);
-	XPLMDebugString(text);
-//	xivap.addText(colWhite, "temp " + ftoa(temperature_sealevel_c) + " dewp " + ftoa(dewpoi_sealevel_c)
-	//	+ " press " + ftoa(barometer_sealevel_inhg) + " rain " + ftoa(rain_percent)
-	//	+ " thdst " + ftoa(thunderstorm_percent) + " vis " + ftoa(visibility_reported_m),
-	//	false, true); // log to file only
-
-//	set = false;
+	if(set) {
+	xivap.addText(colWhite, "temp " + ftoa(temperature_sealevel_c) + " dewp " + ftoa(dewpoi_sealevel_c)
+		+ " press " + ftoa(barometer_sealevel_inhg) + " rain " + ftoa(rain_percent)
+		+ " thdst " + ftoa(thunderstorm_percent) + " vis " + ftoa(visibility_reported_m),
+		false, true); // log to file only
+	}
+	set = false;
 #endif
-
+*/
 }
 
 void WeatherGod::init()
@@ -371,7 +359,9 @@ void WeatherGod::setWinds(const WxStation& station)
 	//
 	// the layer in between
 	//
-
+	char text[100];
+	sprintf(text,"windturbulance:%4.1f\r\n",xivap.UsingTurbulance());
+	XPLMDebugString(text);
 	if(aircraftAlt <= station.windLayers[1].alt) {
 		// aircraft is below the second wind layer
 		target.wind_altitude_msl_m[1] = station.windLayers[1].alt;
@@ -451,10 +441,8 @@ float WeatherGod::getVisibility(const WxStation& s)
 void WeatherGod::dump() const
 {
 	xivap.addText(colWhite, "Target WX:", true, true);
-	XPLMDebugString("Target WX:\r\n");
 	target.printDebug();
 	xivap.addText(colWhite, "Current WX:", true, true);
-	XPLMDebugString("Current WX follows:\r\n");
 	current.printDebug();
 }
 
@@ -530,11 +518,8 @@ void WeatherGod::setWeather(const WxStation& s, float aircraftAltm, float ground
 
 #ifdef WX_DEBUG
 	xivap.addText(colYellow, "Using WX for " + s.name, true, true);
-	sprintf(text,"Using WX for %s\r\n",s.name);
-	XPLMDebugString(text);
 	target.printDebug();
 	xivap.addText(colYellow, "Current WX follows:", true, true);
-	XPLMDebugString("Current WX follows:\r\n");
 	current.printDebug();
 #endif
 
@@ -635,8 +620,6 @@ void XPWeatherSituation::printDebug() const
 		}
 		str += "base: " + ftoa(cloud_base_msl_m[i] * 3.2808399f)
 			+ " top: " + ftoa(cloud_tops_msl_m[i] * 3.2808399f) + " ";
-		XPLMDebugString(str);
-		XPLMDebugString("\r\n");
 		xivap.addText(colLightGray, str, true, true);
 	}
 
@@ -647,8 +630,6 @@ void XPWeatherSituation::printDebug() const
 			+ " shearDir " + ftoa(shear_direction_degt[i])
 			+ " shearGain " + ftoa(shear_speed_kt[i])
 			+ " turb " + ftoa(turbulence[i]);
-		XPLMDebugString(str);
-		XPLMDebugString("\r\n");
 		xivap.addText(colLightGray, str, true, true);
 	}
 
@@ -663,7 +644,5 @@ void XPWeatherSituation::printDebug() const
 		+ " therm " + ftoa(thermal_percent)
 		+ " therm.alt " + ftoa(thermal_altitude_msl_m)
 		+ " vis " + ftoa(visibility_reported_m);
-		XPLMDebugString(str);
-		XPLMDebugString("\r\n");
 	xivap.addText(colLightGray, str, true, true);
 }
