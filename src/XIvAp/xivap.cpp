@@ -1359,30 +1359,32 @@ void Xivap::flightLoopCallback()
 		XPLMSetDatai(gXpdrId, 0);
 	}
 
+	// Download data for make/update serverlist.txt
+	static float nextServerListCallTime = 0.0;
+	if (XPLMGetElapsedTime() > nextServerListCallTime && _downloadingServerStatus){
+		nextServerListCallTime = XPLMGetElapsedTime() + 5.0f;
+		// poll server list download if necessary
+		// uiWindow.addMessage(colRed, "Polling HTTP ...", true, true);
+		switch(_HTTPclient.status(static_cast<float>(XPLMGetElapsedTime()), 30.0f)) { // give up after 30 seconds
+			case HTTP::Status_Connecting:
+			case HTTP::Status_Downloading:
+				// uiWindow.addMessage(colRed, "Status is connecting or downloading...", true, true);
+				break;
+
+			case HTTP::Status_Error:
+				uiWindow.addMessage(colRed, "Failed to download server list", true, true);
+			case HTTP::Status_Finished:
+				_downloadingServerStatus = false;
+				// uiWindow.addMessage(colRed, "Status is finished", true, true);
+				break;
+		}
+	}
+	
 	// check if we should switch to a new weather station
 	// and check the http downloader
 	if(XPLMGetElapsedTime() > _nextWxCheck && _useWeather) {
 		_nextWxCheck = XPLMGetElapsedTime() + WEATHER_UPDATE_INTERVAL;
 		checkWeather(XPLMGetElapsedTime());
-
-		// poll server list download if necessary
-		// this is here because i could not find a better place. dont bother, has nothing to do with weather.
-		if(_downloadingServerStatus) {
-			//uiWindow.addMessage(colRed, "Polling HTTP ...", true, true);
-			switch(_HTTPclient.status(static_cast<float>(XPLMGetElapsedTime()), 30.0f)) { // give up after 30 seconds
-				case HTTP::Status_Connecting:
-				case HTTP::Status_Downloading:
-					//uiWindow.addMessage(colRed, "Status is connecting or downloading...", true, true);
-					break;
-
-				case HTTP::Status_Error:
-					uiWindow.addMessage(colRed, "Failed to download server list", true, true);
-				case HTTP::Status_Finished:
-					_downloadingServerStatus = false;
-					//uiWindow.addMessage(colRed, "Status is finished", true, true);
-					break;
-			}
-		}
 	}
 
 	// weather transition
