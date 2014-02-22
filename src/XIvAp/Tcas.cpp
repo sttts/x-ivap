@@ -381,6 +381,7 @@ BELOW - Expands the vertical scan to 2700 ft above and 9900 ft below the aircraf
 void Tcas::TcasFlightLoopcallback()
 {
 static bool firsttime;
+
 #if TCASTEST
 	Testtargets();
 #endif
@@ -440,6 +441,7 @@ static bool firsttime;
 void	Tcas::TcasWinDrawCallback(XPLMWindowID inWindowID, void *inRefcon)
 {
 char txt[10];
+
 if (xivap.uiWindow.visible() & ShowTcas) {
 									//XPLMDrawTranslucentDarkBox(left, top, right, bottom); //temp until opengl is finished
 					
@@ -483,9 +485,9 @@ if (xivap.uiWindow.visible() & ShowTcas) {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 int Tcas::TcasWinMouseCallback(XPLMWindowID inWindowID, int x, int y,
-										XPLMMouseStatus inMouse, void *inRefcon)
+							   XPLMMouseStatus inMouse, void *inRefcon)
 {
-
+	if (xivap.uiWindow.visible() & ShowTcas) {
 		switch(inMouse) {
 		case xplm_MouseDown:
 			XPLMBringWindowToFront(window);
@@ -505,6 +507,7 @@ int Tcas::TcasWinMouseCallback(XPLMWindowID inWindowID, int x, int y,
 			if(dragging) return endDrag(x, y);
 			else if(clicking) return endClick(x, y);
 			break;
+		}
 	}
 	return 0;
 }
