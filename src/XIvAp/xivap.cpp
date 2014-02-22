@@ -1260,30 +1260,116 @@ void Xivap::sendFlightplan()
 
 #define HANDLECHG(message) { changed = true; if(length(changes) > 0) changes += ", "; changes += message; }
 
+/*
+void Xivap::test(void)
+{
+//	Flightplan new_fp = fsd.getFlightplan(m);
+	bool changed = false;
+	string changes = "";
+	string cruisespeed="080";
+	string departure="GMMX";
+	string destination="DAAG";
+	string hoursenroute="10";
+	string minenroute="30";
+	string remarks="KLMVA";
+	string route="ABDOR AGOVA FES CHE";
+	string alternate="ZZZZ";
+	string deptimeest="1200";
+	string deptimeact="1200";
+	string cruisealt="F310";
+	string new_alttype="F";
+	char text[100];
+/*	
+	XPLMDebugString("cruisespeed");
+	XPLMDebugString(new_fp.cruisespeed);
+	XPLMDebugString("\r\ncruisealitude");
+	XPLMDebugString(new_fp.cruisealt);
+	XPLMDebugString("\r\ncDepattime");
+	XPLMDebugString(new_fp.deptimeact);
+	XPLMDebugString("\r\nAirport");
+	XPLMDebugString(new_fp.departure);
+	XPLMDebugString("\r\nest. dep. time");
+	XPLMDebugString(new_fp.deptimeest);
+	XPLMDebugString("\r\ndestination");
+	XPLMDebugString(new_fp.destination);
+	XPLMDebugString("\r\nhours enroute");
+	XPLMDebugString(new_fp.hoursenroute);
+	XPLMDebugString("\r\nminutes enroute");
+	XPLMDebugString(new_fp.minenroute);
+	XPLMDebugString("\r\nremarks");
+	XPLMDebugString(new_fp.remarks);
+	XPLMDebugString("\r\nroute");
+	XPLMDebugString(new_fp.route);
+	XPLMDebugString("\r\nalternate");
+	XPLMDebugString(new_fp.alternate);
+	
+	//fix for cruisealtitude bug
+
+	if (pos("F",cruisealt)==0)	{del(cruisealt, 0, 1);new_alttype="F";}
+	else if (pos("A",cruisealt)==0)	{del(cruisealt, 0, 1);new_alttype="A";}
+	else if (pos("VFR",cruisealt)==0)	{del(cruisealt, 0, 3);new_alttype="VFR";}
+	
+	XPLMDebugString(fpl.deptimeact);
+	XPLMDebugString("=waardeflp");
+	XPLMDebugString(deptimeact);
+	XPLMDebugString("\r\n");
+	XPLMDebugString(fpl.cruisealt);
+	XPLMDebugString("=cruisealt");
+	XPLMDebugString(cruisealt);
+	XPLMDebugString("\r\n");
+	if(fpl.cruisealt != cruisealt) { HANDLECHG("cruise altitude"); fpl.cruisealt = cruisealt; }
+	if(fpl.deptimeact != deptimeact) { HANDLECHG("dep. time"); fpl.deptimeact = deptimeact; }
+//	if(fpl.cruisespeed != cruisespeed) { HANDLECHG("cruise speed"); fpl.cruisespeed = cruisespeed; }
+	if(fpl.destination != destination) { HANDLECHG("destination"); fpl.destination = destination; }
+	if(fpl.departure != departure) { HANDLECHG("dep. airport"); fpl.departure = departure; }
+	if(fpl.hoursenroute != hoursenroute) { HANDLECHG("hours enroute"); fpl.hoursenroute = hoursenroute; }
+	if(fpl.minenroute != minenroute) { HANDLECHG("minutes enroute"); fpl.minenroute = minenroute; }
+	if(fpl.remarks != remarks) { HANDLECHG("remarks"); fpl.remarks = remarks; }
+	if(fpl.route != route) { HANDLECHG("route"); fpl.route =route ; }
+	if(fpl.alternate != alternate) { HANDLECHG("alternate"); fpl.alternate = alternate; }
+	if(fpl.deptimeest != deptimeest) { HANDLECHG("est. dep. time"); fpl.deptimeest = deptimeest; }
+	if(fpl.alttype!=new_alttype) {HANDLECHG("Alttype"); fpl.alttype =new_alttype ; }
+
+	if(changed) {
+		uiWindow.addMessage(colYellow, "Flightplan changed by : " + changes, true, true);
+		msgWindow.addMessage(colYellow, "Flightplan changed by : " + changes);
+
+		// update flightplan in flightplan window
+		flightplanForm().fillForm(FALSE);
+
+	//	fsd.sendFlightplan(fpl);
+	}
+}
+*/
 void Xivap::handleFPchange(const FSD::Message& m)
 {
 	Flightplan new_fp = fsd.getFlightplan(m);
 	bool changed = false;
 	string changes = "";
+	//fix for cruisealtitude/ATC bug 22/02/2014 bvk
+	if (pos("F",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 1);new_fp.alttype="F";}
+	else if (pos("A",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 1);new_fp.alttype="A";}
+	else if (pos("VFR",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 3);new_fp.alttype="VFR";}
 
 	if(fpl.cruisespeed != new_fp.cruisespeed) { HANDLECHG("cruise speed"); fpl.cruisespeed = new_fp.cruisespeed; }
+	if(fpl.cruisealt != new_fp.cruisealt) { HANDLECHG("cruise altitude"); fpl.cruisealt = new_fp.cruisealt; }
+	if(fpl.deptimeact != new_fp.deptimeact) { HANDLECHG("dep. time"); fpl.deptimeact = new_fp.deptimeact; }
 	if(fpl.departure != new_fp.departure) { HANDLECHG("dep. airport"); fpl.departure = new_fp.departure; }
 	if(fpl.deptimeest != new_fp.deptimeest) { HANDLECHG("est. dep. time"); fpl.deptimeest = new_fp.deptimeest; }
-	if(fpl.deptimeact != new_fp.deptimeact) { HANDLECHG("dep. time"); fpl.deptimeact = new_fp.deptimeact; }
-	if(fpl.cruisealt != new_fp.cruisealt) { HANDLECHG("cruise altitude"); fpl.cruisealt = new_fp.cruisealt; }
 	if(fpl.destination != new_fp.destination) { HANDLECHG("destination"); fpl.destination = new_fp.destination; }
 	if(fpl.hoursenroute != new_fp.hoursenroute) { HANDLECHG("hours enroute"); fpl.hoursenroute = new_fp.hoursenroute; }
 	if(fpl.minenroute != new_fp.minenroute) { HANDLECHG("minutes enroute"); fpl.minenroute = new_fp.minenroute; }
 	if(fpl.alternate != new_fp.alternate) { HANDLECHG("alternate"); fpl.alternate = new_fp.alternate; }
 	if(fpl.remarks != new_fp.remarks) { HANDLECHG("remarks"); fpl.remarks = new_fp.remarks; }
-	if(fpl.route != new_fp.route) { HANDLECHG("route"); fpl.route = new_fp.route; }
+	if(fpl.route != new_fp.route) { HANDLECHG("route"); fpl.route =new_fp.route ; }
+	if(fpl.alttype!=new_fp.alttype) {HANDLECHG("Alttype"); fpl.alttype =new_fp.alttype ; }
 
 	if(changed) {
 		uiWindow.addMessage(colYellow, "Flightplan changed by " + m.source + ": " + changes, true, true);
 		msgWindow.addMessage(colYellow, "Flightplan changed by " + m.source + ": " + changes);
 
 		// update flightplan in flightplan window
-		flightplanForm().fillForm();
+		flightplanForm().fillForm(FALSE);
 
 		fsd.sendFlightplan(fpl);
 	}
@@ -1874,7 +1960,10 @@ void Xivap::handleCommand(string line)
 		_multiplayer.setAllModels(aircraft, airline, livery);
 		return;
 
-	} else if(command == "HELP") {
+	}	else if (command=="TEST") { //special inserted debugconsole command 22/02/2014 bvk
+		/*insert here the functions you whish to check*/
+		//xivap.test();
+	}	else if(command == "HELP") {
 		uiWindow.addMessage(colYellow, "List of commands:", false, false);
 		uiWindow.addMessage(colYellow, ".R <text> - reply to private message", false, false);
 		uiWindow.addMessage(colYellow, ".MSG <callsign> <text> - send private message to callsign", false, false);
@@ -1893,6 +1982,7 @@ void Xivap::handleCommand(string line)
 		uiWindow.addMessage(colYellow, ".X <code> - tune transponder to code", false, false);
 		uiWindow.addMessage(colYellow, ".C1 <freq> / .C2 <freq> - tune COM1 or COM2 to freq", false, false);
 		uiWindow.addMessage(colYellow, ".QNH <QNH> .ALT <ALTIMETER> - Set primary altimeter to barometric value", false, false);
+		uiWindow.addMessage(colYellow, ".TEST -special debugcommand", false, false);
 		uiWindow.addMessage(colYellow, "Use your arrow-up and -down keys to scroll up and down", false, false);
 		return;
 

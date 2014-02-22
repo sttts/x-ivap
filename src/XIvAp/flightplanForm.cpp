@@ -343,7 +343,7 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intp
 		// export
 		if(inParam1 == (intptr_t)exportButton) {
 			xivap.fmcForm().show();
-
+			
 			send(false); // update xivap's flightplan
 
 			char buffer[1024];
@@ -367,12 +367,13 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intp
 			int fplAlt = static_cast<int>(stringtoi(altstr)) * multi;
 
 			xivap.fmcForm().setFields(dep, dest, route, fplAlt);
+			
 			return 1;
 		}
 	}
 
 	if(inMessage == xpMessage_PopupNewItemPicked) {
-		if(inParam1 == (long)actypePopup) {
+		if(inParam1 == (intptr_t)actypePopup) {
 			unsigned int curItem = XPGetWidgetProperty(actypePopup, xpProperty_PopupCurrentItem, NULL);
 			if(curItem >= 0 && curItem < acList.size()) {
 				XPSetWidgetDescriptor(actypeTextField, pconst(acList[curItem].icao));
@@ -395,13 +396,13 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intp
 			}
 		}
 
-		if(inParam1 == (long)alttypePopup) {
+		if(inParam1 == (intptr_t)alttypePopup) {
 			unsigned int curItem = XPGetWidgetProperty(alttypePopup, xpProperty_PopupCurrentItem, NULL);
 			if(curItem == 2) // Altitude VFR
 				XPSetWidgetDescriptor(altTextField, "");
 		}		
 
-		if(inParam1 == (long)airlinePopup) {
+		if(inParam1 == (intptr_t)airlinePopup) {
 			unsigned int curItem = XPGetWidgetProperty(airlinePopup, xpProperty_PopupCurrentItem, NULL);
 			if(curItem == 0) {
 				XPSetWidgetDescriptor(airlineTextField, "");
@@ -488,39 +489,45 @@ void FlightplanForm::reset()
 	setUserCredentials();
 
 	xivap.fpl.load(DEFAULT_FPL_FILE);
-	fillForm();
+	fillForm(TRUE);
 }
 
-void FlightplanForm::fillForm()
+void FlightplanForm::fillForm(bool reset)
 {
-	if(!xivap.fpl.isValid()) {
-		Flightplan f;
-		// hardcoded defaults
-		f.departure = "LOIH";
-		f.destination = "LSZE";
-		f.alternate = "EDNY";
-		f.aircrafttype = "C172";
-		f.flightrules = "V";
-		f.typeofflight = "G";
-		f.number = "1";
-		f.pob = "2";
-		f.alttype = "VFR";
-		f.hoursenroute = "00";
-		f.minenroute = "30";
-		f.hoursfuel = "01";
-		f.minfuel = "00";
-		f.deptimeest = "1200";
-		f.wtc = "L";
-		f.equip = "S";
-		f.transpondertype = "C";
-		f.speedtype = "N";
-		f.cruisespeed = "0120";
-		f.route = "DCT VFR";
-		f.remarks = "X-IvAp";
-		xivap.fpl = f;
+	if(!xivap.fpl.isValid()) { 
+		if (reset) {
+			Flightplan f;
+			// hardcoded defaults
+			f.departure = "LOIH";
+			f.destination = "LSZE";
+			f.alternate = "EDNY";
+			f.aircrafttype = "C172";
+			f.flightrules = "V";
+			f.typeofflight = "G";
+			f.number = "1";
+			f.pob = "2";
+			f.alttype = "VFR";
+			f.hoursenroute = "00";
+			f.minenroute = "30";
+			f.hoursfuel = "01";
+			f.minfuel = "00";
+			f.deptimeest = "1200";
+			f.wtc = "L";
+			f.equip = "S";
+			f.transpondertype = "C";
+			f.speedtype = "N";
+			f.cruisespeed = "0120";
+			f.route = "DCT VFR";
+			f.remarks = "X-IvAp";
+			xivap.fpl = f;
+		} else {
+			xivap.uiWindow.addMessage(colYellow, "Flight plan error: " + xivap.fpl.errorMessage());
+			xivap.messageBox().show("Flight plan error: " + xivap.fpl.errorMessage());
+			return;
+		}
 	}
 
-	long i = 0;
+	intptr_t i = 0;
 	switch(xivap.fpl.flightrules[0]) {
 		case 'V': i = 0; break;
 		case 'Y': i = 2; break;
@@ -895,7 +902,7 @@ bool FlightplanForm::SetTextToClipboard(const std::string& inText)
 }
 
 // CutCopyPaste in Widget
-int	FlightplanForm::WidgetFunc_CutCopyPaste(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2)
+int	FlightplanForm::WidgetFunc_CutCopyPaste(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2)
 {
 	if (inMessage == xpMsg_KeyPress)
 	{
@@ -904,9 +911,9 @@ int	FlightplanForm::WidgetFunc_CutCopyPaste(XPWidgetMessage inMessage, XPWidgetI
 
 		if ((flags & (xplm_DownFlag + xplm_ControlFlag)) == (xplm_DownFlag + xplm_ControlFlag))
 		{
-			long	selStart = XPGetWidgetProperty(inWidget, xpProperty_EditFieldSelStart, NULL);
-			long	selEnd = XPGetWidgetProperty(inWidget, xpProperty_EditFieldSelEnd, NULL);
-			long	strLen = XPGetWidgetDescriptor(inWidget, NULL, 0);
+			intptr_t	selStart = XPGetWidgetProperty(inWidget, xpProperty_EditFieldSelStart, NULL);
+			intptr_t	selEnd = XPGetWidgetProperty(inWidget, xpProperty_EditFieldSelEnd, NULL);
+			intptr_t	strLen = XPGetWidgetDescriptor(inWidget, NULL, 0);
 			std::string	txt;
 			txt.resize(strLen);
 			XPGetWidgetDescriptor(inWidget, &*txt.begin(), txt.size()+1);

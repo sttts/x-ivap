@@ -28,7 +28,7 @@ public:
 
 	void show();
 	void hide();
-	void fillForm();
+	void fillForm(bool);
 
 	int handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t  inParam1, intptr_t inParam2);
 
@@ -41,7 +41,7 @@ public:
 	// CutCopyPaste functional
 	bool GetTextFromClipboard(std::string& outText);
 	bool SetTextToClipboard(const std::string& inText);
-	int WidgetFunc_CutCopyPaste(XPWidgetMessage inMessage, XPWidgetID inWidget, long inParam1, long inParam2);
+	int WidgetFunc_CutCopyPaste(XPWidgetMessage inMessage, XPWidgetID inWidget, intptr_t inParam1, intptr_t inParam2);
 
 
 private:
