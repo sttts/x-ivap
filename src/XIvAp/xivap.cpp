@@ -1369,7 +1369,7 @@ void Xivap::handleFPchange(const FSD::Message& m)
 		msgWindow.addMessage(colYellow, "Flightplan changed by " + m.source + ": " + changes);
 
 		// update flightplan in flightplan window
-		flightplanForm().fillForm(FALSE);
+		flightplanForm().fillForm(false);
 
 		fsd.sendFlightplan(fpl);
 	}

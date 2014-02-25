@@ -535,7 +535,7 @@ void FMCForm::FMCExport()
 	if(dstAirport != XPLM_NAV_NOT_FOUND)
 		XPLMSetFMSEntryInfo(fmsIndex++, dstAirport, altitude_);
 
-	xivap.flightplanForm().fillForm(TRUE);
+	xivap.flightplanForm().fillForm(true);
 }
 
 void FMCForm::setFields(string departure, string destination, string route, int altitude)

@@ -489,7 +489,7 @@ void FlightplanForm::reset()
 	setUserCredentials();
 
 	xivap.fpl.load(DEFAULT_FPL_FILE);
-	fillForm(TRUE);
+	fillForm(true);
 }
 
 void FlightplanForm::fillForm(bool reset)
