@@ -83,7 +83,7 @@ void FMCForm::create()
 	int y = 675;
 	int x2 = x + 400;
 	int y2 = y - 550;
-
+	
 	window = XPCreateWidget(x, y, x2, y2,
 					1,			// Visible
 					"FMC Utility", // desc
@@ -134,7 +134,7 @@ void FMCForm::create()
 	// SID
 	XPCreateWidget(x, y-4, x+72, y-16, 1, "SID:", 0, window, xpWidgetClass_Caption);
 	sidTextField = XPCreateWidget(x+35, y, x+100, y-22, 1, "", 0, window, xpWidgetClass_TextField);
-
+	
 	y -= 22;
 	// SID popup
 	sidPopup = XPCreatePopup(x+5, y, x+95, y-22, 1, "(no SID;", window);
@@ -148,14 +148,14 @@ void FMCForm::create()
 	y -= 22;
 	sidSaveBtn = XPCreateWidget(x, y, x+100, y-22, 1, "Save SID", 0, window, xpWidgetClass_Button);
 	XPSetWidgetProperty(sidSaveBtn, xpProperty_ButtonType, xpPushButton);
-
+	
 	y = y_copy;
 	x += 120;
 	// waypoints
 	XPCreateWidget(x, y, x+100, y-12, 1, "Waypoints:", 0, window, xpWidgetClass_Caption);
-
+	 //hier deed hij het nog
 	y -= 14;
-	sidWptListBox = XPCreateListBox(x, y, x + 250, y - 62, 1, "", window);
+	sidWptListBox = XPCreateListBox(x, y, x + 250, y - 62, 1, "", window); //dit is hem 2014
 
 	y -= 62;
 	// clear buttons
@@ -163,11 +163,10 @@ void FMCForm::create()
 	XPSetWidgetProperty(sidClearBtn, xpProperty_ButtonType, xpPushButton);
 	sidClearAllBtn = XPCreateWidget(x+120, y, x+220, y-22, 1, "Clear ALL", 0, window, xpWidgetClass_Button);
 	XPSetWidgetProperty(sidClearAllBtn, xpProperty_ButtonType, xpPushButton);
-	x -= 120;
-
 
 
 	// STAR GROUP
+	x -= 120;
 	x -= 10; y -= 32;
 	XPCreateWidget(x, y, x+390, y-12,
 		1, "Standard Terminal Arrival Route (STAR):", 0, window, xpWidgetClass_Caption);
@@ -188,7 +187,7 @@ void FMCForm::create()
 	y -= 32;
 	starLoadBtn = XPCreateWidget(x, y, x+100, y-22, 1, "Load STAR", 0, window, xpWidgetClass_Button);
 	XPSetWidgetProperty(starLoadBtn, xpProperty_ButtonType, xpPushButton);
-
+	
 	// Save STAR
 	y -= 22;
 	starSaveBtn = XPCreateWidget(x, y, x+100, y-22, 1, "Save STAR", 0, window, xpWidgetClass_Button);
@@ -198,10 +197,10 @@ void FMCForm::create()
 	x += 120;
 	// waypoints
 	XPCreateWidget(x, y, x+100, y-12, 1, "Waypoints:", 0, window, xpWidgetClass_Caption);
-
+	
 	y -= 14;
 	starWptListBox = XPCreateListBox(x, y, x + 250, y - 62, 1, "", window);
-
+	
 	y -= 62;
 	// clear buttons
 	starClearBtn = XPCreateWidget(x+10, y, x+110, y-22, 1, "Clear WPT", 0, window, xpWidgetClass_Button);
@@ -536,7 +535,7 @@ void FMCForm::FMCExport()
 	if(dstAirport != XPLM_NAV_NOT_FOUND)
 		XPLMSetFMSEntryInfo(fmsIndex++, dstAirport, altitude_);
 
-	xivap.flightplanForm().fillForm();
+	xivap.flightplanForm().fillForm(TRUE);
 }
 
 void FMCForm::setFields(string departure, string destination, string route, int altitude)
