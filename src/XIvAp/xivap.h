@@ -155,7 +155,7 @@ public:
 	bool usingPMSG() {return _usePMSG;};
 	void setPMSG(bool value);
 
-	float UsingTurbulance() {return _turbulance;};
+	bool UsingWindLayer() {return _WindLayer;};
 
 	void setLabels(bool value);
 	bool usingLabels() {return _useLabels;};
@@ -323,7 +323,7 @@ private:
 	bool _useVoice;
 	bool _useLabels;
 	bool _usePMSG;
-	float _turbulance;
+	bool _WindLayer;
 #ifdef HAVE_TEAMSPEAK
 	TeamSpeak tsRemote;
 	bool _tsLoaded;

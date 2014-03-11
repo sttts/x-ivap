@@ -18,7 +18,7 @@
 
 #include "weatherPosition.h"
 
-//#define WX_DEBUG
+#define WX_DEBUG
 
 #define CLOUD_LAYERS 3
 #define WIND_LAYERS 3
@@ -27,7 +27,7 @@
 #define THERMALS_MAX_AGL	2000
 
 // max. visibility in m
-#define MAX_VISIBILITY		40000 // 40 KM
+#define MAX_VISIBILITY		60000 // 40 KM increased to  60km
 
 #define QNH_ALTIMETER_FACTOR (1013.25f/29.92f)
 
@@ -40,6 +40,7 @@ public:
 	int cloud_type[CLOUD_LAYERS];
 	float cloud_base_msl_m[CLOUD_LAYERS];
 	float cloud_tops_msl_m[CLOUD_LAYERS];
+	int cloud_coverage[CLOUD_LAYERS]; //new 1/03/2014
 
 	float visibility_reported_m, rain_percent, thunderstorm_percent,
 		wind_turbulence_percent, barometer_sealevel_inhg,
@@ -65,16 +66,16 @@ public:
 	// and resets the current weather situation in xplane
 	void transit(XPWeatherSituation& target, XPWeatherSituation& lastset);
 	void printDebug() const;
+	
 
 private:
 	bool initialized;
 
 	void setWeather(const XPWeatherSituation& target, XPWeatherSituation& lastset);
+	
 
 	// data refs
-	XPLMDataRef ref_cloud_type[CLOUD_LAYERS],
-				ref_cloud_base_msl_m[CLOUD_LAYERS],
-				ref_cloud_tops_msl_m[CLOUD_LAYERS];
+
 
 	XPLMDataRef ref_wind_altitude_msl_m[WIND_LAYERS],
 				ref_wind_direction_degt[WIND_LAYERS],
@@ -123,11 +124,15 @@ private:
 	void setClouds(const WxStation& s);
 	void setWinds(const WxStation& s);
 	float getVisibility(const WxStation& s);
-
+	float ScaleCloudTypes(int,int);
 	XPWeatherSituation current;		// currently active wx
 	XPWeatherSituation target;		// desired wx (the one we're moving towards)
 	XPWeatherSituation lastset;		// the wx settings we did write to XP
-
+	XPLMDataRef ref_cloud_type[CLOUD_LAYERS];
+	XPLMDataRef	ref_cloud_coverage[CLOUD_LAYERS];
+	XPLMDataRef ref_cloud_base_msl_m[CLOUD_LAYERS];
+	XPLMDataRef	ref_cloud_tops_msl_m[CLOUD_LAYERS];
+				
 	// used for console printout only
 	
 };

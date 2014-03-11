@@ -328,10 +328,9 @@ void Xivap::XPluginStart()
 	if(str == "0") _useLabels = false;
 	else _useLabels = true;
 	/*extra parameter for the windturbulance x10*/
-	str = config.readConfig("PREFERENCES", "TURBULANCE");
-	_turbulance=atof(str);
-	if (_turbulance<2) _turbulance=4.0f;
-	else if (_turbulance>20) _turbulance=20.0f;
+	str = config.readConfig("PREFERENCES", "FIXEDWINDLAYER");
+	if(str == "0") _WindLayer = false;
+	else _WindLayer = true;
 
 	str = config.readConfig("PREFERENCES", "PRVTMSGSOUND");
 	// compare against 0 -> if it is not set, it defaults to ON
@@ -452,7 +451,7 @@ void Xivap::connect(const string& callsign_, const string& vid, const string& pa
 
 	// warn user if no flightplan filed
 	if(!_fplPrefiled) {
-	//	messageBox().show("WARNING: You are connecting without a flight plan. Please submit one (Plugins -> X-IvAp -> Send flightplan)");
+		messageBox().show("WARNING: You are connecting without a flight plan. Please submit one (Plugins -> X-IvAp -> Send flightplan)");
 	} else {
 		//otherwise send actual flightplan aircraft data
 		fsd.sendPlaneInfo(_acType + _acAirline + _acLivery);

@@ -18,6 +18,7 @@
 
 #include <math.h> // for fabs()
 
+#define turbulancescale	14 //special made for xplane10, otherwise you will crash will turbulance orginal factor was 4
 XPWeatherSituation::XPWeatherSituation():
 initialized(false)
 {
@@ -28,15 +29,8 @@ char text[200];
 void XPWeatherSituation::init()
 {
 	// those are all 660+ refs
-	ref_cloud_type[0]				= XPLMFindDataRef("sim/weather/cloud_type[0]");
-	ref_cloud_type[1]				= XPLMFindDataRef("sim/weather/cloud_type[1]");
-	ref_cloud_type[2]				= XPLMFindDataRef("sim/weather/cloud_type[2]");
-	ref_cloud_base_msl_m[0]			= XPLMFindDataRef("sim/weather/cloud_base_msl_m[0]");
-	ref_cloud_base_msl_m[1]			= XPLMFindDataRef("sim/weather/cloud_base_msl_m[1]");
-	ref_cloud_base_msl_m[2]			= XPLMFindDataRef("sim/weather/cloud_base_msl_m[2]");
-	ref_cloud_tops_msl_m[0]			= XPLMFindDataRef("sim/weather/cloud_tops_msl_m[0]");
-	ref_cloud_tops_msl_m[1]			= XPLMFindDataRef("sim/weather/cloud_tops_msl_m[1]");
-	ref_cloud_tops_msl_m[2]			= XPLMFindDataRef("sim/weather/cloud_tops_msl_m[2]");
+
+
 	ref_visibility_reported_m		= XPLMFindDataRef("sim/weather/visibility_reported_m");
 	ref_rain_percent				= XPLMFindDataRef("sim/weather/rain_percent");
 	ref_thunderstorm_percent		= XPLMFindDataRef("sim/weather/thunderstorm_percent");
@@ -74,18 +68,13 @@ void XPWeatherSituation::init()
 	ref_thermal_rate_ms				= XPLMFindDataRef("sim/weather/thermal_rate_ms");
 	ref_thermal_altitude_msl_m		= XPLMFindDataRef("sim/weather/thermal_altitude_msl_m");
 
+
 	initialized = true;
 }
 
 void XPWeatherSituation::getWeather()
 {
 	if(!initialized) return;
-
-	for(int i = 0; i < CLOUD_LAYERS; ++i) {
-		cloud_type[i] = XPLMGetDatai(ref_cloud_type[i]);
-		cloud_base_msl_m[i] = XPLMGetDataf(ref_cloud_base_msl_m[i]);
-		cloud_tops_msl_m[i] = XPLMGetDataf(ref_cloud_tops_msl_m[i]);
-	}
 
 	/*
 	wave_amplitude = XPLMGetDataf(ref_wave_amplitude);
@@ -138,22 +127,6 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 #ifdef WX_DEBUG
 	XPLMDebugString("Xivap dumping following data to Xplane\r\n");
 #endif
-	for(int i = 0; i < CLOUD_LAYERS; ++i) {
-		WXi(ref_cloud_type[i], cloud_type[i]);
-		WXf(ref_cloud_base_msl_m[i], cloud_base_msl_m[i]);
-		WXf(ref_cloud_tops_msl_m[i], cloud_tops_msl_m[i]);
-
-#ifdef WX_DEBUG
-		
-		sprintf(text,"set cloud layer %d : type %d base  %3.1f  tops \r\n",i,cloud_type[i],cloud_base_msl_m[i],cloud_tops_msl_m[i]);
-		XPLMDebugString(text);
-	//	xivap.addText(colWhite, "set cloud layer " + itostring(i) + ": type " + itostring(cloud_type[i])
-	//		+ " base " + ftoa(cloud_base_msl_m[i]) + " tops " + ftoa(cloud_tops_msl_m[i]),
-	//		false, true); // log to file only
-#endif
-
-	}
-
 /*
 	WXf(ref_wave_amplitude, wave_amplitude);
 	WXf(ref_wave_length, wave_length);
@@ -173,13 +146,13 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 
 #ifdef WX_DEBUG
 		
-		sprintf(text,"set wind layer %d: alt %5.0f dir %3.1f speed %3.0f sheardir %3.1f gusts %3.1f turb %1.3f \r\n",i,wind_altitude_msl_m[i],wind_direction_degt[i],wind_speed_kt[i],shear_direction_degt[i],shear_speed_kt[i],turbulence[i]);
-		XPLMDebugString(text);
-	//	xivap.addText(colWhite, "set wind layer " + itostring(i) + ": alt " + ftoa(wind_altitude_msl_m[i])
-		//	+ " dir " + ftoa(wind_direction_degt[i]) + " speed " + ftoa(wind_speed_kt[i])
-		//	+ " shear " + ftoa(shear_direction_degt[i]) + " gusts " + ftoa(shear_speed_kt[i])
-		//	+ " turb " + ftoa(turbulence[i]),
-		//	false, true); // log to file only
+	//	sprintf(text,"set wind layer %d: alt %5.0f dir %3.1f speed %3.0f sheardir %3.1f gusts %3.1f turb %1.3f planealtitude %5.0f\r\n",i,wind_altitude_msl_m[i]*3.2808399f,wind_direction_degt[i],wind_speed_kt[i],shear_direction_degt[i],shear_speed_kt[i],turbulence[i],xivap.elevationft());
+	//	XPLMDebugString(text);
+		xivap.addText(colWhite, "set wind layer " + itostring(i) + ": alt " + ftoa(wind_altitude_msl_m[i])
+			+ " dir " + ftoa(wind_direction_degt[i]) + " speed " + ftoa(wind_speed_kt[i])
+			+ " shear " + ftoa(shear_direction_degt[i]) + " gusts " + ftoa(shear_speed_kt[i])
+			+ " turb " + ftoa(turbulence[i]),
+			false, true); // log to file only
 		
 #endif
 		
@@ -203,12 +176,12 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 
 
 #ifdef WX_DEBUG
-	sprintf(text,"temp %3.1f dewp %2.1f press %4.1f rain %3.0f thdst %3.0f vis %5.0f\r\n\n",temperature_sealevel_c,dewpoi_sealevel_c,barometer_sealevel_inhg,rain_percent,thunderstorm_percent,visibility_reported_m);
-	XPLMDebugString(text);
-//	xivap.addText(colWhite, "temp " + ftoa(temperature_sealevel_c) + " dewp " + ftoa(dewpoi_sealevel_c)
-	//	+ " press " + ftoa(barometer_sealevel_inhg) + " rain " + ftoa(rain_percent)
-	//	+ " thdst " + ftoa(thunderstorm_percent) + " vis " + ftoa(visibility_reported_m),
-	//	false, true); // log to file only
+	//sprintf(text,"temp %3.1f dewp %2.1f press %4.1f rain %3.0f thdst %3.0f vis %3.1f\r\n\n",temperature_sealevel_c,dewpoi_sealevel_c,barometer_sealevel_inhg,rain_percent,thunderstorm_percent,visibility_reported_m*0.00062137119223733f);
+	//XPLMDebugString(text);
+	xivap.addText(colWhite, "temp " + ftoa(temperature_sealevel_c) + " dewp " + ftoa(dewpoi_sealevel_c)
+		+ " press " + ftoa(barometer_sealevel_inhg) + " rain " + ftoa(rain_percent)
+		+ " thdst " + ftoa(thunderstorm_percent) + " vis " + ftoa(visibility_reported_m*0.000621371192f),
+		false, true); // log to file only
 
 //	set = false;
 #endif
@@ -218,7 +191,18 @@ void XPWeatherSituation::setWeather(const XPWeatherSituation& target, XPWeatherS
 void WeatherGod::init()
 {
 	if (initialized) { return; }
-
+	ref_cloud_type[0]				= XPLMFindDataRef("sim/weather/cloud_type[0]");
+	ref_cloud_type[1]				= XPLMFindDataRef("sim/weather/cloud_type[1]");
+	ref_cloud_type[2]				= XPLMFindDataRef("sim/weather/cloud_type[2]");
+	ref_cloud_coverage[0]			= XPLMFindDataRef("sim/weather/cloud_coverage[0]");	//float	1010+	yes	Coverage 0..6	//new 1/03/2014
+	ref_cloud_coverage[1]			= XPLMFindDataRef("sim/weather/cloud_coverage[1]");	//float	1010+	yes	Coverage 0..6	//new 1/03/2014
+	ref_cloud_coverage[2]			= XPLMFindDataRef("sim/weather/cloud_coverage[2]"); //new 1/03/2014
+	ref_cloud_base_msl_m[0]			= XPLMFindDataRef("sim/weather/cloud_base_msl_m[0]");
+	ref_cloud_base_msl_m[1]			= XPLMFindDataRef("sim/weather/cloud_base_msl_m[1]");
+	ref_cloud_base_msl_m[2]			= XPLMFindDataRef("sim/weather/cloud_base_msl_m[2]");
+	ref_cloud_tops_msl_m[0]			= XPLMFindDataRef("sim/weather/cloud_tops_msl_m[0]");
+	ref_cloud_tops_msl_m[1]			= XPLMFindDataRef("sim/weather/cloud_tops_msl_m[1]");
+	ref_cloud_tops_msl_m[2]			= XPLMFindDataRef("sim/weather/cloud_tops_msl_m[2]");
 	current.init();
 	lastset.init();
 	current.getWeather();
@@ -233,30 +217,70 @@ void WeatherGod::syncWx()
 	current.getWeather();
 }
 
+float WeatherGod::ScaleCloudTypes(int type,int coverage)
+{
+	//// xplane format : Clear = 0, High Cirrus = 1, Scattered = 2, Broken = 3, Overcast = 4, stratus=5 (new from version 7)
+	//fsd format: 1=cirrus 2=cirrostratus 3=cirrocumulus 4=altostratus 5=altocumulus 6=stratocumulus 7=nimbostratus 8=stratus 9=cumulus 10=towering cumulus / thunderstorm
+	///coverage is a float between 0-5.9
+	//you cant set type and coverage at the same time, it is the one or the other
+	//we using the type as selector and the coverage as differentation 0.0...0.8
+float result;
+	switch (type)
+	{
+		case 1:case 2:case 3: result=10;break; // High Cirrus = 1
+		case 4: result=20;break; // Scattered = 2
+		case 5: result=30;break; //Broken = 3
+		case 6:case 7: result=40;break; //Overcast = 4
+		case 8:case 9: case 10: result= 50;break; //stratus=5
+		default: result= 0;break; //Clear = 0
+	}
+
+result+=coverage;
+return result/10;
+}
 void WeatherGod::setClouds(const WxStation& s)
 {
 	rainPercent = 0;
 	turbulencePercent = 0;
 	thunderstormPercent = 0;
+	char text[300];
+	size_t	layer1=99;
+	size_t	layer2=99;
+	size_t	layer3=99;
+	//new cloudprocessing for xplane 10. not anymore for xplane9
+	//the goal was to make something out of the datamess coming from the FSD.
+	//FSD is sending max 10 cloudlayers, xplane can handle only 3. This is a limitation, but by picking the most important out of them it will work
+	// search the cloudlayers for max top and min base
+	//lowest one will be layer 1
+	//highest nr 2 or 3, depending if there is any other cloud layer between them
+	//same time inserted new dataref for coverage
 
 	//
-	// set the two cloud layers with the highest cloud coverage
-	//
-	int maxCoverage = 0; // remember max. coverage
-	for(size_t i = 0; i < s.cloudLayers.size(); ++i) {
-		if(s.cloudLayers[i].coverage > maxCoverage) maxCoverage = s.cloudLayers[i].coverage;
+	float base=99999;
+	float top=0;
 
+	size_t layersSet = 0;
+
+	for(int i = 0; i < s.cloudLayers.size(); ++i) {
+		if (s.cloudLayers[i].base<base) {base=s.cloudLayers[i].base;layer1=i;} //search lowest base level
+		if (s.cloudLayers[i].tops>top) {top=s.cloudLayers[i].tops;layer2=i;} //search highes top level
+		#ifdef WX_DEBUG
+		sprintf(text,"cloudtype %d cloudcoverage %d, cloudbase_min=%5.0f cloudtop_max=%5.0f basemin=%5.0f top max=%5.0f precipbase %4.0f preciprate=%2.0frun=%u\r\n",s.cloudLayers[i].type,s.cloudLayers[i].coverage,s.cloudLayers[i].base,s.cloudLayers[i].tops,base,top,s.cloudLayers[i].precipbase,s.cloudLayers[i].preciprate,i);
+		XPLMDebugString(text);
+		#endif
+		//leaving remaining old Martin stuff as it is.....
 		// thunderstorm?
 		// no thunderstorms above 4500m. otherwise XP will draw flashes and thunder at FL330
 		if(aircraftAlt < 4500) {
 			if(s.cloudLayers[i].type == FSD::CLOUD_THUNDERSTORM) {
 				if(s.cloudLayers[i].coverage > 4) { // thunderstorms only if there is actually enough cloud
-						                            // coverage to be able to have a storm
+					// coverage to be able to have a storm
 					if(thunderstormPercent < (s.cloudLayers[i].coverage - 4) / 3.0f)
 						thunderstormPercent = (s.cloudLayers[i].coverage - 4) / 3.0f;
 				}
 			}
 		}
+
 
 		// check for rain
 		if(s.cloudLayers[i].precip != FSD::PRECIP_NONE) {
@@ -271,51 +295,62 @@ void WeatherGod::setClouds(const WxStation& s)
 
 		// check for turbulences inside a cloud layer the aircraft is flying in
 		if(s.cloudLayers[i].base <= aircraftAlt && s.cloudLayers[i].tops >= aircraftAlt)
-			turbulencePercent = static_cast<float>(s.cloudLayers[i].turbulence) / xivap.UsingTurbulance();
+			turbulencePercent = static_cast<float>(s.cloudLayers[i].turbulence) / turbulancescale;
 	}
-
-	size_t layersSet = 0;
-	while(maxCoverage > 0 && layersSet < CLOUD_LAYERS && layersSet < s.cloudLayers.size()) {
-		for(size_t i = 0; i < s.cloudLayers.size() && layersSet < CLOUD_LAYERS; ++i) {
-			if(s.cloudLayers[i].coverage == maxCoverage) {
-				// Clear = 0, High Cirrus = 1, Scattered = 2, Broken = 3, Overcast = 4
-				int cloudType = 0;
-
-				switch(s.cloudLayers[i].coverage) {
-					case 1:	case 2:	case 3:
-						cloudType = 2;
-						break;
-					case 4: case 5: case 6:
-						cloudType = 3;
-						break;
-					case 7: case 8: default:
-						cloudType = 4;
-						break;
-				}
-				// if clouds are high and cirrus, set cloud type to cirrus
-				if((s.cloudLayers[i].type == FSD::CLOUD_CIRRUS ||
-					s.cloudLayers[i].type == FSD::CLOUD_CIRROCUMULUS ||
-					s.cloudLayers[i].type == FSD::CLOUD_CIRROSTRATUS)
-					&& s.cloudLayers[i].base > 6000)
-					cloudType = 1;
-
-				target.cloud_type[layersSet] = cloudType;
-				target.cloud_base_msl_m[layersSet] = s.cloudLayers[i].base;
-				target.cloud_tops_msl_m[layersSet] = s.cloudLayers[i].tops;
-
-				++layersSet;
-			}
-		}
-
-		--maxCoverage; // use the next cloud layer
+	//search middle layer
+	for(size_t i = 0; i < s.cloudLayers.size(); ++i) {
+		#ifdef WX_DEBUG
+		sprintf(text,"cloudbase_min=%5.0f cloudtop_max=%5.0f  run=%u\r\n",s.cloudLayers[i].base,s.cloudLayers[i].tops,i);
+		XPLMDebugString(text);
+		#endif
+		if (layer1!=99 && layer2!=99) if(s.cloudLayers[i].tops <= s.cloudLayers[layer2].base && i!=layer1 && s.cloudLayers[layer1].tops<s.cloudLayers[i].tops) {layer3=layer2;layer2=i;}
 	}
+	if (layer1==99) return; //nothing found, no update
 
-	// set remaining cloud layers to clear clouds
+	XPLMSetDataf(ref_cloud_coverage[0],ScaleCloudTypes(s.cloudLayers[layer1].type,s.cloudLayers[layer1].coverage));
+	XPLMSetDataf(ref_cloud_base_msl_m[0], s.cloudLayers[layer1].base);
+	XPLMSetDataf(ref_cloud_tops_msl_m[0] , s.cloudLayers[layer1].tops);
+	layersSet=1;
+	#ifdef WX_DEBUG
+	sprintf(text,"cloudtype=%d, cloudcoverage=%d, cloudbase_min=%5.0f, cloudtop_max=%5.0f, basemin=%5.0f, top max=%5.0f, precipbase %4.0f, preciprate=%2.0f, run=%u\r\n", s.cloudLayers[layer1].type,s.cloudLayers[layer1].coverage,s.cloudLayers[layer1].base,s.cloudLayers[layer1].tops,base,top,s.cloudLayers[layer1].precipbase,s.cloudLayers[layer1].preciprate,layer1);
+	XPLMDebugString(text);
+	XPLMDebugString("inserted layer 1\r\n");
+	#endif
+	if (layer2!=99 && layer1!=layer2)  {
+										XPLMSetDataf(ref_cloud_coverage[1],ScaleCloudTypes(s.cloudLayers[layer2].type,s.cloudLayers[layer2].coverage));
+										if (s.cloudLayers[layer2].base < s.cloudLayers[layer1].tops) XPLMSetDataf(ref_cloud_base_msl_m[1], s.cloudLayers[layer1].tops);
+										else 	XPLMSetDataf(ref_cloud_base_msl_m[1], s.cloudLayers[layer2].base);
+										XPLMSetDataf(ref_cloud_tops_msl_m[1] , s.cloudLayers[layer2].tops);
+										layersSet=2;
+										#ifdef WX_DEBUG
+										sprintf(text,"cloudtype %d cloudcoverage %d, cloudbase_min=%5.0f cloudtop_max=%5.0f basemin=%5.0f top max=%5.0f precipbase %4.0f preciprate=%2.0frun=%u\r\n",s.cloudLayers[layer2].type,s.cloudLayers[layer2].coverage,s.cloudLayers[layer2].base,s.cloudLayers[layer2].tops,base,top,s.cloudLayers[layer2].precipbase,s.cloudLayers[layer2].preciprate,layer2);
+										XPLMDebugString(text);
+										XPLMDebugString("inserted layer 2\r\n");
+										#endif
+										if (layer3!=99) {
+														XPLMSetDataf(ref_cloud_coverage[2],ScaleCloudTypes(s.cloudLayers[layer3].type,s.cloudLayers[layer3].coverage));
+														XPLMSetDataf(ref_cloud_base_msl_m[2], s.cloudLayers[layer3].base);
+														XPLMSetDataf(ref_cloud_tops_msl_m[2] , s.cloudLayers[layer3].tops);
+														layersSet=3;
+														#ifdef WX_DEBUG
+														XPLMDebugString("inserted layer 3 \r\n");
+														sprintf(text,"cloudtype %d cloudcoverage %d, cloudbase_min=%5.0f cloudtop_max=%5.0f basemin=%5.0f top max=%5.0f precipbase %4.0f preciprate=%2.0frun=%u\r\n",s.cloudLayers[layer3].type,s.cloudLayers[layer3].coverage,s.cloudLayers[layer3].base,s.cloudLayers[layer3].tops,base,top,s.cloudLayers[layer3].precipbase,s.cloudLayers[layer3].preciprate,layer3);
+														XPLMDebugString(text);
+														#endif
+														}
+										}
+//reset remaining cloudlayers which are not used
+
 	while(layersSet < CLOUD_LAYERS) {
-		target.cloud_base_msl_m[layersSet] = 0;
-		target.cloud_tops_msl_m[layersSet] = 0;
-		target.cloud_type[layersSet++] = 0;
+		XPLMSetDataf(ref_cloud_coverage[layersSet++],0);
+		//XPLMSetDataf(ref_cloud_base_msl_m[layersSet],0);
+		//XPLMSetDataf(ref_cloud_tops_msl_m[layersSet++] ,0);
+		#ifdef WX_DEBUG
+		XPLMDebugString("ereasing layer\r\n");
+		#endif
 	}
+
+
 }
 
 void WeatherGod::setWinds(const WxStation& station)
@@ -341,7 +376,7 @@ void WeatherGod::setWinds(const WxStation& station)
 	target.wind_direction_degt[0] = station.windLayers[0].direction;
 	target.wind_speed_kt[0] = station.windLayers[0].speed;
 	target.shear_direction_degt[0] = station.windLayers[0].variance;
-	target.turbulence[0] = station.windLayers[0].turbulence / xivap.UsingTurbulance();
+	target.turbulence[0] = station.windLayers[0].turbulence / turbulancescale;
 	if(station.windLayers[0].gusts > 0)
 		target.shear_speed_kt[0] = station.windLayers[0].gusts - station.windLayers[0].speed;
 	else
@@ -354,11 +389,12 @@ void WeatherGod::setWinds(const WxStation& station)
 	//
 	// top wind layer (last wind layer)
 	//
+
 	target.wind_altitude_msl_m[2] = station.windLayers[station.windLayers.size() - 1].alt;
 	target.wind_direction_degt[2] = station.windLayers[station.windLayers.size() - 1].direction;
 	target.wind_speed_kt[2] = station.windLayers[station.windLayers.size() - 1].speed;
 	target.shear_direction_degt[2] = station.windLayers[station.windLayers.size() - 1].variance;
-	target.turbulence[2] = station.windLayers[station.windLayers.size() - 1].turbulence / xivap.UsingTurbulance();
+	target.turbulence[2] = station.windLayers[station.windLayers.size() - 1].turbulence / turbulancescale;
 	if(station.windLayers[2].gusts > 0)
 		target.shear_speed_kt[2] = station.windLayers[2].gusts - station.windLayers[2].speed;
 	else
@@ -371,14 +407,27 @@ void WeatherGod::setWinds(const WxStation& station)
 	//
 	// the layer in between
 	//
+	 if (xivap.UsingWindLayer()) {
+		size_t layer=station.windLayers.size()/2;
 
-	if(aircraftAlt <= station.windLayers[1].alt) {
+	target.wind_altitude_msl_m[1] = station.windLayers[layer].alt;
+	target.wind_direction_degt[1] = station.windLayers[layer].direction;
+	target.wind_speed_kt[1] = station.windLayers[layer].speed;
+	target.shear_direction_degt[1] = station.windLayers[layer].variance;
+	target.turbulence[1] = station.windLayers[layer].turbulence / turbulancescale;
+		if(station.windLayers[layer].gusts > 0)
+			target.shear_speed_kt[layer] = station.windLayers[layer].gusts - station.windLayers[layer].speed;
+		else
+			target.shear_speed_kt[layer] = 0;
+	 } else {
+	
+	if (aircraftAlt <= station.windLayers[1].alt) {
 		// aircraft is below the second wind layer
 		target.wind_altitude_msl_m[1] = station.windLayers[1].alt;
 		target.wind_direction_degt[1] = station.windLayers[1].direction;
 		target.wind_speed_kt[1] = station.windLayers[1].speed;
 		target.shear_direction_degt[1] = station.windLayers[1].variance;
-		target.turbulence[1] = station.windLayers[1].turbulence / xivap.UsingTurbulance();
+		target.turbulence[1] = station.windLayers[1].turbulence / turbulancescale;
 		if(station.windLayers[1].gusts > 0)
 			target.shear_speed_kt[1] = station.windLayers[1].gusts - station.windLayers[1].speed;
 		else
@@ -399,6 +448,7 @@ void WeatherGod::setWinds(const WxStation& station)
 
 
 	} else {
+		
 		// aircraft is somewhere in between - interpolate the wind layers
 		WxStation s = station;
 		s.sortWindLayers(aircraftAlt, 2);
@@ -427,6 +477,7 @@ void WeatherGod::setWinds(const WxStation& station)
 		else
 			target.shear_speed_kt[1] = 0;
 
+	}
 	}
 
 	// check for turbulences in wind layer
@@ -579,14 +630,6 @@ void XPWeatherSituation::transit(XPWeatherSituation& target, XPWeatherSituation&
 		firstTime = false;
 	}
 
-	for(int i = 0; i < CLOUD_LAYERS; ++i) {
-		// no transit for cloud layers. it looks too bad in the sim (slight pause, clouds change suddently)
-
-		cloud_type[i] = target.cloud_type[i];	// no transition for cloud types possible
-		cloud_base_msl_m[i] = target.cloud_base_msl_m[i];	
-		cloud_tops_msl_m[i] = target.cloud_tops_msl_m[i];	
-	}
-
 	/*
 	TRANSIT(wave_amplitude, 0.1f);
 	TRANSIT(wave_length, 0.1f);
@@ -626,6 +669,8 @@ void XPWeatherSituation::transit(XPWeatherSituation& target, XPWeatherSituation&
 
 void XPWeatherSituation::printDebug() const
 {
+	XPLMDebugString("\r\n");
+	/*
 	for(int i = 0; i < CLOUD_LAYERS; ++i) {
 		string str = "cloud layer " + itostring(i) + ": ";
 		switch(cloud_type[i]) {
@@ -633,14 +678,17 @@ void XPWeatherSituation::printDebug() const
 			case 2: str += "Scattered "; break;
 			case 3: str += "Broken "; break;
 			case 4: str += "Overcast "; break;
+			case 5: str +="Stratus ";break;
+			case 0: str +="Clear ";break;
 		}
-		str += "base: " + ftoa(cloud_base_msl_m[i] * 3.2808399f)
-			+ " top: " + ftoa(cloud_tops_msl_m[i] * 3.2808399f) + " ";
+		str += "base: " + ftoa(cloud_base_msl_m[i] )
+			+ " top: " + ftoa(cloud_tops_msl_m[i] ) + " "
+			+="coverage: " +itostring(cloud_coverage[i]) ;
 		XPLMDebugString(str);
 		XPLMDebugString("\r\n");
 		xivap.addText(colLightGray, str, true, true);
 	}
-
+	*/
 	for(int i = 0; i < WIND_LAYERS; ++i) {
 		string str = "wind layer " + itostring(i) + ": alt " + ftoa(wind_altitude_msl_m[i] * 3.2808399f)
 			+ " dir " + ftoa(wind_direction_degt[i]) 
@@ -663,7 +711,7 @@ void XPWeatherSituation::printDebug() const
 	str = "rain " + ftoa(rain_percent)
 		+ " therm " + ftoa(thermal_percent)
 		+ " therm.alt " + ftoa(thermal_altitude_msl_m)
-		+ " vis " + ftoa(visibility_reported_m);
+		+ " vis " + ftoa(visibility_reported_m*0.000621371192f);
 		XPLMDebugString(str);
 		XPLMDebugString("\r\n");
 	xivap.addText(colLightGray, str, true, true);
