@@ -327,15 +327,32 @@ void Xivap::XPluginStart()
 	// compare against 0 -> if it is not set, it defaults to ON
 	if(str == "0") _useLabels = false;
 	else _useLabels = true;
-	/*extra parameter for the windturbulance x10*/
+	/* these are added for the modified weathersystem  bvk 16/03/2014*/
+	/*extra parameter for the middle windlayer x10*/
 	str = config.readConfig("PREFERENCES", "FIXEDWINDLAYER");
 	if(str == "0") _WindLayer = false;
 	else _WindLayer = true;
 
+	/*extra parameter for the maxvisibilty x10*/
+	str = config.readConfig("PREFERENCES", "MAXVISIBILITY");
+	if(length(str) > 0 && str != "0") _Maxvisibility=atoi(pconst(str));
+	if (_Maxvisibility>100000 || _Maxvisibility<40000) _Maxvisibility=40000; //in km
+
+		/*extra parameter for turbulance*/
+	str = config.readConfig("PREFERENCES", "TURBULANCE");
+	if(length(str) > 0 && str != "0") _Turbulance=atoi(pconst(str));
+	
+	if (_Turbulance>30 || _Turbulance<4) _Turbulance=15;
+	/*char text[100];
+	sprintf(text,"extra parameters turbulance %d, maxvisbility %d  ",_Turbulance,_Maxvisibility);
+	if (_WindLayer) XPLMDebugString("Fixed windlayer\r\n"); else XPLMDebugString("Floating Windlayer\r\n");
+	XPLMDebugString(text);
+	*/
 	str = config.readConfig("PREFERENCES", "PRVTMSGSOUND");
 	// compare against 0 -> if it is not set, it defaults to ON
 	if(str == "0") _usePMSG = false;
 	else _usePMSG = true;
+
 	// p2p preferences
 	str = config.readConfig("P2P", "ENABLE");
 	// compare against 0 -> if it is not set, it defaults to ON

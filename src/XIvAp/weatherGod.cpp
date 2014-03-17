@@ -18,7 +18,7 @@
 
 #include <math.h> // for fabs()
 
-#define turbulancescale	14 //special made for xplane10, otherwise you will crash will turbulance orginal factor was 4
+
 XPWeatherSituation::XPWeatherSituation():
 initialized(false)
 {
@@ -295,7 +295,7 @@ void WeatherGod::setClouds(const WxStation& s)
 
 		// check for turbulences inside a cloud layer the aircraft is flying in
 		if(s.cloudLayers[i].base <= aircraftAlt && s.cloudLayers[i].tops >= aircraftAlt)
-			turbulencePercent = static_cast<float>(s.cloudLayers[i].turbulence) / turbulancescale;
+			turbulencePercent = static_cast<float>(s.cloudLayers[i].turbulence) / xivap.UsingTurbulance();
 	}
 	//search middle layer
 	for(size_t i = 0; i < s.cloudLayers.size(); ++i) {
@@ -376,7 +376,7 @@ void WeatherGod::setWinds(const WxStation& station)
 	target.wind_direction_degt[0] = station.windLayers[0].direction;
 	target.wind_speed_kt[0] = station.windLayers[0].speed;
 	target.shear_direction_degt[0] = station.windLayers[0].variance;
-	target.turbulence[0] = station.windLayers[0].turbulence / turbulancescale;
+	target.turbulence[0] = station.windLayers[0].turbulence / xivap.UsingTurbulance();
 	if(station.windLayers[0].gusts > 0)
 		target.shear_speed_kt[0] = station.windLayers[0].gusts - station.windLayers[0].speed;
 	else
@@ -394,7 +394,7 @@ void WeatherGod::setWinds(const WxStation& station)
 	target.wind_direction_degt[2] = station.windLayers[station.windLayers.size() - 1].direction;
 	target.wind_speed_kt[2] = station.windLayers[station.windLayers.size() - 1].speed;
 	target.shear_direction_degt[2] = station.windLayers[station.windLayers.size() - 1].variance;
-	target.turbulence[2] = station.windLayers[station.windLayers.size() - 1].turbulence / turbulancescale;
+	target.turbulence[2] = station.windLayers[station.windLayers.size() - 1].turbulence / xivap.UsingTurbulance();
 	if(station.windLayers[2].gusts > 0)
 		target.shear_speed_kt[2] = station.windLayers[2].gusts - station.windLayers[2].speed;
 	else
@@ -414,7 +414,7 @@ void WeatherGod::setWinds(const WxStation& station)
 	target.wind_direction_degt[1] = station.windLayers[layer].direction;
 	target.wind_speed_kt[1] = station.windLayers[layer].speed;
 	target.shear_direction_degt[1] = station.windLayers[layer].variance;
-	target.turbulence[1] = station.windLayers[layer].turbulence / turbulancescale;
+	target.turbulence[1] = station.windLayers[layer].turbulence / xivap.UsingTurbulance();
 		if(station.windLayers[layer].gusts > 0)
 			target.shear_speed_kt[layer] = station.windLayers[layer].gusts - station.windLayers[layer].speed;
 		else
@@ -427,7 +427,7 @@ void WeatherGod::setWinds(const WxStation& station)
 		target.wind_direction_degt[1] = station.windLayers[1].direction;
 		target.wind_speed_kt[1] = station.windLayers[1].speed;
 		target.shear_direction_degt[1] = station.windLayers[1].variance;
-		target.turbulence[1] = station.windLayers[1].turbulence / turbulancescale;
+		target.turbulence[1] = station.windLayers[1].turbulence / xivap.UsingTurbulance();
 		if(station.windLayers[1].gusts > 0)
 			target.shear_speed_kt[1] = station.windLayers[1].gusts - station.windLayers[1].speed;
 		else
@@ -489,7 +489,7 @@ void WeatherGod::setWinds(const WxStation& station)
 
 float WeatherGod::getVisibility(const WxStation& s)
 {
-	float result = MAX_VISIBILITY;
+	float result = (float) xivap.UsingVisibility();
 	for(size_t i = 0; i < s.visLayers.size(); ++i) {
 		if(s.visLayers[i].base <= aircraftAlt
 			&& s.visLayers[i].tops >= aircraftAlt
