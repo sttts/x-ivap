@@ -694,6 +694,7 @@ void UiWindow::prepScreen()
 				addText(AL_left, 0, colDarkGreen, "VHF1 " + xivap.com1freq(), false);
 				
 				addText(AL_ctr, 1, colYellow,"WxStat:"+ xivap._erwin.oldWxStation,false); //added for display Used wxname 4/01/2013
+				addText(AL_ctr, 2, colYellow,xivap.simratio,false);
 				string line = "OFFLINE";
 				if(xivap.online()) {line = xivap.fsd.callsign() + " ON";Graphics|=4;} else Graphics&=~4;
 				addText(AL_right, 0, colLightBlue, line, false);

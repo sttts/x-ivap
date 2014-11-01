@@ -2224,3 +2224,43 @@ void Xivap::Selcal(string source)
 	msgWindow.addMessage(colYellow, source + ">S-E-L-C-A-L");
 #endif
 }
+/*
+void InitSimRatio(void)
+{
+XPLMRegisterFlightLoopCallback(SimRatioCallBack,		// Callback
+								   60.0,					// Interval 60.0 = second per frame
+								   NULL);	
+}
+*/
+bool Xivap::CalculateSimRatio(void)
+{
+	static double lastlat=0,lastlon;
+	static UInt32 lasttime=xivap.watch.getTime();
+	static float lastheading=0;
+	UInt32 time;
+	float timediff;
+	float simrate=0;
+	float groundspeed=	xivap.GetSpeed();
+
+	double distance=0;
+	static char hit=0;
+	distance=deg2dist(xivap.GetLat(),xivap.GetLon(),lastlat,lastlon);
+	lastlat=xivap.GetLat();
+	lastlon=xivap.GetLon();
+	if (((xivap.GetHeading()-lastheading)>5) | ((lastheading-xivap.GetHeading())>5)) {lastheading=xivap.GetHeading();return true;}
+	lastheading=xivap.GetHeading();
+	
+	time=xivap.watch.getTime();
+	timediff=time-lasttime;
+	timediff/=1000000;
+	lasttime=time;
+	
+	if (xivap.GetSpeed()>50) {simrate=(distance*3600/timediff)/xivap.GetSpeed();
+							 if (simrate>1) simrate=1;
+							 sprintf(xivap.simratio,"SimRatio:%1.3f",simrate);
+							 if (simrate<0.9) hit++; else hit=0;
+							 if (hit>2)  {Playsound("warning-sim-speed.mp3");hit=0;}
+								}
+	
+	return true;
+}

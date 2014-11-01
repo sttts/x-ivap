@@ -374,6 +374,11 @@ float	TcasBoxFlightLoopCallback(
 									   int                  inCounter,    
 									   void *               XFMCinRefcon)
 {
+	static int timer=0;
+	
 	xivap.Tcasbox.TcasFlightLoopcallback();
+	timer++;
+	if (timer>=60) {timer=0; xivap.CalculateSimRatio();}
+	
 	return 1;
 }

@@ -93,6 +93,7 @@ public:
 	void sendPosUpdate();
 	void updateStatus();
 	void updatePosition(PlanePosition* position = NULL);
+	bool CalculateSimRatio(void);
 
 	double elevationft() const { return el * 3.2808399; };
 	double flightlevelft() const;
@@ -208,7 +209,7 @@ public:
 	float GetPitch() const { return pitch; };
 	float GetBank() const { return bank; };
 	float GetHeading() const { return heading; };
-
+	char simratio[30];
 	bool posSent;
 
 	void RequestP2P(const string& callsign, const string& protocol, int mode, const string& ipport);
