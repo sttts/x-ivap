@@ -540,7 +540,7 @@ void MultiplayerEngine::eatThis(const FSD::Message &packet)
 		
 		pilot->interpolator.takeNewPosition(pos, pilot->distance);
 
-		pilot->CalcDistance(xivap.GetLat(), xivap.GetLon());
+		pilot->CalcDistance(xivap.GetLat(), xivap.GetLon()); //test deze eens
 
 		double altdiff = pos->pos.elevation - xivap.elevationft();
 		if(altdiff < 0) altdiff *= -1.0;
@@ -862,9 +862,10 @@ void MultiplayerEngine::ProcessPPOS1Pos(MultiplayerPilot *pilot, const char *buf
 		if(altdiff < 0) altdiff *= -1.0;
 
 		// see if close enough...
+		
 		pilot->CalcDistance(xivap.GetLat(), xivap.GetLon());
 		if(pilot->distance > P2P_RANGE * 2 || altdiff > P2P_ALTDIFF * 2) {
-			// send STFU here
+
 			TLVPacket packet;
 			packet.setTV(IVAO_PTPOS_Interval, 0);
 			UInt16 len;
@@ -1098,20 +1099,22 @@ bool MultiplayerEngine::sendPeerPositions()
 
 void MultiplayerEngine::calcPeerFrequencies()
 {
-	double weightSum = 0;
+	/*  fixed p2p rate, no need anymore for dynamic rate, solved the flashing problem 3/11/14
+	double weightSum = 20;
+	
 	int recvsum = 0;
-
+	 
 	for(PlaneMap::iterator i = _planes.begin(); i != _planes.end(); ++i) {
 		MultiplayerPilot& p = *(i->second);
 
 		if(p.p2pmode < 1 || p.p2pport == 0)
 			continue;
-
+	
 		// full rate for peers within 0.6nm
 		double rate = (P2P_RANGE - p.distance + 0.6) / P2P_RANGE;
 		if(rate < 0) rate = 0;
 		if(rate > 1) rate = 1;
-
+		
 		double altdiff = p.interpolator.lastKnownPosition().pos.elevation - xivap.elevationft();
 		if(altdiff < 0) altdiff *= -1.0;
 
@@ -1119,16 +1122,19 @@ void MultiplayerEngine::calcPeerFrequencies()
 		double rate2 = (P2P_ALTDIFF - altdiff + 1200) / P2P_ALTDIFF;
 		if(rate2 < 0) rate2 = 0;
 		if(rate2 > 1) rate2 = 1;
+		
 		rate *= rate2;
-
-		p.p2prate = rate;
-		weightSum += rate;
+		
+		p.p2prate =rate; 
+			
+		weightSum +=rate;
+		
 		recvsum += p.p2pmaxrate_recv;
 	}
-
+	*/
 	double recvFactor = 1;
 	double sendFactor = 1;
-
+/*
 	// calculate the amount of bytes per second we would be sending at that rate
 	double bps = weightSum * P2P_MAX_RATE * (PTPOS_POSITION_SIZE + 5); // 5 extra bytes just to be sure (pings etc)
 
@@ -1139,7 +1145,7 @@ void MultiplayerEngine::calcPeerFrequencies()
 	bps = recvsum * PTPOS_POSITION_SIZE;
 	if(bps > p2precvbps) // i receive too much!
 		recvFactor = p2precvbps / bps; // scale it down
-
+*/
 	// update peers with their new maxima
 	for(PlaneMap::iterator i = _planes.begin(); i != _planes.end(); ++i) {
 		MultiplayerPilot& p = *(i->second);
@@ -1148,12 +1154,12 @@ void MultiplayerEngine::calcPeerFrequencies()
 			continue;
 
 		// that much I send to HIM
-		p.p2pmaxrate_send_real = (int)(P2P_MAX_RATE * p.p2prate * sendFactor);
+		p.p2pmaxrate_send_real = (int)(P2P_MAX_RATE * sendFactor);
 		if(p.p2pmaxrate_send_real > p.p2pmaxrate_send && p.p2pmaxrate_send >= 0)
 			p.p2pmaxrate_send_real = p.p2pmaxrate_send;
 
 		// that much HE is allowed to send to ME
-		int sendmax = (int)(P2P_MAX_RATE * recvFactor * p.p2prate);
+		int sendmax = (int)(P2P_MAX_RATE * recvFactor);
 
 		if(sendmax != p.p2pmaxrate_recv) {
 			static TLVPacket packet;

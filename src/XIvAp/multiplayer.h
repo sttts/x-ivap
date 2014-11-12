@@ -41,8 +41,8 @@
 
 // default send/receive rates for p2p packets
 // (in bytes per seconds)
-#define P2P_DEFAULT_MAX_SENDBPS	1024
-#define P2P_DEFAULT_MAX_RECVBPS	5000
+#define P2P_DEFAULT_MAX_SENDBPS	10240 //increased these values by 10, as it was the old days of 28k setted
+#define P2P_DEFAULT_MAX_RECVBPS	50000
 
 #include <map>
 
