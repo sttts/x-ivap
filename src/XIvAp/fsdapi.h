@@ -145,10 +145,11 @@ private:
 
 	// rev. 3 authentification
 	pt::ularge clientSeed, clientSig;
-
-	typedef std::map<std::string, std::string> AliasMap;
-	AliasMap _cslAliases;
-	void _loadMTLAliases();
+// ==== Start exclude code for new MTL ===
+//	typedef std::map<std::string, std::string> AliasMap;
+//	AliasMap _cslAliases;
+//	void _loadMTLAliases();
+// ==== End exclude code ===
 };
 
 #endif

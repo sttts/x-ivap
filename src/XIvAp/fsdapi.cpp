@@ -201,56 +201,58 @@ FsdAPI::FsdAPI()
 	_mtl = "";
 	_usingWX = false;
 	_usingVoice = false;
-	_loadMTLAliases();
-}
-
-void FsdAPI::_loadMTLAliases()
-{
-	// load the MTL alias list
-	string filename = getXivapRessourcesDir() + "mtlalias.txt";
-
-	char l[512];
-	int linesize = 511;
-
-    FILE *in = fopen(pconst(filename), "r");
-
-	_cslAliases.clear();
-    if(in == NULL) return;
-
-	string line = "";
-	std::pair<std::string, std::string> entry;
-	do {
-		fgets(l, linesize, in);
-		l[linesize] = 0;
-		if(feof(in)) line = "";
-		else {
-			line = l;
-			line = strupcase(trim(line));
-
-			if(length(line) > 0) {
-				if(line[0] != '"') continue;
-
-				del(line, 0, 1);
-				// DHLRSTRP" "DHLOLD"
-				int p = pos('"', line); if(p < 0) continue;
-				entry.first = pconst(copy(line, 0, p));
-				del(line, 0, p+1);
-				line = trim(line);
-
-				// "DHLOLD"
-				if(line[0] != '"') continue;
-				del(line, 0, 1);
-
-				// DHLOLD"
-				p = pos('"', line); if(p < 0) continue;
-				entry.second = pconst(copy(line, 0, p));
-
-				// MTL -> CSL
-				_cslAliases[entry.second] = entry.first;
-			}
-		}
-	} while(!feof(in));
-	fclose(in);
+// ======== Start exclude code for new MTL ====
+//	_loadMTLAliases();
+//}
+//
+//void FsdAPI::_loadMTLAliases()
+//{
+//	// load the MTL alias list
+//	string filename = getXivapRessourcesDir() + "mtlalias.txt";
+//
+//	char l[512];
+//	int linesize = 511;
+//
+//    FILE *in = fopen(pconst(filename), "r");
+//
+//	_cslAliases.clear();
+//    if(in == NULL) return;
+//
+//	string line = "";
+//	std::pair<std::string, std::string> entry;
+//	do {
+//		fgets(l, linesize, in);
+//		l[linesize] = 0;
+//		if(feof(in)) line = "";
+//		else {
+//			line = l;
+//			line = strupcase(trim(line));
+//
+//			if(length(line) > 0) {
+//				if(line[0] != '"') continue;
+//
+//				del(line, 0, 1);
+//				// DHLRSTRP" "DHLOLD"
+//				int p = pos('"', line); if(p < 0) continue;
+//				entry.first = pconst(copy(line, 0, p));
+//				del(line, 0, p+1);
+//				line = trim(line);
+//
+//				// "DHLOLD"
+//				if(line[0] != '"') continue;
+//				del(line, 0, 1);
+//
+//				// DHLOLD"
+//				p = pos('"', line); if(p < 0) continue;
+//				entry.second = pconst(copy(line, 0, p));
+//
+//				// MTL -> CSL
+//				_cslAliases[entry.second] = entry.first;
+//			}
+//		}
+//	} while(!feof(in));
+//	fclose(in);
+// ==== End exclude code =======
 }
 
 void FsdAPI::connectPilot(string host, string port, string callsign, string id, string password,
@@ -363,18 +365,20 @@ FSD::Message FsdAPI::receive()
 				break;
 
 			case _FSD_PLANEINFO_:
-				if(length(m.tokens[0]) > 4) {
-					// convert MTL string to CSL alias, if it is set
-					string ac = copy(m.tokens[0], 0, 4); // aircraft code
-					string s = m.tokens[0];
-					del(s, 0, 4); // rest without aircraft code
+// ==== Start exclude code for new MTL ======
+				//if(length(m.tokens[0]) > 4) {
+				//	// convert MTL string to CSL alias, if it is set
+				//	string ac = copy(m.tokens[0], 0, 4); // aircraft code
+				//	string s = m.tokens[0];
+				//	del(s, 0, 4); // rest without aircraft code
 
-					// look up this MTL code...
-					AliasMap::iterator it = _cslAliases.find(pconst(s));
-					// and replace it with the CSL alias if found
-					if(it != _cslAliases.end())
-						m.tokens[0] = ac + string(it->second.c_str());
-				}
+				//	// look up this MTL code...
+				//	AliasMap::iterator it = _cslAliases.find(pconst(s));
+				//	// and replace it with the CSL alias if found
+				//	if(it != _cslAliases.end())
+				//		m.tokens[0] = ac + string(it->second.c_str());
+				//}
+// ===== End exclude code ====
 				break;
 
 			default:
@@ -767,20 +771,22 @@ void FsdAPI::sendPlaneInfo(string mtl)
 	// look up the CSL alias table: if the _mtl string is in there,
 	// send the corresponding alias
 	// alias table contains MTL -> CSL mapping (file is the other way around)
-	if(length(_mtl) > 4) {
-		string ac = copy(_mtl, 0, 4);
-		string s = _mtl;
-		del(s, 0, 4);
-		AliasMap::iterator it = _cslAliases.begin();
-		bool found = false;
-		while(it != _cslAliases.end() && !found) {
-			if(it->second.c_str() == s) {
-				found = true;
-				_mtl = ac + string(it->first.c_str());
-			}
-			++it;
-		}
-	}
+// ===== Start exclude code for new MTL =====
+	//if(length(_mtl) > 4) {
+	//	string ac = copy(_mtl, 0, 4);
+	//	string s = _mtl;
+	//	del(s, 0, 4);
+	//	AliasMap::iterator it = _cslAliases.begin();
+	//	bool found = false;
+	//	while(it != _cslAliases.end() && !found) {
+	//		if(it->second.c_str() == s) {
+	//			found = true;
+	//			_mtl = ac + string(it->first.c_str());
+	//		}
+	//		++it;
+	//	}
+	//}
+// ==== End exclude code ====
 
 	// don't send 5 letter CSL livery codes. If the livery code exceeds
 	// 3 characters, remove it
