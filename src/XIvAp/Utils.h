@@ -8,7 +8,7 @@
 
 namespace xmp{
 
-	inline std::string &trim(std::string &inStr, bool inLeft = true, bool inRight = true, const std::string &inDelim = " \t\f\v\r\n"){
+	inline std::string trim(std::string inStr, bool inLeft = true, bool inRight = true, const std::string &inDelim = " \t\f\v\r\n"){
 		if(inRight)
 		{
 			inStr.erase(inStr.find_last_not_of(inDelim) + 1);//trim right side

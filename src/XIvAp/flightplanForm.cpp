@@ -771,67 +771,75 @@ void FlightplanForm::updateACList()
 	unsigned int i = XPGetWidgetProperty(actypePopup, xpProperty_PopupCurrentItem, NULL);
 	if(i >= acList.size())
 		XPSetWidgetProperty(actypePopup, xpProperty_PopupCurrentItem, 0);
+
+	// for update airline and liveries list depend by aircraft;
+	updateALList();
 }
 
 void FlightplanForm::updateALList()
 {
-	char buffer[1024];
+	char buffer[1024];	
+	string airlineIcao, aircraftIcao;
 
-	string altype;
-	READFORM(airlineTextField, altype);
-	alList = xivap.airlinesDB.retrieve(altype);
+	READFORM(airlineTextField, airlineIcao);
+	READFORM(actypeTextField, aircraftIcao);
+
+	// AIRLINES
+	alList = xivap.airlinesDB.getAirlines(airlineIcao, aircraftIcao);
 	string caption = "none;";
 	for(AirlinesDB::AirlinesList::const_iterator it = alList.begin(); it != alList.end(); ++it) {
-		caption += it->icao + " (" + it->name; 
-		if(it->va) caption += " VA";
-		caption += ");";
+		caption += it->icao + " " + it->name;
+		caption += ";";
 	}
 	XPSetWidgetDescriptor(airlinePopup, pconst(caption));
 
 	unsigned int i = XPGetWidgetProperty(airlinePopup, xpProperty_PopupCurrentItem, NULL);
-	if(i >= alList.size() || alList.size() == 1)
+	if(i >= alList.size())
 		XPSetWidgetProperty(airlinePopup, xpProperty_PopupCurrentItem, 1);
 
-	livList = xivap.airlinesDB.getLiveries(altype);
+	// LIVERIES
+	livList = xivap.airlinesDB.getLiveries(airlineIcao, aircraftIcao);
 	caption = "none;";
 	for(AirlinesDB::LiveryList::const_iterator it = livList.begin(); it != livList.end(); ++it)
 		caption += it->description + ";";
 	XPSetWidgetDescriptor(liveryPopup, pconst(caption));
-	if(livList.size() == 0)
-		XPSetWidgetProperty(liveryPopup, xpProperty_PopupCurrentItem, 0);
 
+	i = XPGetWidgetProperty(liveryPopup, xpProperty_PopupCurrentItem, NULL);
+	if(i >= livList.size())
+		XPSetWidgetProperty(airlinePopup, xpProperty_PopupCurrentItem, 1);
 }
 
 void FlightplanForm::FMcar(bool enable)
 {
+	// TODO: work for FMC Livery?
 	if(enable==true)
 	{
-	XPSetWidgetDescriptor(actypeTextField, pconst("ZZZC"));
-	updateACList();
-	XPHideWidget(actypeTextField);
-	XPSetWidgetDescriptor(airlineTextField, pconst("   "));
-	XPHideWidget(airlineTextField);
-	XPHideWidget(airlinePopup);
-	XPHideWidget(airlineStaticText);
-	XPShowWidget(fmcarStaticText);
-	updateALList();   
-    string caption;
-	livList.clear();
-	livList = xivap.airlinesDB.getLiveries("FMC");
-	for(AirlinesDB::LiveryList::const_iterator it = livList.begin(); it != livList.end(); ++it)
-	caption += it->description + ";";
-	XPSetWidgetDescriptor(liveryPopup, pconst(caption));
+		XPSetWidgetDescriptor(actypeTextField, pconst("ZZZC"));
+		updateACList();
+		XPHideWidget(actypeTextField);
+		XPSetWidgetDescriptor(airlineTextField, pconst("   "));
+		XPHideWidget(airlineTextField);
+		XPHideWidget(airlinePopup);
+		XPHideWidget(airlineStaticText);
+		XPShowWidget(fmcarStaticText);
+		updateALList();   
+		string caption;
+		livList.clear();
+		livList = xivap.airlinesDB.getLiveries("FMC", "ZZZC");
+		for(AirlinesDB::LiveryList::const_iterator it = livList.begin(); it != livList.end(); ++it)
+			caption += it->description + ";";
+		XPSetWidgetDescriptor(liveryPopup, pconst(caption));
 	}
 	else
 	{
-	xivap.aircraftChange();
-	updateACList();
-	XPShowWidget(actypeTextField);
-	XPShowWidget(airlineTextField);
-	XPShowWidget(airlinePopup);
-	XPShowWidget(airlineStaticText);
-	XPHideWidget(fmcarStaticText);
-	updateALList();   
+		xivap.aircraftChange();
+		updateACList();
+		XPShowWidget(actypeTextField);
+		XPShowWidget(airlineTextField);
+		XPShowWidget(airlinePopup);
+		XPShowWidget(airlineStaticText);
+		XPHideWidget(fmcarStaticText);
+		updateALList();   
 	}
 }
 

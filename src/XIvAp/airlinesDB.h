@@ -24,21 +24,21 @@ public:
 
 	class Airline {
 	public:
-		Airline(): icao(""), name(""), va(false) {};
-		string icao, name;
+		Airline(): acfIcao(""), icao(""), name(""), va(false) {};
+		string acfIcao, icao, name;
 		bool va;
 	};
 	typedef std::vector<Airline> AirlinesList;
 
 	class Livery {
 	public:
-		Livery(): icao(""), code(""), description("") {};
-		string icao, code, description;
+		Livery(): acfIcao(""), icao(""), code(""), description("") {};
+		string acfIcao, icao, code, description;
 	};
 	typedef std::vector<Livery> LiveryList;
 
-	AirlinesList retrieve(string searchstr);
-	LiveryList getLiveries(string airline);
+	AirlinesList getAirlines(string airlineIcao, string aircraftIcao);
+	LiveryList getLiveries(string airlineIcao, string aircraftIcao);
 
 private:
 	class ICAOComparator {
@@ -56,8 +56,8 @@ private:
 	private:
 		string _what;
 	};
-
 	AirlinesList _database;
+
 	LiveryList _liveries;
 
 };
