@@ -200,7 +200,7 @@ void FlightplanForm::create()
 	XPSetWidgetProperty(speedTextField, xpProperty_MaxCharacters, 4);
 
 	// alt type
-	alttypePopup = XPCreatePopup(x+125, y, x+172, y-22, 1, "F  (Flight Level);A  (Altitude);VFR;", window);
+	alttypePopup = XPCreatePopup(x+125, y, x+172, y-22, 1, "F  (Flight Level);A  (Altitude);VFR;S  (Standard Metric);M  (Plain metric)", window);
 
 	// alt
 	altTextField = XPCreateWidget(x+178, y, x+220, y-22, 1, "", 0, window, xpWidgetClass_TextField);
@@ -283,18 +283,6 @@ void FlightplanForm::create()
 	XPSetWidgetProperty(picTextField, xpProperty_MaxCharacters, 30);
 	XPCreateWidget(x+355, y, x+370, y-22, 1, "<<=", 0, window, xpWidgetClass_Caption);
 
-	/*
-	y = y - 24;
-	XPCreateWidget(x+20, y, x+180, y-12, 1, "FMC waypoints", 0, window, xpWidgetClass_Caption);
-
-	y = y - 12;
-	XPCreateWidget(x+8, y, x+20, y-22, 1, "-", 0, window, xpWidgetClass_Caption);
-	fmcTextField = XPCreateWidget(x+20, y, x+322+24, y-44, 1, "", 0, window, xpWidgetClass_TextField);
-	XPSetWidgetProperty(fmcTextField, xpProperty_TextFieldType, xpTextEntryField);
-	XPSetWidgetProperty(fmcTextField, xpProperty_MaxCharacters, 512);
-	XPCreateWidget(x+355, y-32, x+370, y-44, 1, "<<=", 0, window, xpWidgetClass_Caption);
-	*/
-
 	y = y - 35;
 	// Export
 	exportButton = XPCreateWidget(x+20, y, x+55+55, y-22, 1, "FMC Utility", 0, window, xpWidgetClass_Button);
@@ -361,6 +349,8 @@ int	FlightplanForm::handler(XPWidgetMessage inMessage, XPWidgetID inWidget, intp
 				case 0: multi = 100; break;	// FL are * 100 feet
 				case 1: multi = 100; break; // Alts are * 100 feet
 				case 2: multi = 0; break;   // he filed VFR. Set alt to 0
+				case 3:case 4:  multi=10;break;   // he filed  metric, Alts are *10 meters
+				
 			}
 			string altstr;
 			READFORM(altTextField, altstr);
@@ -574,6 +564,8 @@ void FlightplanForm::fillForm(bool reset)
 	switch(xivap.fpl.alttype[0]) {
 		case 'F': i = 0; break;
 		case 'A': i = 1; break;
+		case 'S' :i = 3; break;
+		case 'M' :i = 4; break;
 		default:
 		case 'V': i = 2; break;
 	}
@@ -700,6 +692,8 @@ void FlightplanForm::send(bool closeWindow)
 		case 0: xivap.fpl.alttype = "F"; break;
 		case 1: xivap.fpl.alttype = "A"; break;
 		case 2: xivap.fpl.alttype = "VFR"; break;
+		case 3: xivap.fpl.alttype = "S";break;
+		case 4: xivap.fpl.alttype = "M";break;
 	}
 	READFORM(altTextField, xivap.fpl.cruisealt);
 

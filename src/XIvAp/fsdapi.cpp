@@ -167,7 +167,7 @@ bool Flightplan::isValid()
 	if(alttype == "VFR") cruisealt = "0";
 	else {
 		FPCHECK(length(alttype) != 1, "invalid altitude type");
-		FPCHECKST(alttype, "FA", "flight rule must be one of F,A");
+		FPCHECKST(alttype, "FASM", "flight rule must be one of F,A,S,M");
 		FPCHECK(stringtoi(cruisealt) <= 0, cruisealt + " is not a valid number");
 	}
 

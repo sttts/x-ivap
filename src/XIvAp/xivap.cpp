@@ -1366,6 +1366,8 @@ void Xivap::handleFPchange(const FSD::Message& m)
 	if (pos("F",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 1);new_fp.alttype="F";}
 	else if (pos("A",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 1);new_fp.alttype="A";}
 	else if (pos("VFR",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 3);new_fp.alttype="VFR";}
+	else if (pos("S",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 1);new_fp.alttype="S";}
+	else if (pos("M",new_fp.cruisealt)==0)	{del(new_fp.cruisealt, 0, 1);new_fp.alttype="M";}
 
 	if(fpl.cruisespeed != new_fp.cruisespeed) { HANDLECHG("cruise speed"); fpl.cruisespeed = new_fp.cruisespeed; }
 	if(fpl.cruisealt != new_fp.cruisealt) { HANDLECHG("cruise altitude"); fpl.cruisealt = new_fp.cruisealt; }
@@ -1998,6 +2000,8 @@ void Xivap::handleCommand(string line)
 		uiWindow.addMessage(colYellow, ".X <code> - tune transponder to code", false, false);
 		uiWindow.addMessage(colYellow, ".C1 <freq> / .C2 <freq> - tune COM1 or COM2 to freq", false, false);
 		uiWindow.addMessage(colYellow, ".QNH <QNH> .ALT <ALTIMETER> - Set primary altimeter to barometric value", false, false);
+		uiWindow.addMessage(colYellow, ".KILL -kill a user, (restricted)", false, false);
+		uiWindow.addMessage(colYellow, ".INF -info from users (restricted)", false, false);
 		uiWindow.addMessage(colYellow, ".TEST -special debugcommand", false, false);
 		uiWindow.addMessage(colYellow, "Use your arrow-up and -down keys to scroll up and down", false, false);
 		return;
