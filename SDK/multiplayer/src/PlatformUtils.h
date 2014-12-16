@@ -45,8 +45,8 @@
 		#define	DIR_CHAR	'/'
 		#define DIR_STR		"/"
 #elif APL
-		#define	DIR_CHAR	':'
-		#define DIR_STR		":"
+		#define	DIR_CHAR	'/'
+		#define DIR_STR		"/"
 #else
 	#error PLATFORM NOT DEFINED
 #endif	
@@ -66,16 +66,6 @@ void	EndianFlipLong(long * ioLong);
  *
  */
 const char * GetApplicationPath(void);
-
-#if APL
-/*
- * Convert an HFS path to a POSIX Path.  Returns 0 for success, -1 for failure.
- * WARNING: this only works for EXISTING FILES!!!!!!!!!!!!!!!!!
- *
- */
-int HFS2PosixPath(const char *path, char *result, int resultLen);
-int Posix2HFSPath(const char *path, char *result, int resultLen);
-#endif
 
 /*
  * Takes a path and replaces the dir chars with the 'native' ones.

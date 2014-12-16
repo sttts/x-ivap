@@ -22,12 +22,12 @@ extern char Graphics;
 
 PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
 {
-
+	XPLMEnableFeature("XPLM_USE_NATIVE_PATHS",1); //for native path MacOs
 #ifdef INTERNAL_BETA
 	if(!xivap.betaBlocker.CheckDate())
 		return 0;
 #endif
-
+	
 	strcpy(outName, "X-IvAp");
 	strcpy(outSig, "ivao.xivap");
 	string desc = string(SOFTWARE_NAME) + " " 

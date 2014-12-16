@@ -35,12 +35,8 @@ string getXivapRessourcesDir(void);
 string getXplaneHomeDir(void);
 string getPosixPath();
 
-#ifdef APPLE
-// nasty mach-o SDK workaround
-string getMachRessourcesDir();
-#else
 #define getMachRessourcesDir getXivapRessourcesDir
-#endif
+
 
 
 string float2coords(const float& ord);

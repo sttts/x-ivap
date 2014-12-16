@@ -120,13 +120,7 @@ string getXplaneHomeDir(void)
 		string path = string(app);
 		int p;
 
-#ifdef APPLE
-		// Convert Mach-O path to POSIX path
-		char posix[1024];
-		HFS2PosixPath(pconst(path), posix, 1024);
-		posix[1023] = 0; // just to make sure
-		path = posix;
-#endif
+
 
 		p = rpos(DIR_CHAR, path);
 		result=copy(path,0,p) +DIR_CHAR;
@@ -155,36 +149,7 @@ string getXivapRessourcesDir()
 	return path;
 }
 
-#ifdef APPLE
-string getMachRessourcesDir()
-{
-	string result = "";
-	const char* app = GetApplicationPath();
-	string path(app);
-	static bool firsttime = true;
-	
-	// faulty string on XP840:
-	// Macintosh HD:Applications:X-Plane 8.40:X-Plane 840.app:Contents:MacOS:
-	int p = pos(string(".app:Contents:"), path);
-	if(p > 0) {
-		// remove X-Plane 840.app:Contents:MacOS: from the application path
-		path = copy(path, 0, p); // chop off everything after ".app:"
-		//p = rpos(':', path);
-		//path = copy(path, 0, p); // chop off the remaining "X-Plane 840"
-	}
-	
-	p = rpos(':', path);
-	result = copy(path, 0, p) + ":Resources:plugins:"
-		+ string(RESOURCES_DIR) + ":";
 
-	if(firsttime) {
-		XPLMDebugString(string("Mach ressources directory is ") + result + "\n");
-		firsttime = false;
-	}
-
-	return result;
-}
-#endif
 
 string float2coords(const float& ord)
 {

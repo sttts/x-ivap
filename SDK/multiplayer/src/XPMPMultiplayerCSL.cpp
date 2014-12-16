@@ -34,26 +34,7 @@
 
 using std::max;
 
-#if APL
-#include <Carbon/Carbon.h>
 
-int ConvertPath1(const char * inPath, char * outPath, int outPathMaxLen) {
-
-	CFStringRef inStr = CFStringCreateWithCString(kCFAllocatorDefault, inPath ,kCFStringEncodingMacRoman);
-	if (inStr == NULL)
-		return -1;
-	CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, inStr, kCFURLHFSPathStyle,0);
-	CFStringRef outStr = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
-	if (!CFStringGetCString(outStr, outPath, outPathMaxLen, kCFURLPOSIXPathStyle))
-		return -1;
-	CFRelease(outStr);
-	CFRelease(url);
-	CFRelease(inStr);
-	return 0;
-}
-
-
-#endif
 
 // Set this to 1 to get TONS of diagnostics on what the lib is doing.
 #define 	DEBUG_CSL_LOADING 0
@@ -656,13 +637,9 @@ bool CSL_LoadCSL(const char * inFolderPath, const char * inRelatedFile, const ch
 	int	total, ret; //changed from long to int due x64 problems 24/12/2012 bvk
 	
 	char folder[1024];
-#if APL
-	//delete old rubbish from latency MacOS 31/10/2012 bloody mumbo jumbo shit....
-	//Posix2HFSPath(inFolderPath, folder, sizeof(folder));
-	ConvertPath1(inFolderPath, folder, sizeof(folder));
-#else
+
 	strcpy(folder,inFolderPath);
-#endif
+
 	XPLMGetDirectoryContents(inFolderPath, 0, name_buf, 16384, index_buf, 65536 / sizeof(char*),
 							 &total, &ret);
 	char txt[100];
@@ -671,10 +648,7 @@ bool CSL_LoadCSL(const char * inFolderPath, const char * inRelatedFile, const ch
 	vector<string>	pckgs;
 	for (int r = 0; r < ret; ++r)
 	{
-#if APL
-	if (index_buf[r][0] == '.')
-			continue;
-#endif	
+	
 		char * foo = index_buf[r];
 		string	path(folder); //changed 31/10/2012
 		path += DIR_STR;

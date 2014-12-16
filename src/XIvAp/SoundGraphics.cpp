@@ -63,25 +63,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //1.04 15-10-2012 first attemt to build a extern tcasbox
 //1.05 2-01-2013 integration in x64 system
 
-// OS X: we use this to convert our file path.
-#if APL
-#include <Carbon/Carbon.h>
 
-int ConvertPath(const char * inPath, char * outPath, int outPathMaxLen) {
-
-	CFStringRef inStr = CFStringCreateWithCString(kCFAllocatorDefault, inPath ,kCFStringEncodingMacRoman);
-	if (inStr == NULL)
-		return -1;
-	CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, inStr, kCFURLHFSPathStyle,0);
-	CFStringRef outStr = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
-	if (!CFStringGetCString(outStr, outPath, outPathMaxLen, kCFURLPOSIXPathStyle))
-		return -1;
-	CFRelease(outStr);
-	CFRelease(url);
-	CFRelease(inStr);
-	return 0;
-}
-#endif
 
 char gPluginDataFileIV[255];
 extern int width, height;
@@ -161,9 +143,7 @@ void Playsound (char * voice)
 	strcat(DirPath, SOUND_DIR);
 	strcat(DirPath, XPLMGetDirectorySeparator());
 	strcat(DirPath, voice);
-#if APL
-	ConvertPath(DirPath, DirPath, sizeof(DirPath));
-#endif
+
 
 	result = FMOD_System_CreateSound(csystem, DirPath, FMOD_HARDWARE, 0, &sound1);
 
@@ -496,9 +476,7 @@ int IvaoLoadGLTexture(char *xpFileName, int IvaoTextureId)
 	strcat(xTextureFileName, XPLMGetDirectorySeparator());
 	strcat(xTextureFileName, xpFileName);
 //	XPLMDebugString(xTextureFileName);
-#if APL
-	ConvertPath(xTextureFileName, xTextureFileName, sizeof(xTextureFileName));
-#endif
+
 	//CreateBitmapFromPNG(xTextureFileName, ximg);
 //	XPLMDebugString("loading");
 //	XPLMDebugString(xTextureFileName);

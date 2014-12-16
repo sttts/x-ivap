@@ -170,9 +170,7 @@ const  char * XPMPMultiplayerEnable(void)
 				gPackages[p].planes[pp].austin_idx = gPlanePaths.size();
 				char	buf[1024];
 				strcpy(buf,gPackages[p].planes[pp].file_path.c_str());
-				#if APL
-					Posix2HFSPath(buf,buf,1024);
-				#endif
+		
 				gPlanePaths.push_back(buf);
 			}
 		}
