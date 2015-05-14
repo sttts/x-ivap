@@ -30,6 +30,8 @@
 
 #include "fsdmessage.h"
 
+#include "Utils.h"
+
 
 #ifndef WIN32
 #include <stdlib.h>
@@ -1967,7 +1969,56 @@ void Xivap::handleCommand(string line)
 		_multiplayer.setAllModels(aircraft, airline, livery);
 		return;
 
-	}	else if (command=="TEST") { //special inserted debugconsole command 22/02/2014 bvk
+	}
+	else if (command == "ADDMODEL") {
+		std::string stdLine(line.stl_str());
+		std::vector<std::string> splitLine;
+		splitLine = xmp::explode(stdLine, "/");
+		if (splitLine.size() == 0) {
+			uiWindow.addMessage(colYellow, "Wrong command format. Try use the help command for info: .help ", true, true);
+		}
+		if (strupcase(splitLine[0]) == "ADDMODEL") {
+			uiWindow.addMessage(colYellow, "Wrong command format. Try use the help command for info: .help ", true, true);
+		}
+
+		string icao;
+		string airline;
+		string livery;
+		double latOffset = 0.0001;
+		double lonOffset = 0.0001;
+		double elevOffset = 0.0;
+
+		for (size_t i = 0; i < splitLine.size(); i++) {
+			if (i == 0) {
+				icao = strupcase(splitLine[i]);
+			}
+			else if (i == 1) {
+				airline = strupcase(splitLine[i]);
+			}
+			else if (i == 2) {
+				livery = strupcase(splitLine[i]);
+			}
+			else if (i == 3) {
+				latOffset = std::atof(splitLine[i].c_str());
+			}
+			else if (i == 4) {
+				lonOffset = std::atof(splitLine[i].c_str());
+			}
+			else if (i == 5) {
+				elevOffset = std::atof(splitLine[i].c_str());
+			}
+		}
+
+		_multiplayer.addDebugModel(icao, airline, livery, latOffset, lonOffset, elevOffset);
+		uiWindow.addMessage(colYellow, "Debug CSL Model added: " + icao + airline + livery, false, false);
+		return;
+	}
+	else if (command == "REMMODEL") {
+		_multiplayer.removeDebugModel();
+		uiWindow.addMessage(colYellow, "Debug CSL Model removed.", false, false);
+		return;
+	}
+	else if (command=="TEST") { //special inserted debugconsole command 22/02/2014 bvk
 		/*insert here the functions you whish to check*/
 		//xivap.test();
 	}	else if(command == "HELP") {
@@ -1984,6 +2035,8 @@ void Xivap::handleCommand(string line)
 		uiWindow.addMessage(colYellow, ".NOWX / .YESWX - turn weather off/on", false, false);
 		uiWindow.addMessage(colYellow, ".VOICE / .NOVOICE - turn voice off/on", false, false);
 		uiWindow.addMessage(colYellow, ".MODEL <aircraft>/<airline>/<livery> - see ALL other players as the specified aircraft (for CSL developers)", false, false);
+		uiWindow.addMessage(colYellow, ".ADDMODEL <aircraft>/<airline>/<livery>[/<lat offset>/<lon offset>/<elev offset>] - adds the debug CSL model. (for CSL developers)", false, false);
+		uiWindow.addMessage(colYellow, ".REMMODEL - removes the debug CSL model. (for CSL developers)", false, false);
 		uiWindow.addMessage(colYellow, ".DUMPWX <ICAO> - dump current weather profile and profile for ICAO to logfile and console (for WX debugging)", false, false);
 		uiWindow.addMessage(colYellow, ".FIND <ID> - print information about navaid ID", false, false);
 		uiWindow.addMessage(colYellow, ".X <code> - tune transponder to code", false, false);
@@ -1994,7 +2047,6 @@ void Xivap::handleCommand(string line)
 		uiWindow.addMessage(colYellow, ".TEST -special debugcommand", false, false);
 		uiWindow.addMessage(colYellow, "Use your arrow-up and -down keys to scroll up and down", false, false);
 		return;
-
 	}
 
 }

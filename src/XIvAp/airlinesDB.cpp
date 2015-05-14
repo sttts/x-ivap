@@ -53,22 +53,21 @@ AirlinesDB::AirlinesDB()
 		// GET AIRLINES
 		if (tokens[0].size() == 7){
 			Airline entry;
-			entry.acfIcao = tokens[0].substr(0, 4);
+			entry.acfIcao = trim(tokens[0].substr(0, 4));
 			entry.icao = tokens[0].substr(4);
 			entry.name = tokens[1];
-			entry.va = false;
-				
-				_database.push_back(entry);
-			}
+			entry.va = false;				
+			_database.push_back(entry);
+		}
 		// GET LIVERIES
 		else if (tokens[0].size() > 7){
 			Livery entry;
-			entry.acfIcao = tokens[0].substr(0, 4);
+			entry.acfIcao = trim(tokens[0].substr(0, 4));
 			entry.icao = tokens[0].substr(4, 3);
 			entry.code = tokens[0].substr(7);
 			entry.description = tokens[1];
-				_liveries.push_back(entry);
-			}
+			_liveries.push_back(entry);
+		}
 		else{
 			continue;
 		}			
@@ -105,8 +104,8 @@ AirlinesDB::AirlinesList AirlinesDB::getAirlines(string airlineIcao, string airc
 AirlinesDB::LiveryList AirlinesDB::getLiveries(string airlineIcao, string aircraftIcao)
 {
 	LiveryList result;
-	if (length(airlineIcao) != 3) return result;
-	if (length(aircraftIcao) != 4) return result;
+	if (length(airlineIcao) < 1) return result;
+	if (length(aircraftIcao) < 1) return result;
 
 	airlineIcao = strupcase(airlineIcao);
 	aircraftIcao = strupcase(aircraftIcao);

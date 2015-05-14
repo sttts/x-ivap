@@ -27,6 +27,17 @@ using namespace Multiplayer;
 
 static MultiplayerEngine *_mp_engine = NULL;
 
+// #drawtest
+static XPMPPlaneID gTestPlaneId = NULL;
+static double gTestPlaneLatOffset = 0.0;
+static double gTestPlaneLonOffset = 0.0;
+static double gTestPlaneElevOffset = 0.0;
+
+static string gTestPlaneICAO;
+static string gTestPlaneAirline;
+static string gTestPlaneLivery;
+
+
 XPMPPlaneCallbackResult PlaneDataCallback(XPMPPlaneID inPlane,
 					   XPMPPlaneDataType inDataType,
 					   void * ioData,
@@ -104,6 +115,9 @@ void MultiplayerEngine::clear()
 		++i;
 	}
 	_planes.clear();
+
+	// #drawtest
+	removeDebugModel();
 }
 
 void MultiplayerEngine::disable()
@@ -197,24 +211,92 @@ bool MultiplayerEngine::enable()
 	_enabled = true;
 
 	XPMPLoadPlanesIfNecessary();
+
+	// #drawtest 
+	// TODO: don't forget comment it after debugging
+	//gTestPlaneId = XPMPCreatePlane("B752", "XRW", "", PlaneDataCallback, this);
+
 	return true;
 }
-////plane update is a callback from multiplayer engine
+
+void Multiplayer::MultiplayerEngine::addDebugModel(string aircraft, string airline, string livery, double latOffset, double lonOffset, double elevOffset) {
+	// #drawtest
+	removeDebugModel();
+
+	gTestPlaneLatOffset = latOffset;
+	gTestPlaneLonOffset = lonOffset;
+	gTestPlaneElevOffset = elevOffset;
+
+	gTestPlaneICAO = aircraft;
+	gTestPlaneAirline = airline;
+	gTestPlaneLivery = livery;
+
+	gTestPlaneId = XPMPCreatePlane(aircraft, airline, livery, PlaneDataCallback, this);
+}
+
+void Multiplayer::MultiplayerEngine::removeDebugModel() {
+	// #drawtest
+	if (gTestPlaneId)
+		XPMPDestroyPlane(gTestPlaneId);
+}
+
+//plane update is a callback from multiplayer engine
 XPMPPlaneCallbackResult MultiplayerEngine::planeCallback(
 					XPMPPlaneID inPlane,
 					XPMPPlaneDataType inDataType,
 					void * ioData,
 					void * inRefcon)
 {
-	string callsign = findByID(inPlane);
-	if(callsign == "")
-		return xpmpData_Unavailable;
+	string callsign;
+	MultiplayerPilot* plane = NULL;
 
-	MultiplayerPilot* plane = _planes[STDSTRING(callsign)];
+	// #drawtest
+	if (inPlane == gTestPlaneId) {
+		callsign = "TESTCSL";
+		MultiplayerPilot planeTest;
 
-	// return unavailable if rendering fails for some reason
-	if(!plane->calculateFrame())
-		return xpmpData_Unavailable;
+		planeTest.init();
+		planeTest.mtl = gTestPlaneICAO + gTestPlaneAirline + gTestPlaneLivery;
+		planeTest.setLightPattern(gTestPlaneICAO);
+
+		XPLMDataRef latRef = XPLMFindDataRef("sim/flightmodel/position/latitude");
+		XPLMDataRef lonRef = XPLMFindDataRef("sim/flightmodel/position/longitude");
+		XPLMDataRef elevRef = XPLMFindDataRef("sim/flightmodel/position/elevation");
+		XPLMDataRef pitchRef = XPLMFindDataRef("sim/flightmodel/position/theta");
+		double lat, lon, elev, pitch;
+		lat = XPLMGetDatad(latRef);
+		lon = XPLMGetDatad(lonRef);
+		// TODO: find more accuracy constant
+		elev = XPLMGetDatad(elevRef) / 0.3048;
+		pitch = XPLMGetDataf(pitchRef);
+		lat += gTestPlaneLatOffset;
+		lon += gTestPlaneLonOffset;
+		elev += gTestPlaneElevOffset;
+// 		double x, y, z = 0.0;
+// 		XPLMWorldToLocal(lat, lon, elev, &x, &y, &z);
+// 		XPLMLocalToWorld(x + 50, y + 50, z, &lat, &lon, &elev);		
+
+		planeTest.position.pos.lat = lat;
+		planeTest.position.pos.lon = lon;
+		planeTest.position.pos.elevation = elev;
+
+		planeTest.position.pos.heading = 90.0;
+		planeTest.position.pos.roll = 0.0;
+		planeTest.position.pos.pitch = pitch;
+
+		plane = &planeTest;
+	}
+	else {
+		callsign = findByID(inPlane);
+		if (callsign == "")
+			return xpmpData_Unavailable;
+
+		plane = _planes[STDSTRING(callsign)];
+
+		// return unavailable if rendering fails for some reason
+		if (!plane->calculateFrame())
+			return xpmpData_Unavailable;
+	}	
 
 	switch(inDataType) {
 		case xpmpDataType_Position: {
@@ -231,18 +313,21 @@ XPMPPlaneCallbackResult MultiplayerEngine::planeCallback(
 					return xpmpData_Unchanged;
 				
 					
-				if (xivap.usingLabels()) {
-				
-				        if ((strlen(callsign)>11) | (strlen(callsign)<2)) 
-                                              strcpy(plane->position.pos.label,"????");
+				if (xivap.usingLabels()) {				
+					if ((strlen(callsign) > 11) || (strlen(callsign) < 2)) {
+						strcpy(plane->position.pos.label, "????");
+					}                                              
 					else {
 					      /*if ((plane->position.pos.elevation<45000) & (plane->position.pos.elevation>-30))  
       				          	    sprintf(plane->position.pos.label,"%s(%1.0f)",callsign,plane->position.pos.elevation);
 					      else 
 					            sprintf(plane->position.pos.label,"%s(%1.1f)",callsign,0.1f); */ //to avoid overrun of buffer
-       					      strcpy(plane->position.pos.label, callsign);
+       					  strcpy(plane->position.pos.label, callsign);
 					}
-				} else strcpy(plane->position.pos.label,"");
+				}
+				else {
+					strcpy(plane->position.pos.label, "");
+				}
 				memcpy(ioData, static_cast<void*>(&plane->position), sizeof(XPMPPlanePosition_t));
 				return xpmpData_NewData;
 			}
@@ -359,8 +444,6 @@ bool MultiplayerEngine::splitMTL(string mtl, string& aircraft, string& airline, 
 
 	// bug with old clients
 	mtl = strupcase(mtl);
-	if(length(mtl) == 5) del(mtl, 0, 1);
-	if(length(mtl) == 6) del(mtl, 0, 2);
 
 	airline = mtl;
 	aircraft = copy(airline, 0, 4);	// first 4 letters are aircraft type
@@ -489,8 +572,7 @@ void MultiplayerEngine::eatThis(const FSD::Message &packet)
 
 		if(pilot->XPregistered) {		// we already know this guy -> send the update to X-Plane
 			XPMPChangePlaneModel(pilot->id, icao, airline, livery);
-			xivap.addText(colCyan, "MP: Update pilot information on X-Plane: " + callsign 
-				+ " (" + icao + ":" + airline + ":" + livery + ")", true, true);
+			xivap.addText(colCyan, "MP: Update pilot information on X-Plane: " + callsign + " (" + pilot->mtl + ")", true, true);
 		}
 
 		pilot->setLightPattern(icao);
@@ -508,11 +590,13 @@ void MultiplayerEngine::eatThis(const FSD::Message &packet)
 		if(!splitMTL(pilot->mtl, icao, airline, livery))
 			return;							// returns false if splitting fails
 
+		// truncate the ICAO to make it work with three-letter codes like "H47"
+		icao = trim(icao);
+
 		// now that we have a valid MTL code, we can add the pilot to X-Plane
 		pilot->XPregistered = true;
 		pilot->id = XPMPCreatePlane(icao, airline, livery, PlaneDataCallback, NULL);
-		xivap.addText(colCyan, "MP: Registering Pilot on X-Plane: " + callsign 
-			+ " (" + icao + ":" + airline + ":" + livery + ")", true, true);
+		xivap.addText(colCyan, "MP: Registering Pilot on X-Plane: " + callsign + " (" + pilot->mtl + ")", true, true);
 	}
 
 	// if we dont know the MTL string for this pilot,

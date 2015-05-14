@@ -100,6 +100,9 @@ public:
 
 	// for CSL debugging
 	void setAllModels(string aircraft, string airline, string livery);
+	// for CSL debugging
+	void addDebugModel(string aircraft, string airline, string livery, double latOffset, double lonOffset, double elevOffset);
+	void removeDebugModel();
 
 	// perform p2p lookup
 	void testp2p(string stunserver);
