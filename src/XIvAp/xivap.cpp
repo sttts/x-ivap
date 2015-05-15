@@ -227,8 +227,14 @@ void Xivap::XPluginStart()
 	gXpdrMode		= XPLMFindDataRef("sim/cockpit/radios/transponder_mode");
 	gXpdrId			= XPLMFindDataRef("sim/cockpit/radios/transponder_id");
 
-	gCom1			= XPLMFindDataRef("sim/cockpit2/radios/actuators/com1_frequency_hz_833");
-	gCom2			= XPLMFindDataRef("sim/cockpit2/radios/actuators/com2_frequency_hz_833");
+	if (_xplane_version >= 10300) {
+		gCom1 = XPLMFindDataRef("sim/cockpit2/radios/actuators/com1_frequency_hz_833");
+		gCom2 = XPLMFindDataRef("sim/cockpit2/radios/actuators/com2_frequency_hz_833");
+	}
+	else {
+		gCom1 = XPLMFindDataRef("sim/cockpit/radios/com1_freq_hz");
+		gCom2 = XPLMFindDataRef("sim/cockpit/radios/com2_freq_hz");
+	}	
 	gAudioSwitches	= XPLMFindDataRef("sim/cockpit/switches/audio_panel_out");
 
 	// autopilot stuff
@@ -789,12 +795,33 @@ void Xivap::updateStatus()
 	if(_activeRadio != act) setComActive(act);
 
 	int freq = XPLMGetDatai(gCom1);
-	if(freq != _com1freq) 	tuneCom(1, freq);
-
-
+	if (_xplane_version < 10300) {
+		if (_com1freq > 99999) {
+			if (freq != _com1freq / 10)
+				tuneCom(1, freq);
+		}
+		else {
+			if (freq != _com1freq)
+				tuneCom(1, freq);
+		}
+	}
+	else {
+		if (freq != _com1freq) 	tuneCom(1, freq);
+	}
 	freq = XPLMGetDatai(gCom2);
-
-	if(freq != _com2freq)	tuneCom(2, freq);
+	if (_xplane_version < 10300) {
+		if (_com2freq > 99999) {
+			if (freq != _com2freq / 10)
+				tuneCom(2, freq);
+		}
+		else {
+			if (freq != _com2freq)
+				tuneCom(2, freq);
+		}
+	}
+	else {
+		if (freq != _com2freq) 	tuneCom(2, freq);
+	}
 
 	if(XPLMGetElapsedTime() > _lastParams + PARAMS_MINDELAY)
 		sendPlaneParams();
@@ -947,8 +974,9 @@ void Xivap::tuneCom(int radio, int freq, string name)
 
 			// X-Plane uses 5 digits in frequencies, and it always sets the last 5 digits.
 			// If the freq has 6 digits, drop the last one
-		//	if(freq > 99999) freq /= 10;
-
+			if (_xplane_version < 10300) {
+				if (freq > 99999) freq /= 10;
+			}
 			XPLMSetDatai(gCom1, freq);
 			break;
 		case 2:
@@ -956,8 +984,9 @@ void Xivap::tuneCom(int radio, int freq, string name)
 
 			// X-Plane uses 5 digits in frequencies, and it always sets the last 5 digits.
 			// If the freq has 6 digits, drop the last one
-		//	if(freq > 99999) freq /= 10;
-
+			if (_xplane_version < 10300) {
+				if (freq > 99999) freq /= 10;
+			}
 			XPLMSetDatai(gCom2, freq);
 			break;
 	}
