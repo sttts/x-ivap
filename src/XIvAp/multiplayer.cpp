@@ -595,6 +595,7 @@ void MultiplayerEngine::eatThis(const FSD::Message &packet)
 
 		// now that we have a valid MTL code, we can add the pilot to X-Plane
 		pilot->XPregistered = true;
+		if (callsign==xivap._PilotDisable1 ||callsign==xivap._PilotDisable2) return;
 		pilot->id = XPMPCreatePlane(icao, airline, livery, PlaneDataCallback, NULL);
 		xivap.addText(colCyan, "MP: Registering Pilot on X-Plane: " + callsign + " (" + pilot->mtl + ")", true, true);
 	}

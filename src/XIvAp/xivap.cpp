@@ -383,7 +383,15 @@ void Xivap::XPluginStart()
 	str = config.readConfig("P2P", "STUNSERVER");
 	if(length(str) > 0)
 		_stun_server = str;
+	_PilotDisable1="12345";
+	_PilotDisable2="12345";
 
+	str = config.readConfig("CSL", "PILOT1");
+	if(length(str) > 0)
+		_PilotDisable1 = str;
+	str = config.readConfig("CSL", "PILOT2");
+	if(length(str) > 0)
+		_PilotDisable2 = str;
 	// test if icao.dat can be read
 	FILE *fp = fopen(getXivapRessourcesDir() + STATIONS_FILE, "r");
 	if(fp == NULL) {

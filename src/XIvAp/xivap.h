@@ -110,7 +110,8 @@ public:
 	string deptAirport() { return _deptAirport; };
 	string destAirport() { return _destAirport; };
 	string flightRoute() { return _flightRoute; };
-
+	string _PilotDisable1; //added for shared cockpit
+	string _PilotDisable2;
 		
 	// call this periodically
 	// checks if one of the radios is tuned to a station for which we do not have an ATIS
