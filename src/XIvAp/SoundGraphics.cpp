@@ -26,8 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "XPLMUtilities.h"
 #include "XPLMNavigation.h"
 #include "XPLMProcessing.h"
-#include "fmod.h"
-#include "fmod_errors.h"
+#include "fmod.hpp"
 #include "SoundGraphics.h"
 #include "Tcas.h"
 #include <math.h>
@@ -75,24 +74,34 @@ XPLMTextureID IvaoTexture[30]; //maxtexture
 int	Ui_width, Ui_height;
 int	xPanelWindowLeft, xPanelWindowBottom;
 char Graphics = 0;
-
+#if IBM
+static HANDLE gConsoleHandle = NULL;
+#endif
 XPLMDataRef	RED = NULL, GREEN = NULL, BLUE = NULL;
 XPLMDataRef gXpdrCode, gXpdrMode, gXpdrId;
-FMOD_SOUND    *sound1;
-FMOD_CHANNEL  *channel = 0;
+FMOD::System     *csystem;
+FMOD::Channel    *channel = 0;
+FMOD::Sound      *sound1;
+void             *extradriverdata = 0;
 FMOD_RESULT    result;
 int            key;
 unsigned int   version;
-FMOD_DSP       *dsp = 0;
-FMOD_SYSTEM    *csystem;
+//FMOD_DSP       *dsp = 0;
 Tcas	Tcasbox;
+//void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line);
+//#define ERRCHECK1(_result) ERRCHECK_fn(_result, __FILE__, __LINE__)
 
 int ERRCHECK(FMOD_RESULT result)
 {
+	char buffer[200];
 	if (result != FMOD_OK)
 	{
-		XPLMDebugString(FMOD_ErrorString(result));
-
+		//ERRCHECK1(result);
+		
+	//	XPLMDebugString(FMOD_ErrorString(result));
+		//FMOD_RESULT
+			sprintf(buffer,"Fmod error result:%d\r\n",result);
+			XPLMDebugString(buffer);
 		return 0;
 
 	}
@@ -102,29 +111,18 @@ int ERRCHECK(FMOD_RESULT result)
 
 int InitSound(void)
 {
-
+	char buffer[200];
 
 	/*        Create a System object and initialize.
 	*/
-	result = FMOD_System_Create(&csystem);
-	ERRCHECK(result);
-
-	result = FMOD_System_GetVersion(csystem, &version);
-	ERRCHECK(result);
-
-	if (version < FMOD_VERSION)
-	{
-
-		XPLMDebugString("SoundInit Error!  You are using an old version of FMOD\r\n");
-		return 0;
-	}
-
-	result = FMOD_System_Init(csystem, 32, FMOD_INIT_NORMAL, NULL);
-	ERRCHECK(result);
-	//XPLMDebugString(SOUNDDIR);
-	//XPLMDebugString(TEXTURESDIR);
+#if IBM
+	gConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
+	result = FMOD::System_Create(&csystem);
+    ERRCHECK(result);
+	result = csystem->getVersion(&version);
+    ERRCHECK(result);  
 	XPLMGetSystemPath(gPluginDataFileIV);
-	
 	strcat(gPluginDataFileIV, RESOURCES);
 	strcat(gPluginDataFileIV, XPLMGetDirectorySeparator());
 	strcat(gPluginDataFileIV, PLUGINS);
@@ -132,6 +130,16 @@ int InitSound(void)
 	strcat(gPluginDataFileIV, RESOURCES_DIR);
 	strcat(gPluginDataFileIV, XPLMGetDirectorySeparator());
 
+	if (version < FMOD_VERSION)
+	{
+		sprintf(buffer,"version:%d-%d",version,FMOD_VERSION);
+			XPLMDebugString(buffer);
+		XPLMDebugString("SoundInit Error!  You are using an old version of FMOD\r\n");
+	//	return 0;
+	}
+	result =csystem->init(32, FMOD_INIT_NORMAL, extradriverdata);
+
+	ERRCHECK(result);
 	XPLMDebugString("SoundInit done\r\n");
 
 	return 1;
@@ -144,23 +152,19 @@ void Playsound (char * voice)
 	strcat(DirPath, XPLMGetDirectorySeparator());
 	strcat(DirPath, voice);
 
+	 result = csystem->createSound(DirPath, FMOD_DEFAULT, 0, &sound1);
 
-	result = FMOD_System_CreateSound(csystem, DirPath, FMOD_HARDWARE, 0, &sound1);
-
-	if (ERRCHECK(result) == 0)
-		return;
-
-	result = FMOD_System_PlaySound(csystem, FMOD_CHANNEL_FREE, sound1, 0, &channel);
+	//if (ERRCHECK(result) == 0)
+	//	return;
+	result = csystem->playSound(sound1, 0, false, &channel);
 	ERRCHECK(result);
-
-	result= FMOD_Channel_SetVolume(channel, soundlevel);
+	channel->setVolume(soundlevel);
 	ERRCHECK(result);
 }
 
 void CloseAudioSystem(void)
 {
-
-	result = FMOD_System_Release(csystem);
+	result = sound1->release();
 	ERRCHECK(result);
 
 }

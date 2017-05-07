@@ -107,10 +107,10 @@ XIVAP_DEPENDS=ptypes stund zlib png
 # Handle Linux/OS X specific stuff here.
 ifeq (${OS}, Linux)
 	ifeq (${ARCH}, 32)
-	FMODEX=fmodex
+	FMODEX=fmod
 	endif
 	ifeq (${ARCH}, 64)
-	FMODEX=fmodex64
+	FMODEX=fmod
 	CFLAGS+=-DX64
 	endif
 	cpp_SRC+=${WD}/SDK/multiplayer/src/PlatformUtils.lin.cpp
@@ -137,10 +137,10 @@ endif
 
 ifeq (${OS}, Darwin)
 	ifeq (${ARCH}, 32)
-	FMODEX=fmodex
+	FMODEX=fmod
 	endif
 	ifeq (${ARCH}, 64)
-	FMODEX=fmodex
+	FMODEX=fmod
 	CFLAGS+=-DX64
 	endif
         OS_VER=$(shell uname -r | sed 's/\([0-9]*\).*/\1/')

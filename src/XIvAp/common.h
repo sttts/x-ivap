@@ -95,7 +95,7 @@ inline float ntohf1( const float f )
 #include "version.h"
 
 //splitted the copyrightlines to fit in the resized window 18/08/2012
-#define SOFTWARE_COPYRIGHT1	"(c)2005-2013 by Martin Domig, Kristof Provost, Andrew McGregor"
+#define SOFTWARE_COPYRIGHT1	"(c)2005-2017 by Martin Domig, Kristof Provost, Andrew McGregor"
 #define	SOFTWARE_COPYRIGHT2	"Thijmen de Gooijer, Kenny Moens, X-AiR Team, XFMC Team"
 
 #ifdef IVAO
